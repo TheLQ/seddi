@@ -1,17 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!--
- Some notes about this file
-  - All id's are treated as normal properties since we don't want hibernate
-    trying to generate them. It also lets us grab every column in a single
-    method call
--->
+
 <hibernate-mapping>
 	<class entity-name="Badges" table="badges">
-		<property name="id" type="int">
-			<column name="id" />
-		</property>
+		<id name="Id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
 		<property name="Name" type="string">
 			<column name="Name" length="40" not-null="true" />
 		</property>
@@ -23,9 +19,10 @@
 		</property>
 	</class>
 	<class entity-name="Comments" table="comments">
-		<property name="id" type="int">
-			<column name="id" />
-		</property>
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
 		<property name="creationDate" type="timestamp">
 			<column name="CreationDate" length="19" not-null="true" />
 		</property>
@@ -43,9 +40,10 @@
 		</property>
 	</class>
 	<class entity-name="posts" table="posts">
-		<property name="id" type="int">
-			<column name="id" />
-		</property>
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
 		<property name="acceptedAnswerId" type="java.lang.Integer">
 			<column name="AcceptedAnswerId" />
 		</property>
@@ -115,17 +113,19 @@
 		</composite-id>
 	</class>
 	<class entity-name="posttypes" table="posttypes">
-		<property name="id" type="int">
-			<column name="id" />
-		</property>
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
 		<property name="type" type="string">
 			<column name="Type" length="10" not-null="true" />
 		</property>
 	</class>
 	<class entity-name="posthistory" table="posthistory">
-		<property name="id" type="int">
-			<column name="id" />
-		</property>
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
 		<property name="postHistoryTypeId" type="byte">
 			<column name="PostHistoryTypeId" />
 		</property>
@@ -152,9 +152,10 @@
 		</property>
 	</class>
 	<class entity-name="users" table="users">
-		<property name="id" type="int">
-			<column name="id" />
-		</property>
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
 		<property name="aboutMe" type="string">
 			<column name="AboutMe" length="65535" />
 		</property>
@@ -193,9 +194,10 @@
 		</property>
 	</class>
 	<class entity-name="votes" table="votes">
-		<property name="id" type="int">
-			<column name="id" />
-		</property>
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
 		<property name="postId" type="int">
 			<column name="PostId" not-null="true" />
 		</property>
@@ -213,9 +215,10 @@
 		</property>
 	</class>
 	<class entity-name="votetypes" table="votetypes">
-		<property name="id" type="int">
-			<column name="id" />
-		</property>
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
 		<property name="name" type="string">
 			<column name="Name" length="40" not-null="true" />
 		</property>
