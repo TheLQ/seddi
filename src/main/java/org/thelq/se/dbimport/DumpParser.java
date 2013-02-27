@@ -79,7 +79,8 @@ public class DumpParser {
 				attributesMap.put(xmlReader.getAttributeLocalName(i), xmlReader.getAttributeValue(i));
 
 			//Advance to END_ELEMENT, skipping the attributes and other stuff
-			while (xmlReader.next() != XMLEvent.END_ELEMENT);
+			while (xmlReader.next() != XMLEvent.END_ELEMENT) {
+			}
 
 			parsedCount++;
 			return attributesMap;
