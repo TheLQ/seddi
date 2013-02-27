@@ -122,7 +122,7 @@
 		</property>
 	</class>
 	<class entity-name="posthistory" table="posthistory">
-		<composite-id name="id" class="org.thelq.se.dbimport.PosthistoryId">
+		<composite-id name="id">
 			<key-property name="id" type="int">
 				<column name="Id" />
 			</key-property>
