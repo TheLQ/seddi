@@ -122,35 +122,34 @@
 		</property>
 	</class>
 	<class entity-name="posthistory" table="posthistory">
-		<composite-id name="id">
-			<key-property name="id" type="int">
-				<column name="Id" />
-			</key-property>
-			<key-property name="postHistoryTypeId" type="byte">
-				<column name="PostHistoryTypeId" />
-			</key-property>
-			<key-property name="postId" type="int">
-				<column name="PostId" />
-			</key-property>
-			<key-property name="revisionGuid" type="string">
-				<column name="RevisionGUID" length="38" />
-			</key-property>
-			<key-property name="creationDate" type="timestamp">
-				<column name="CreationDate" length="19" />
-			</key-property>
-			<key-property name="userId" type="int">
-				<column name="UserId" />
-			</key-property>
-			<key-property name="userDisplayName" type="string">
-				<column name="UserDisplayName" length="40" />
-			</key-property>
-			<key-property name="comment" type="string">
-				<column name="Comment" length="400" />
-			</key-property>
-			<key-property name="text" type="string">
-				<column name="Text" length="65535" />
-			</key-property>
-		</composite-id>
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
+		<property name="postHistoryTypeId" type="byte">
+			<column name="PostHistoryTypeId" />
+		</property>
+		<property name="postId" type="int">
+			<column name="PostId" />
+		</property>
+		<property name="revisionGuid" type="string">
+			<column name="RevisionGUID" length="38" />
+		</property>
+		<property name="creationDate" type="timestamp">
+			<column name="CreationDate" length="19" />
+		</property>
+		<property name="userId" type="int">
+			<column name="UserId" />
+		</property>
+		<property name="userDisplayName" type="string">
+			<column name="UserDisplayName" length="40" />
+		</property>
+		<property name="comment" type="string">
+			<column name="Comment" length="400" />
+		</property>
+		<property name="text" type="string">
+			<column name="Text" length="65535" />
+		</property>
 	</class>
 	<class entity-name="users" table="users">
 		<id name="id" type="int">
