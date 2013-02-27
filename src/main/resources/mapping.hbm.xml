@@ -1,0 +1,227 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class entity-name="Badges" table="badges" catalog="so">
+		<id name="Id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
+		<property name="Name" type="string">
+			<column name="Name" length="40" not-null="true" />
+		</property>
+		<property name="UserId" type="int">
+			<column name="UserId" not-null="true" />
+		</property>
+		<property name="Date" type="timestamp">
+			<column name="Date" length="19" not-null="true" />
+		</property>
+	</class>
+	<class entity-name="Comments" table="comments" catalog="so">
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
+		<property name="creationDate" type="timestamp">
+			<column name="CreationDate" length="19" not-null="true" />
+		</property>
+		<property name="postId" type="int">
+			<column name="PostId" not-null="true" />
+		</property>
+		<property name="score" type="java.lang.Integer">
+			<column name="Score" />
+		</property>
+		<property name="text" type="string">
+			<column name="Text" length="65535" not-null="true" />
+		</property>
+		<property name="userId" type="java.lang.Integer">
+			<column name="UserId" />
+		</property>
+	</class>
+	<class entity-name="posts" table="posts" catalog="so">
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
+		<property name="acceptedAnswerId" type="java.lang.Integer">
+			<column name="AcceptedAnswerId" />
+		</property>
+		<property name="answerCount" type="java.lang.Integer">
+			<column name="AnswerCount" />
+		</property>
+		<property name="body" type="string">
+			<column name="Body" not-null="true" />
+		</property>
+		<property name="closedDate" type="timestamp">
+			<column name="ClosedDate" length="19" />
+		</property>
+		<property name="commentCount" type="java.lang.Integer">
+			<column name="CommentCount" />
+		</property>
+		<property name="communityOwnedDate" type="timestamp">
+			<column name="CommunityOwnedDate" length="19" />
+		</property>
+		<property name="creationDate" type="timestamp">
+			<column name="CreationDate" length="19" not-null="true" />
+		</property>
+		<property name="favoriteCount" type="java.lang.Integer">
+			<column name="FavoriteCount" />
+		</property>
+		<property name="lastActivityDate" type="timestamp">
+			<column name="LastActivityDate" length="19" not-null="true" />
+		</property>
+		<property name="lastEditDate" type="timestamp">
+			<column name="LastEditDate" length="19" />
+		</property>
+		<property name="lastEditorDisplayName" type="string">
+			<column name="LastEditorDisplayName" length="40" />
+		</property>
+		<property name="lastEditorUserId" type="java.lang.Integer">
+			<column name="LastEditorUserId" />
+		</property>
+		<property name="ownerUserId" type="java.lang.Integer">
+			<column name="OwnerUserId" />
+		</property>
+		<property name="parentId" type="java.lang.Integer">
+			<column name="ParentId" />
+		</property>
+		<property name="postTypeId" type="int">
+			<column name="PostTypeId" not-null="true" />
+		</property>
+		<property name="score" type="int">
+			<column name="Score" not-null="true" />
+		</property>
+		<property name="tags" type="string">
+			<column name="Tags" length="150" />
+		</property>
+		<property name="title" type="string">
+			<column name="Title" length="250" />
+		</property>
+		<property name="viewCount" type="int">
+			<column name="ViewCount" not-null="true" />
+		</property>
+	</class>
+	<class entity-name="PostTags" table="posttags" catalog="so">
+		<composite-id name="id">
+			<key-property name="postId" type="int">
+				<column name="PostId" />
+			</key-property>
+			<key-property name="tag" type="string">
+				<column name="Tag" length="50" />
+			</key-property>
+		</composite-id>
+	</class>
+	<class entity-name="posttypes" table="posttypes" catalog="so">
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
+		<property name="type" type="string">
+			<column name="Type" length="10" not-null="true" />
+		</property>
+	</class>
+	<class entity-name="posthistory" table="posthistory" catalog="so">
+		<composite-id name="id" class="org.thelq.se.dbimport.PosthistoryId">
+			<key-property name="id" type="int">
+				<column name="Id" />
+			</key-property>
+			<key-property name="postHistoryTypeId" type="byte">
+				<column name="PostHistoryTypeId" />
+			</key-property>
+			<key-property name="postId" type="int">
+				<column name="PostId" />
+			</key-property>
+			<key-property name="revisionGuid" type="string">
+				<column name="RevisionGUID" length="38" />
+			</key-property>
+			<key-property name="creationDate" type="timestamp">
+				<column name="CreationDate" length="19" />
+			</key-property>
+			<key-property name="userId" type="int">
+				<column name="UserId" />
+			</key-property>
+			<key-property name="userDisplayName" type="string">
+				<column name="UserDisplayName" length="40" />
+			</key-property>
+			<key-property name="comment" type="string">
+				<column name="Comment" length="400" />
+			</key-property>
+			<key-property name="text" type="string">
+				<column name="Text" length="65535" />
+			</key-property>
+		</composite-id>
+	</class>
+	<class entity-name="users" table="users" catalog="so">
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
+		<property name="aboutMe" type="string">
+			<column name="AboutMe" length="65535" />
+		</property>
+		<property name="age" type="java.lang.Integer">
+			<column name="Age" />
+		</property>
+		<property name="creationDate" type="timestamp">
+			<column name="CreationDate" length="19" not-null="true" />
+		</property>
+		<property name="displayName" type="string">
+			<column name="DisplayName" length="40" not-null="true" />
+		</property>
+		<property name="downVotes" type="int">
+			<column name="DownVotes" not-null="true" />
+		</property>
+		<property name="emailHash" type="string">
+			<column name="EmailHash" length="40" />
+		</property>
+		<property name="lastAccessDate" type="timestamp">
+			<column name="LastAccessDate" length="19" not-null="true" />
+		</property>
+		<property name="location" type="string">
+			<column name="Location" length="100" />
+		</property>
+		<property name="reputation" type="int">
+			<column name="Reputation" not-null="true" />
+		</property>
+		<property name="upVotes" type="int">
+			<column name="UpVotes" not-null="true" />
+		</property>
+		<property name="views" type="int">
+			<column name="Views" not-null="true" />
+		</property>
+		<property name="websiteUrl" type="string">
+			<column name="WebsiteUrl" length="200" />
+		</property>
+	</class>
+	<class entity-name="votes" table="votes" catalog="so">
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
+		<property name="postId" type="int">
+			<column name="PostId" not-null="true" />
+		</property>
+		<property name="userId" type="java.lang.Integer">
+			<column name="UserId" />
+		</property>
+		<property name="bountyAmount" type="java.lang.Integer">
+			<column name="BountyAmount" />
+		</property>
+		<property name="voteTypeId" type="int">
+			<column name="VoteTypeId" not-null="true" />
+		</property>
+		<property name="creationDate" type="timestamp">
+			<column name="CreationDate" length="19" not-null="true" />
+		</property>
+	</class>
+	<class entity-name="votetypes" table="votetypes" catalog="so">
+		<id name="id" type="int">
+			<column name="Id" />
+			<generator class="assigned" />
+		</id>
+		<property name="name" type="string">
+			<column name="Name" length="40" not-null="true" />
+		</property>
+	</class>
+</hibernate-mapping>
