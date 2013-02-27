@@ -3,7 +3,7 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-	<class entity-name="Badges" table="badges" catalog="so">
+	<class entity-name="Badges" table="badges">
 		<id name="Id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
@@ -18,7 +18,7 @@
 			<column name="Date" length="19" not-null="true" />
 		</property>
 	</class>
-	<class entity-name="Comments" table="comments" catalog="so">
+	<class entity-name="Comments" table="comments">
 		<id name="id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
@@ -39,7 +39,7 @@
 			<column name="UserId" />
 		</property>
 	</class>
-	<class entity-name="posts" table="posts" catalog="so">
+	<class entity-name="posts" table="posts">
 		<id name="id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
@@ -102,7 +102,7 @@
 			<column name="ViewCount" not-null="true" />
 		</property>
 	</class>
-	<class entity-name="PostTags" table="posttags" catalog="so">
+	<class entity-name="PostTags" table="posttags">
 		<composite-id name="id">
 			<key-property name="postId" type="int">
 				<column name="PostId" />
@@ -112,7 +112,7 @@
 			</key-property>
 		</composite-id>
 	</class>
-	<class entity-name="posttypes" table="posttypes" catalog="so">
+	<class entity-name="posttypes" table="posttypes">
 		<id name="id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
@@ -121,7 +121,7 @@
 			<column name="Type" length="10" not-null="true" />
 		</property>
 	</class>
-	<class entity-name="posthistory" table="posthistory" catalog="so">
+	<class entity-name="posthistory" table="posthistory">
 		<composite-id name="id" class="org.thelq.se.dbimport.PosthistoryId">
 			<key-property name="id" type="int">
 				<column name="Id" />
@@ -152,7 +152,7 @@
 			</key-property>
 		</composite-id>
 	</class>
-	<class entity-name="users" table="users" catalog="so">
+	<class entity-name="users" table="users">
 		<id name="id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
@@ -194,7 +194,7 @@
 			<column name="WebsiteUrl" length="200" />
 		</property>
 	</class>
-	<class entity-name="votes" table="votes" catalog="so">
+	<class entity-name="votes" table="votes">
 		<id name="id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
@@ -215,7 +215,7 @@
 			<column name="CreationDate" length="19" not-null="true" />
 		</property>
 	</class>
-	<class entity-name="votetypes" table="votetypes" catalog="so">
+	<class entity-name="votetypes" table="votetypes">
 		<id name="id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
