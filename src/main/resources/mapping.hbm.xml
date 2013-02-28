@@ -33,7 +33,7 @@
 			<column name="Score" />
 		</property>
 		<property name="text" type="string">
-			<column name="Text" length="65535" not-null="true" />
+			<column name="Text" length="600" not-null="true" />
 		</property>
 		<property name="userId" type="int">
 			<column name="UserId" />
@@ -50,7 +50,7 @@
 		<property name="answerCount" type="int">
 			<column name="AnswerCount" />
 		</property>
-		<property name="body" type="string">
+		<property name="body" type="text">
 			<column name="Body" not-null="true" />
 		</property>
 		<property name="closedDate" type="timestamp">
@@ -147,7 +147,7 @@
 		<property name="comment" type="string">
 			<column name="Comment" length="400" />
 		</property>
-		<property name="text" type="string">
+		<property name="text" type="text">
 			<column name="Text" length="65535" />
 		</property>
 	</class>
@@ -156,7 +156,7 @@
 			<column name="Id" />
 			<generator class="assigned" />
 		</id>
-		<property name="aboutMe" type="string">
+		<property name="aboutMe" type="text">
 			<column name="AboutMe" length="65535" />
 		</property>
 		<property name="age" type="int">
