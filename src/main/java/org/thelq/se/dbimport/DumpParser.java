@@ -2,7 +2,9 @@ package org.thelq.se.dbimport;
 
 import com.ctc.wstx.cfg.ErrorConsts;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,16 +13,17 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
-import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
 /**
  *
  * @author Leon
  */
+@Slf4j
 public class DumpParser {
 	protected static int BATCH_SIZE = 5000;
 	protected static XMLInputFactory2 xmlFactory;
@@ -43,6 +46,7 @@ public class DumpParser {
 	protected boolean endOfFile = false;
 	@Setter
 	protected Map<String, Type> properties;
+	protected SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
 	public DumpParser(File file) throws XMLStreamException {
 		this.file = file;
@@ -90,9 +94,13 @@ public class DumpParser {
 
 				//Attempt to convert to number if nessesary
 				Object attributeValue;
-				if (attributeType != String.class)
+				if (attributeType == Date.class) {
+					log.debug("Attempting to parse " + attributeValueRaw + " as a date");
+					attributeValue = dateFormatter.parse(attributeValueRaw);
+				} else if (attributeType != String.class) {
+					log.debug("Converting " + attributeValueRaw + " to class " + attributeType);
 					attributeValue = NumberUtils.createNumber(attributeValueRaw);
-				else
+				} else
 					attributeValue = attributeValueRaw;
 
 				attributesMap.put(normalName, attributeValue);
