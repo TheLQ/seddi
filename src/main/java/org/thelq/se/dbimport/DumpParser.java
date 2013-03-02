@@ -10,8 +10,12 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
+import org.hibernate.type.StandardBasicTypes;
+import org.hibernate.type.Type;
 
 /**
  *
@@ -37,6 +41,8 @@ public class DumpParser {
 	protected int parsedCount;
 	@Getter
 	protected boolean endOfFile = false;
+	@Setter
+	protected Map<String, Type> properties;
 
 	public DumpParser(File file) throws XMLStreamException {
 		this.file = file;
@@ -49,10 +55,10 @@ public class DumpParser {
 		this.root = xmlReader.getLocalName();
 	}
 
-	public List<Map<String, String>> parseNextBatch(List<String> properties) {
-		List<Map<String, String>> entries = new ArrayList();
+	public List<Map<String, Object>> parseNextBatch() {
+		List<Map<String, Object>> entries = new ArrayList();
 		for (int i = 0; i < BATCH_SIZE; i++) {
-			Map<String, String> newEntry = parseNextEntry(properties);
+			Map<String, Object> newEntry = parseNextEntry();
 			if (newEntry == null)
 				//Were done
 				break;
@@ -61,7 +67,7 @@ public class DumpParser {
 		return entries;
 	}
 
-	public Map<String, String> parseNextEntry(List<String> properties) {
+	public Map<String, Object> parseNextEntry() {
 		try {
 			int eventType = xmlReader.nextTag();
 			String curElement = xmlReader.getName().toString();
@@ -76,10 +82,20 @@ public class DumpParser {
 						+ " at " + xmlReader.getLocation().toString());
 
 			//Build attributes map
-			Map<String, String> attributesMap = new HashMap();
+			Map<String, Object> attributesMap = new HashMap();
 			for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
-				String normalName = Utils.getCaseInsensitive(properties, xmlReader.getAttributeLocalName(i));
-				attributesMap.put(normalName, xmlReader.getAttributeValue(i));
+				String normalName = Utils.getCaseInsensitive(properties.keySet(), xmlReader.getAttributeLocalName(i));
+				Class attributeType = properties.get(normalName).getReturnedClass();
+				String attributeValueRaw = xmlReader.getAttributeValue(i);
+
+				//Attempt to convert to number if nessesary
+				Object attributeValue;
+				if (attributeType != String.class)
+					attributeValue = NumberUtils.createNumber(attributeValueRaw);
+				else
+					attributeValue = attributeValueRaw;
+
+				attributesMap.put(normalName, attributeValue);
 			}
 
 			//Advance to END_ELEMENT, skipping the attributes and other stuff

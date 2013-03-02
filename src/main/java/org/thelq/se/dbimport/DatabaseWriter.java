@@ -42,10 +42,10 @@ public class DatabaseWriter {
 		//session.setFlushMode(FlushMode.MANUAL);
 	}
 
-	public void insertData(String table, List<Map<String, String>> data) throws Exception {
+	public void insertData(String table, List<Map<String, Object>> data) throws Exception {
 		Transaction tx = session.beginTransaction();
 		try {
-			for (Map<String, String> curDataEntry : data)
+			for (Map<String, Object> curDataEntry : data)
 				session.insert(table, curDataEntry);
 			//session.flush();
 			tx.commit();
