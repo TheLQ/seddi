@@ -86,8 +86,8 @@
 		<property name="parentId" type="int">
 			<column name="ParentId" />
 		</property>
-		<property name="postTypeId" type="int">
-			<column name="PostTypeId" not-null="true" />
+		<property name="postTypeId" type="byte">
+			<column name="PostTypeId" not-null="true" length="2"/>
 		</property>
 		<property name="score" type="int">
 			<column name="Score" not-null="true" />
