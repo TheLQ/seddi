@@ -47,10 +47,10 @@ public class DumpParser {
 		this.root = xmlReader.getLocalName();
 	}
 
-	public List<Map<String, String>> parseNextBatch() {
+	public List<Map<String, String>> parseNextBatch(List<String> properties) {
 		List<Map<String, String>> entries = new ArrayList();
 		for (int i = 0; i < BATCH_SIZE; i++) {
-			Map<String, String> newEntry = parseNextEntry();
+			Map<String, String> newEntry = parseNextEntry(properties);
 			if (newEntry == null)
 				//Were done
 				break;
@@ -59,7 +59,7 @@ public class DumpParser {
 		return entries;
 	}
 
-	public Map<String, String> parseNextEntry() {
+	public Map<String, String> parseNextEntry(List<String> properties) {
 		try {
 			int eventType = xmlReader.nextTag();
 			String curElement = xmlReader.getName().toString();
@@ -75,8 +75,10 @@ public class DumpParser {
 
 			//Build attributes map
 			Map<String, String> attributesMap = new HashMap();
-			for (int i = 0; i < xmlReader.getAttributeCount(); i++)
-				attributesMap.put(xmlReader.getAttributeLocalName(i), xmlReader.getAttributeValue(i));
+			for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
+				String normalName = Utils.getCaseInsensitive(properties, xmlReader.getAttributeLocalName(i));
+				attributesMap.put(normalName, xmlReader.getAttributeValue(i));
+			}
 
 			//Advance to END_ELEMENT, skipping the attributes and other stuff
 			while (xmlReader.next() != XMLEvent.END_ELEMENT) {
