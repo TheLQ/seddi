@@ -172,7 +172,7 @@
 			<column name="DownVotes" not-null="true" />
 		</property>
 		<property name="emailHash" type="string">
-			<column name="EmailHash" length="40" />
+			<column name="EmailHash" length="32" />
 		</property>
 		<property name="lastAccessDate" type="timestamp">
 			<column name="LastAccessDate" length="19" not-null="true" />
