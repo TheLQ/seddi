@@ -216,7 +216,7 @@
 		<property name="bountyAmount" type="int">
 			<column name="BountyAmount" />
 		</property>
-		<property name="voteTypeId" type="int">
+		<property name="voteTypeId" type="byte">
 			<column name="VoteTypeId" not-null="true" />
 		</property>
 		<property name="creationDate" type="timestamp">
