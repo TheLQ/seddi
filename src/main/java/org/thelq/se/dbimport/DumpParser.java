@@ -113,7 +113,8 @@ public class DumpParser {
 			parsedCount++;
 			return attributesMap;
 		} catch (Exception e) {
-			throw new RuntimeException("Cannot parse entry #" + (parsedCount + 1), e);
+			throw new RuntimeException("Cannot parse entry #" + (parsedCount + 1)
+					+ " of file " + file.getName(), e);
 		}
 	}
 
