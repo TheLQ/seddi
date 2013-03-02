@@ -63,6 +63,8 @@ public class Main {
 		}
 
 		//Execute!
+		int totalEntries = 0;
+		long startTime = System.currentTimeMillis();
 		for (DumpParser parser : dumpParsers) {
 			log.info("[ + " + parser.getRoot() + "] Starting parsing");
 			String actualTableName = Utils.getCaseInsensitive(metadataMap.keySet(), parser.getRoot());
@@ -70,6 +72,7 @@ public class Main {
 				log.debug("[ + " + parser.getRoot() + "] Batch: " + parser.getParsedCount());
 				dbWriter.insertData(actualTableName, parser.parseNextBatch());
 			}
+			totalEntries += parser.getParsedCount();
 			log.info("[ + " + parser.getRoot() + "] Done!");
 		}
 
@@ -77,7 +80,9 @@ public class Main {
 		for (DumpParser parser : dumpParsers)
 			for (String curError : parser.getErrors())
 				log.warn("SAVED ERROR: " + curError);
-		log.info("Done importing!!");
+		
+		long totalSeconds = (System.currentTimeMillis() - startTime) / 60;
+		log.info("Done!! Imported " + totalEntries + " in " + totalSeconds + " seconds");
 	}
 
 	public static void main(String[] args) {
