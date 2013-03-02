@@ -29,9 +29,11 @@ public class DumpParser {
 		xmlFactory.configureForSpeed();
 	}
 	protected XMLStreamReader2 xmlReader;
+	@Getter
 	protected File file;
 	@Getter
 	protected String root;
+	@Getter
 	protected int parsedCount;
 	@Getter
 	protected boolean endOfFile = false;
