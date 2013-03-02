@@ -46,7 +46,10 @@ public class DumpParser {
 	protected boolean endOfFile = false;
 	@Setter
 	protected Map<String, Type> properties;
-	protected SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+	protected SimpleDateFormat dateFormatterLong = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+	protected SimpleDateFormat dateFormatterShort = new SimpleDateFormat("yyyy-MM-dd");
+	@Getter
+	protected List<String> errors = new ArrayList();
 
 	public DumpParser(File file) throws XMLStreamException {
 		this.file = file;
@@ -89,17 +92,32 @@ public class DumpParser {
 			Map<String, Object> attributesMap = new HashMap();
 			for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
 				String normalName = Utils.getCaseInsensitive(properties.keySet(), xmlReader.getAttributeLocalName(i));
-				Class attributeType = properties.get(normalName).getReturnedClass();
+				Type attributeType = properties.get(normalName);
+				if (attributeType == null) {
+					errors.add("Unknown column " + xmlReader.getAttributeLocalName(i)
+							+ " at " + xmlReader.getLocation().toString());
+					continue;
+				}
+				Class attributeTypeClass = attributeType.getReturnedClass();
 				String attributeValueRaw = xmlReader.getAttributeValue(i);
 
 				//Attempt to convert to number if nessesary
 				Object attributeValue;
-				if (attributeType == Date.class) {
+				if (attributeTypeClass == Date.class) {
 					log.debug("Attempting to parse " + attributeValueRaw + " as a date");
-					attributeValue = dateFormatter.parse(attributeValueRaw);
-				} else if (attributeType != String.class) {
-					log.debug("Converting " + attributeValueRaw + " to class " + attributeType);
-					attributeValue = NumberUtils.createNumber(attributeValueRaw);
+					if (attributeValueRaw.length() < 11)
+						attributeValue = dateFormatterShort.parse(attributeValueRaw);
+					else
+						attributeValue = dateFormatterLong.parse(attributeValueRaw);
+				} else if (attributeTypeClass == Byte.class) {
+					log.debug("Converting " + attributeValueRaw + " to a byte");
+					attributeValue = Byte.parseByte(attributeValueRaw);
+				} else if (attributeTypeClass != String.class) {
+					log.debug("Converting " + attributeValueRaw + " ( " + xmlReader.getAttributeLocalName(i) + " to class " + attributeTypeClass);
+					if (attributeValueRaw.isEmpty())
+						attributeValue = 0;
+					else
+						attributeValue = NumberUtils.createNumber(attributeValueRaw);
 				} else
 					attributeValue = attributeValueRaw;
 
@@ -114,7 +132,7 @@ public class DumpParser {
 			return attributesMap;
 		} catch (Exception e) {
 			throw new RuntimeException("Cannot parse entry #" + (parsedCount + 1)
-					+ " of file " + file.getName(), e);
+					+ " at " + xmlReader.getLocation(), e);
 		}
 	}
 
