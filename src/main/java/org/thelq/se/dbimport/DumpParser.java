@@ -81,7 +81,7 @@ public class DumpParser {
 			//System.out.println("Current element: " + curElement);
 			if (curElement.equals(getRoot())) {
 				//Were done, shutdown this parser
-				System.out.println(parsedCount + " Recieved end");
+				log.info("Done with " + file.getName() + ", parsed " + parsedCount + " enteries");
 				close();
 				return null;
 			} else if (eventType != XMLEvent.START_ELEMENT)
