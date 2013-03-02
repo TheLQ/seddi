@@ -28,13 +28,6 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
 		</dependency>
-		<!--Use TestNG as testing framework-->
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>6.8</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>woodstox-core-asl</artifactId>
@@ -49,27 +42,7 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>4.2.0.CR1</version>
-		</dependency><!--
-	 <dependency>
-	  <groupId>org.hibernate</groupId>
-	  <artifactId>hibernate</artifactId>
-	  <version>3.2.5.ga</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.hibernate</groupId>
-	  <artifactId>hibernate-entitymanager</artifactId>
-	  <version>3.3.2.GA</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>javax.sql</groupId>
-	  <artifactId>jdbc-stdext</artifactId>
-	  <version>2.0</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>javax.transaction</groupId>
-	  <artifactId>jta</artifactId>
-	  <version>1.0.1B</version>
-	 </dependency>-->
+		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
