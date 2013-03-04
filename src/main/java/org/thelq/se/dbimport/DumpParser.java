@@ -51,15 +51,19 @@ public class DumpParser {
 	@Getter
 	protected List<String> errors = new ArrayList();
 
-	public DumpParser(File file) throws XMLStreamException {
-		this.file = file;
+	public DumpParser(File file) {
+		try {
+			this.file = file;
 
-		//Initialize the reader
-		this.xmlReader = (XMLStreamReader2) xmlFactory.createXMLStreamReader(file);
+			//Initialize the reader
+			this.xmlReader = (XMLStreamReader2) xmlFactory.createXMLStreamReader(file);
 
-		//Get root element
-		xmlReader.next();
-		this.root = xmlReader.getLocalName();
+			//Get root element
+			xmlReader.next();
+			this.root = xmlReader.getLocalName();
+		} catch (XMLStreamException ex) {
+			throw new RuntimeException("Cannot initially load XML document", ex);
+		}
 	}
 
 	public List<Map<String, Object>> parseNextBatch() {
