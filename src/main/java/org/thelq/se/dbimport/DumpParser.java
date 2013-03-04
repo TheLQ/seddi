@@ -50,6 +50,9 @@ public class DumpParser {
 	protected SimpleDateFormat dateFormatterShort = new SimpleDateFormat("yyyy-MM-dd");
 	@Getter
 	protected List<String> errors = new ArrayList();
+	@Getter
+	@Setter
+	protected boolean enabled = true;
 
 	public DumpParser(File file) {
 		try {
@@ -80,6 +83,8 @@ public class DumpParser {
 
 	public Map<String, Object> parseNextEntry() {
 		try {
+			if(!enabled)
+				throw new RuntimeException("Parser is disabled");
 			int eventType = xmlReader.nextTag();
 			String curElement = xmlReader.getName().toString();
 			//System.out.println("Current element: " + curElement);
