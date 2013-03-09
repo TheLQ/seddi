@@ -29,7 +29,7 @@
 	</appender>
 
 	<logger name="org.hibernate" level="INFO"/>
-	<logger name="org.thelq" level="INFO"/>
+	<!--<logger name="org.thelq" level="INFO"/>-->
 
 	<root level="ALL">
 		<appender-ref ref="STDOUT" />
