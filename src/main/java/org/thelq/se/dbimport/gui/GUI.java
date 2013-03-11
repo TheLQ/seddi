@@ -64,7 +64,7 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 
 		//Primary panel
-		FormLayout primaryLayout = new FormLayout("pref:grow, 3dlu, pref:grow, 6dlu, pref:grow, 3dlu, pref:grow", "");
+		FormLayout primaryLayout = new FormLayout("pref, 3dlu, left:pref:grow, 10dlu, pref, 3dlu, left:pref:grow", "");
 		DefaultFormBuilder primaryBuilder = new DefaultFormBuilder(primaryLayout);
 		
 		/**
@@ -74,7 +74,7 @@ public class GUI {
 		primaryBuilder.appendSeparator("Options");
 		primaryBuilder.append("Disable Creating Tables", new JCheckBox());
 		primaryBuilder.append("Lower memory usage", new JCheckBox());
-		primaryBuilder.append("Global Table Prefix", new JTextField());
+		primaryBuilder.append("Global Table Prefix", new JTextField(7));
 		primaryBuilder.nextLine();
 		
 		/**
