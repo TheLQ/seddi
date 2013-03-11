@@ -95,7 +95,7 @@ public class GUI {
 		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout)
 				.leadingColumnOffset(1);
 		configBuilder.appendSeparator("Database Configuration");
-		configBuilder.append("Presest", dbType = new JComboBox(new String[]{"MySQL", "SQlite", "MSSQL"}));
+		configBuilder.append("Preset", dbType = new JComboBox(new String[]{"MySQL", "SQlite", "MSSQL"}));
 		configBuilder.append("Username", username = new JTextField(10));
 		configBuilder.append("Password", password = new JPasswordField(10));
 		configBuilder.append("JDBC Connection", jdbcString = new JTextField(15), 9);
