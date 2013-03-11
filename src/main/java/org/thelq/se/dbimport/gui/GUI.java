@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -21,6 +22,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.AbstractTableModel;
@@ -62,31 +64,36 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 
 		//Primary panel
-		//FormLayout primaryLayout = new FormLayout("pref:grow, 3dlu, pref:grow", "pref, pref, pref:grow");
-		FormLayout primaryLayout = new FormLayout("pref:grow", "pref:grow, pref:grow");
+		FormLayout primaryLayout = new FormLayout("pref:grow, 3dlu, pref:grow, 6dlu, pref:grow, 3dlu, pref:grow", "");
 		DefaultFormBuilder primaryBuilder = new DefaultFormBuilder(primaryLayout);
-
+		
 		/**
 		 * Disable Creating Tables, Lower memory usage
 		 */
 		//Options
 		primaryBuilder.appendSeparator("Options");
-		//primaryBuilder.append(new JButton("t2"));
-		//primaryBuilder.append(new JButton("t3")); 
-
+		primaryBuilder.append("Disable Creating Tables", new JCheckBox());
+		primaryBuilder.append("Lower memory usage", new JCheckBox());
+		primaryBuilder.append("Global Table Prefix", new JTextField());
+		primaryBuilder.nextLine();
+		
 		/**
 		 * Enabled, Source, Processed, Details
 		 */
-		//primaryBuilder.append(genList());
-		//primaryBuilder.append(genList());
-		FormLayout listLayout = new FormLayout("pref:grow", "pref");
-		DefaultFormBuilder listBuilder = new DefaultFormBuilder(listLayout).lineGapSize(Sizes.ZERO);
+		primaryBuilder.appendSeparator("Dump Locations");
+		FormLayout locationsLayout = new FormLayout("pref:grow", "pref:grow");
+		DefaultFormBuilder locationsBuilder = new DefaultFormBuilder(locationsLayout)
+				.background(Color.WHITE);
 		for (int i = 0; i < 20; i++)
-			listBuilder.append(genList());
+			locationsBuilder.append(genList());
+		JScrollPane locationsPane = new JScrollPane(locationsBuilder.getPanel());
+		locationsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		locationsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		primaryBuilder.append(locationsPane, 7);
 
 		//Display
 		//frame.setContentPane(primaryBuilder.getPanel());
-		frame.setContentPane(new JScrollPane(listBuilder.getPanel()));
+		frame.setContentPane(primaryBuilder.getPanel());
 		frame.pack();
 		frame.setVisible(true);
 	}
