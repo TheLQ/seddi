@@ -7,6 +7,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.Sizes;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -29,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.AbstractTableModel;
@@ -70,7 +73,7 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 
 		//Primary panel
-		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 6dlu, pref", "pref, pref, fill:pref:grow");
+		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 6dlu, pref", "pref, pref, fill:pref:grow, fill:80dlu");
 		DefaultFormBuilder primaryBuilder = new DefaultFormBuilder(primaryLayout)
 				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5))
 				.leadingColumnOffset(1);
@@ -101,12 +104,21 @@ public class GUI {
 		DefaultFormBuilder locationsBuilder = new DefaultFormBuilder(locationsLayout)
 				.background(Color.WHITE);
 		primaryBuilder.appendSeparator("Dump Locations");
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < 10; i++)
 			locationsBuilder.append(genList());
 		JScrollPane locationsPane = new JScrollPane(locationsBuilder.getPanel());
 		locationsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		locationsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		primaryBuilder.append(locationsPane, 3);
+		
+		//Logger
+		JTextPane loggerText = new JTextPaneNW();
+		loggerText.setEditable(false);
+		loggerText.setAlignmentX(Component.CENTER_ALIGNMENT);
+		JScrollPane loggerPane = new JScrollPane(loggerText);
+		loggerPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		loggerPane.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		primaryBuilder.append(loggerPane, 3);
 
 		//Display
 		frame.setContentPane(primaryBuilder.getPanel());
@@ -213,6 +225,20 @@ public class GUI {
 		});
 		workerTable.setFillsViewportHeight(true);
 		return workerTable;
+	}
+	
+	public class JTextPaneNW extends JTextPane {
+		@Override
+		public void setSize(Dimension d) {
+			if (d.width < getParent().getSize().width)
+				d.width = getParent().getSize().width;
+			super.setSize(d);
+		}
+
+		@Override
+		public boolean getScrollableTracksViewportWidth() {
+			return false;
+		}
 	}
 
 	public static void main(String[] args) {
