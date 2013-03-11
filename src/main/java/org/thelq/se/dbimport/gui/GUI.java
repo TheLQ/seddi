@@ -35,6 +35,7 @@ import javax.swing.WindowConstants;
 import javax.swing.table.AbstractTableModel;
 import lombok.Getter;
 import ch.qos.logback.classic.Logger;
+import com.jgoodies.forms.debug.FormDebugPanel;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 
@@ -50,6 +51,7 @@ public class GUI {
 	protected JTextField username;
 	protected JTextField password;
 	protected JTextField jdbcString;
+	protected JTextField dialect;
 	protected JCheckBox disableCreateTables;
 	protected JCheckBox lowerMemoryUsage;
 	protected JTextField globalTablePrefix;
@@ -91,14 +93,20 @@ public class GUI {
 				.leadingColumnOffset(1);
 
 		//DB Config panel
-		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow", "pref:grow, pref:grow");
-		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout)
+		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow", 
+				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
+		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout, new FormDebugPanel())
 				.leadingColumnOffset(1);
 		configBuilder.appendSeparator("Database Configuration");
 		configBuilder.append("Preset", dbType = new JComboBox(new String[]{"MySQL", "SQlite", "MSSQL"}));
 		configBuilder.append("Username", username = new JTextField(10));
 		configBuilder.append("Password", password = new JPasswordField(10));
+		configBuilder.nextLine();
+		configBuilder.nextLine();
 		configBuilder.append("JDBC Connection", jdbcString = new JTextField(15), 9);
+		configBuilder.nextLine();
+		configBuilder.nextLine();
+		configBuilder.append("Dialect", dialect = new JTextField(10), 3);
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
 		//Options
