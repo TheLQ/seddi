@@ -45,6 +45,15 @@ public class GUI {
 	protected Controller controller;
 	protected JFrame frame;
 	protected JTable workerTable;
+	protected JComboBox dbType;
+	protected JTextField username;
+	protected JTextField password;
+	protected JTextField jdbcString;
+	protected JCheckBox disableCreateTables;
+	protected JCheckBox lowerMemoryUsage;
+	protected JTextField globalTablePrefix;
+	protected DefaultFormBuilder locationsBuilder;
+	protected JTextPane loggerText;
 
 	public GUI(Controller passedController) {
 		this.controller = passedController;
@@ -83,10 +92,10 @@ public class GUI {
 		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout)
 				.leadingColumnOffset(1);
 		configBuilder.appendSeparator("Database Configuration");
-		configBuilder.append("Presest", new JComboBox(new String[]{"MySQL", "SQlite", "MSSQL"}));
-		configBuilder.append("Username", new JTextField(10));
-		configBuilder.append("Password", new JPasswordField(10));
-		configBuilder.append("JDBC Connection", new JTextField(15), 9);
+		configBuilder.append("Presest", dbType = new JComboBox(new String[]{"MySQL", "SQlite", "MSSQL"}));
+		configBuilder.append("Username", username = new JTextField(10));
+		configBuilder.append("Password", password = new JPasswordField(10));
+		configBuilder.append("JDBC Connection", jdbcString = new JTextField(15), 9);
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
 		//Options
@@ -94,14 +103,14 @@ public class GUI {
 		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout)
 				.leadingColumnOffset(1);
 		optionsBuilder.appendSeparator("Options");
-		optionsBuilder.append("Disable Creating Tables", new JCheckBox());
-		optionsBuilder.append("Lower memory usage", new JCheckBox());
-		optionsBuilder.append("Global Table Prefix", new JTextField(7));
+		optionsBuilder.append("Disable Creating Tables", disableCreateTables = new JCheckBox());
+		optionsBuilder.append("Lower memory usage", lowerMemoryUsage = new JCheckBox());
+		optionsBuilder.append("Global Table Prefix", globalTablePrefix = new JTextField(7));
 		primaryBuilder.append(optionsBuilder.getPanel());
 
 		//Locations
 		FormLayout locationsLayout = new FormLayout("pref:grow", "pref");
-		DefaultFormBuilder locationsBuilder = new DefaultFormBuilder(locationsLayout)
+		locationsBuilder = new DefaultFormBuilder(locationsLayout)
 				.background(Color.WHITE);
 		primaryBuilder.appendSeparator("Dump Locations");
 		for (int i = 0; i < 10; i++)
@@ -112,7 +121,7 @@ public class GUI {
 		primaryBuilder.append(locationsPane, 3);
 		
 		//Logger
-		JTextPane loggerText = new JTextPaneNW();
+		loggerText = new JTextPaneNW();
 		loggerText.setEditable(false);
 		loggerText.setAlignmentX(Component.CENTER_ALIGNMENT);
 		JScrollPane loggerPane = new JScrollPane(loggerText);
