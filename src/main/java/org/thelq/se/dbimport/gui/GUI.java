@@ -70,34 +70,36 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 
 		//Primary panel
-		FormLayout primaryLayout = new FormLayout("pref:grow, 6dlu, pref:grow", "pref, 6dlu, pref:grow");
+		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 6dlu, pref", "pref, pref, fill:pref:grow");
 		DefaultFormBuilder primaryBuilder = new DefaultFormBuilder(primaryLayout)
-				.border(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5))
+				.leadingColumnOffset(1);
 
 		//DB Config panel
-		FormLayout configLayout = new FormLayout("pref, 3dlu, pref, 10dlu, pref, 3dlu, pref, 10dlu, pref, 3dlu, pref", "pref:grow, pref:grow");
-		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout);
+		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow", "pref:grow, pref:grow");
+		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout)
+				.leadingColumnOffset(1);
 		configBuilder.appendSeparator("Database Configuration");
 		configBuilder.append("Presest", new JComboBox(new String[]{"MySQL", "SQlite", "MSSQL"}));
 		configBuilder.append("Username", new JTextField(10));
 		configBuilder.append("Password", new JPasswordField(10));
-		configBuilder.append("JDBC Connection", new JTextField(15), configLayout.getColumnCount() - 2);
-		primaryBuilder.add(configBuilder.getPanel(), CC.xy(1, 1));
+		configBuilder.append("JDBC Connection", new JTextField(15), 9);
+		primaryBuilder.append(configBuilder.getPanel(), 2);
 
 		//Options
-		FormLayout optionsLayout = new FormLayout("pref, 3dlu, left:pref:grow, 10dlu, pref, 3dlu, left:pref:grow", "");
-		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout);
+		FormLayout optionsLayout = new FormLayout("5dlu, pref, 3dlu, left:pref:grow, 6dlu, pref, 3dlu, left:pref:grow", "");
+		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout)
+				.leadingColumnOffset(1);
 		optionsBuilder.appendSeparator("Options");
 		optionsBuilder.append("Disable Creating Tables", new JCheckBox());
 		optionsBuilder.append("Lower memory usage", new JCheckBox());
 		optionsBuilder.append("Global Table Prefix", new JTextField(7));
-		primaryBuilder.add(optionsBuilder.getPanel(), CC.xy(3, 1));
+		primaryBuilder.append(optionsBuilder.getPanel());
 
 		//Locations
-		FormLayout locationsLayout = new FormLayout("pref:grow", "pref:grow");
+		FormLayout locationsLayout = new FormLayout("pref:grow", "pref");
 		DefaultFormBuilder locationsBuilder = new DefaultFormBuilder(locationsLayout)
 				.background(Color.WHITE);
-		primaryBuilder.nextLine(2);
 		primaryBuilder.appendSeparator("Dump Locations");
 		for (int i = 0; i < 20; i++)
 			locationsBuilder.append(genList());
