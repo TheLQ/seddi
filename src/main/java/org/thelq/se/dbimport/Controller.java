@@ -20,8 +20,8 @@ public class Controller {
 	protected ExecutorService threadPool = Executors.newCachedThreadPool();
 
 	public Controller() {
-		DatabaseWriter.init();
 		gui = new GUI(this);
+		DatabaseWriter.init();
 	}
 
 	public void addFile(final File file) {
@@ -45,5 +45,9 @@ public class Controller {
 				}
 			}
 		});
+	}
+	
+	public static void main(String[] args) {
+		new Controller();
 	}
 }

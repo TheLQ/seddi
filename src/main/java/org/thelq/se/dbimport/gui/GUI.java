@@ -1,11 +1,11 @@
 package org.thelq.se.dbimport.gui;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.AppenderBase;
 import com.google.common.collect.Iterables;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.Sizes;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -16,7 +16,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -29,12 +28,14 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.table.AbstractTableModel;
+import lombok.Getter;
+import ch.qos.logback.classic.Logger;
+import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 
 /**
@@ -53,7 +54,9 @@ public class GUI {
 	protected JCheckBox lowerMemoryUsage;
 	protected JTextField globalTablePrefix;
 	protected DefaultFormBuilder locationsBuilder;
+	@Getter
 	protected JTextPane loggerText;
+	protected AppenderBase logAppender;
 
 	public GUI(Controller passedController) {
 		this.controller = passedController;
@@ -119,7 +122,7 @@ public class GUI {
 		locationsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		locationsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		primaryBuilder.append(locationsPane, 3);
-		
+
 		//Logger
 		loggerText = new JTextPaneNW();
 		loggerText.setEditable(false);
@@ -133,6 +136,12 @@ public class GUI {
 		frame.setContentPane(primaryBuilder.getPanel());
 		frame.pack();
 		frame.setVisible(true);
+
+		//Initialize logger
+		Logger rootLogger = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+		logAppender = new GUILogAppender(this, rootLogger.getLoggerContext());
+		logAppender.start();
+		rootLogger.addAppender(logAppender);
 	}
 
 	protected JComponent genList() {
@@ -235,7 +244,7 @@ public class GUI {
 		workerTable.setFillsViewportHeight(true);
 		return workerTable;
 	}
-	
+
 	public class JTextPaneNW extends JTextPane {
 		@Override
 		public void setSize(Dimension d) {
