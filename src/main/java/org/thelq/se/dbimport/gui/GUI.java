@@ -45,7 +45,7 @@ public class GUI {
 
 		//Setup menu
 		JMenuBar menuBar = new JMenuBar();
-		JMenuItem menuAdd = new JMenuItem("Add Files/Directories");
+		JMenuItem menuAdd = new JMenuItem("Add Files/Folders");
 		menuAdd.setMnemonic(KeyEvent.VK_F);
 		menuAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
