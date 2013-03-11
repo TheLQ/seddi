@@ -63,29 +63,5 @@
 			<artifactId>guava-collections</artifactId>
 			<version>r03</version>
 		</dependency>
-		<dependency>
-			<groupId>org.swinglabs.swingx</groupId>
-			<artifactId>swingx-core</artifactId>
-			<version>1.6.5-1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.netbeans.api</groupId>
-			<artifactId>org-netbeans-swing-outline</artifactId>
-			<version>RELEASE73</version>
-		</dependency>
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>netbeans</id>
-			<name>repository hosting netbeans.org api artifacts</name>
-			<url>http://bits.netbeans.org/maven2/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 </project>
