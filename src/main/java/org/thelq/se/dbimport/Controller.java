@@ -30,6 +30,11 @@ public class Controller {
 				addFile(curFile);
 			return;
 		}
+		//Only care about xml files
+		if (!file.getName().endsWith(".xml")) {
+			log.debug("Ignoring file " + file.getAbsolutePath());
+			return;
+		}
 		threadPool.execute(new Runnable() {
 			public void run() {
 				try {
