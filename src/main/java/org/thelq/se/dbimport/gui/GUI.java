@@ -2,6 +2,7 @@ package org.thelq.se.dbimport.gui;
 
 import com.google.common.collect.Iterables;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.Sizes;
@@ -12,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -36,7 +38,7 @@ public class GUI {
 	protected Controller controller;
 	protected JFrame frame;
 	protected JTable workerTable;
-
+	
 	public GUI(Controller passedController) {
 		this.controller = passedController;
 		frame = new JFrame();
@@ -53,7 +55,7 @@ public class GUI {
 				fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				fc.setMultiSelectionEnabled(true);
 				fc.setDialogTitle("Select Folders/Files/Archives");
-
+				
 				if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
 					return;
 				for (File curFile : fc.getSelectedFiles())
@@ -64,40 +66,43 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 
 		//Primary panel
-		FormLayout primaryLayout = new FormLayout("pref, 3dlu, left:pref:grow, 10dlu, pref, 3dlu, left:pref:grow", "");
-		DefaultFormBuilder primaryBuilder = new DefaultFormBuilder(primaryLayout);
-		
-		/**
-		 * Disable Creating Tables, Lower memory usage
-		 */
+		FormLayout primaryLayout = new FormLayout("pref:grow, pref:grow", "pref:grow, pref:grow");
+		JPanel primaryPanel = new FormDebugPanel(primaryLayout);
+
+		//DB Config panel
+		FormLayout configLayout = new FormLayout("pref:grow", "pref:grow");
+		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout);
+		configBuilder.appendSeparator("Database Configuration");
+		configBuilder.append(new JButton("Wootz"));
+		primaryPanel.add(configBuilder.getPanel(), CC.xy(1, 1));
+
 		//Options
-		primaryBuilder.appendSeparator("Options");
-		primaryBuilder.append("Disable Creating Tables", new JCheckBox());
-		primaryBuilder.append("Lower memory usage", new JCheckBox());
-		primaryBuilder.append("Global Table Prefix", new JTextField(7));
-		primaryBuilder.nextLine();
-		
-		/**
-		 * Enabled, Source, Processed, Details
-		 */
-		primaryBuilder.appendSeparator("Dump Locations");
+		FormLayout optionsLayout = new FormLayout("pref, 3dlu, left:pref:grow, 10dlu, pref, 3dlu, left:pref:grow", "");
+		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout);
+		optionsBuilder.appendSeparator("Options");
+		optionsBuilder.append("Disable Creating Tables", new JCheckBox());
+		optionsBuilder.append("Lower memory usage", new JCheckBox());
+		optionsBuilder.append("Global Table Prefix", new JTextField(7));
+		primaryPanel.add(optionsBuilder.getPanel(), CC.xy(2, 1));
+
+		//Locations
 		FormLayout locationsLayout = new FormLayout("pref:grow", "pref:grow");
 		DefaultFormBuilder locationsBuilder = new DefaultFormBuilder(locationsLayout)
 				.background(Color.WHITE);
+		locationsBuilder.appendSeparator("Dump Locations");
 		for (int i = 0; i < 20; i++)
 			locationsBuilder.append(genList());
 		JScrollPane locationsPane = new JScrollPane(locationsBuilder.getPanel());
 		locationsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		locationsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		primaryBuilder.append(locationsPane, 7);
+		primaryPanel.add(locationsPane, CC.xyw(1, 2, 2));
 
 		//Display
-		//frame.setContentPane(primaryBuilder.getPanel());
-		frame.setContentPane(primaryBuilder.getPanel());
+		frame.setContentPane(primaryPanel);
 		frame.pack();
 		frame.setVisible(true);
 	}
-
+	
 	protected JComponent genList() {
 		FormLayout layout = new FormLayout("15dlu, pref:grow", "pref:grow, pref:grow");
 		final JPanel panel = new JPanel(layout);
@@ -123,7 +128,7 @@ public class GUI {
 		//panel.setBorder(BorderFactory.createLineBorder(Color.RED));
 		return panel;
 	}
-
+	
 	protected JComponent genJTableExample() {
 		final String[] columnNames = {"First Name",
 			"Last Name",
@@ -146,23 +151,23 @@ public class GUI {
 			public String getColumnName(int col) {
 				return columnNames[col].toString();
 			}
-
+			
 			public int getRowCount() {
 				return rowData.length;
 			}
-
+			
 			public int getColumnCount() {
 				return columnNames.length;
 			}
-
+			
 			public Object getValueAt(int row, int col) {
 				return rowData[row][col];
 			}
-
+			
 			public boolean isCellEditable(int row, int col) {
 				return true;
 			}
-
+			
 			public void setValueAt(Object value, int row, int col) {
 				rowData[row][col] = value;
 				fireTableCellUpdated(row, col);
@@ -170,24 +175,24 @@ public class GUI {
 		});
 		return exampleTable;
 	}
-
+	
 	protected JComponent genJTable() {
 		JTable workerTable = new JTable(new AbstractTableModel() {
 			String[] columns = {"Enabled", "Source", "# Processed", "Parser Status", "Database Status"};
-
+			
 			@Override
 			public String getColumnName(int column) {
 				return columns[column];
 			}
-
+			
 			public int getColumnCount() {
 				return columns.length;
 			}
-
+			
 			public int getRowCount() {
 				return controller.getParsers().size();
 			}
-
+			
 			public Object getValueAt(int rowIndex, int columnIndex) {
 				if (columnIndex == 0)
 					//Enabled status
@@ -198,7 +203,7 @@ public class GUI {
 		workerTable.setFillsViewportHeight(true);
 		return workerTable;
 	}
-
+	
 	public static void main(String[] args) {
 		new GUI(null);
 	}
