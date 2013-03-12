@@ -5,15 +5,12 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.dialect.MySQL5Dialect;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
@@ -38,8 +35,7 @@ public class DatabaseWriter {
 	protected static String driver;
 	@Setter
 	protected static String dialect;
-	
-	
+
 	public static void init() throws HibernateException {
 		configuration = new Configuration();
 		configuration.configure();
@@ -50,6 +46,11 @@ public class DatabaseWriter {
 		configuration.setProperty("hibernate.dialect", dialect);
 		serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
 		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+
+		//Make a test connection so we know if this actually works
+		Session testSession = sessionFactory.openSession();
+		testSession.beginTransaction();
+		testSession.close();
 	}
 	protected StatelessSession session;
 
@@ -71,7 +72,7 @@ public class DatabaseWriter {
 			throw e;
 		}
 	}
-	
+
 	public static void createTables() {
 		SchemaExport exporter = new SchemaExport(serviceRegistry, configuration);
 		exporter.setHaltOnError(true);
