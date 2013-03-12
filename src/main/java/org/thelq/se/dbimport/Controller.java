@@ -21,7 +21,6 @@ public class Controller {
 
 	public Controller() {
 		gui = new GUI(this);
-		DatabaseWriter.init();
 	}
 
 	public void addFile(final File file) {
