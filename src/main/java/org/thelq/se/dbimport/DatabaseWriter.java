@@ -3,6 +3,7 @@ package org.thelq.se.dbimport;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
@@ -27,10 +28,26 @@ public class DatabaseWriter {
 	protected static SessionFactory sessionFactory;
 	protected static Configuration configuration;
 	protected static ServiceRegistry serviceRegistry;
-
-	protected static void init() throws HibernateException {
+	@Setter
+	protected static String username;
+	@Setter
+	protected static String password;
+	@Setter
+	protected static String jdbcString;
+	@Setter
+	protected static String driver;
+	@Setter
+	protected static String dialect;
+	
+	
+	public static void init() throws HibernateException {
 		configuration = new Configuration();
 		configuration.configure();
+		configuration.setProperty("hibernate.connection.username", username);
+		configuration.setProperty("hibernate.connection.password", password);
+		configuration.setProperty("hibernate.connection.url", jdbcString);
+		configuration.setProperty("hibernate.connection.driver_class", driver);
+		configuration.setProperty("hibernate.dialect", dialect);
 		serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
 		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 	}
