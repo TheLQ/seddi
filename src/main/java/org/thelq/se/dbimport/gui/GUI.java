@@ -54,6 +54,7 @@ public class GUI {
 	protected JTextField password;
 	protected JTextField jdbcString;
 	protected JTextField dialect;
+	protected JTextField driver;
 	protected JCheckBox disableCreateTables;
 	protected JCheckBox lowerMemoryUsage;
 	protected JTextField globalTablePrefix;
@@ -96,7 +97,7 @@ public class GUI {
 
 		//DB Config panel
 		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow", 
-				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
+				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
 		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout)
 				.leadingColumnOffset(1);
 		configBuilder.appendSeparator("Database Configuration");
@@ -109,7 +110,10 @@ public class GUI {
 		configBuilder.nextLine();
 		configBuilder.nextLine();
 		configBuilder.append("Dialect", dialect = new JTextField(10), 5);
-		configBuilder.append(new JButton("Import"), 3);
+		configBuilder.nextLine();
+		configBuilder.nextLine();
+		configBuilder.append("Driver", driver = new JTextField(10), 5);
+		configBuilder.add(new JButton("Import"), CC.xywh(10, 6, 3, 3));
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
 		//Options
