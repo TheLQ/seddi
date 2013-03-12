@@ -108,9 +108,7 @@ public class GUI {
 		configBuilder.append("JDBC Connection", jdbcString = new JTextField(15), 9);
 		configBuilder.nextLine();
 		configBuilder.nextLine();
-		configBuilder.append("Dialect", dialect = new JTextField(10), 3);
-		configBuilder.nextColumn();
-		configBuilder.nextColumn();
+		configBuilder.append("Dialect", dialect = new JTextField(10), 5);
 		configBuilder.append(new JButton("Import"), 3);
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
