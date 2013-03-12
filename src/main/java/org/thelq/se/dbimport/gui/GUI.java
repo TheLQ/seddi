@@ -38,8 +38,13 @@ import ch.qos.logback.classic.Logger;
 import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.layout.CellConstraints;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
+import org.thelq.se.dbimport.DatabaseWriter;
 
 /**
  *
@@ -55,6 +60,7 @@ public class GUI {
 	protected JTextField jdbcString;
 	protected JTextField dialect;
 	protected JTextField driver;
+	protected JButton importButton;
 	protected JCheckBox disableCreateTables;
 	protected JCheckBox lowerMemoryUsage;
 	protected JTextField globalTablePrefix;
@@ -96,7 +102,7 @@ public class GUI {
 				.leadingColumnOffset(1);
 
 		//DB Config panel
-		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow", 
+		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow",
 				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
 		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout)
 				.leadingColumnOffset(1);
@@ -113,7 +119,7 @@ public class GUI {
 		configBuilder.nextLine();
 		configBuilder.nextLine();
 		configBuilder.append("Driver", driver = new JTextField(10), 5);
-		configBuilder.add(new JButton("Import"), CC.xywh(10, 6, 3, 3));
+		configBuilder.add(importButton = new JButton("Import"), CC.xywh(10, 6, 3, 3));
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
 		//Options
@@ -153,10 +159,67 @@ public class GUI {
 		frame.setVisible(true);
 
 		//Initialize logger
-		Logger rootLogger = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+		Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		logAppender = new GUILogAppender(this, rootLogger.getLoggerContext());
 		logAppender.start();
 		rootLogger.addAppender(logAppender);
+
+		//Import start code
+		importButton.addActionListener(new ImportActionListener());
+	}
+
+	protected class ImportActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			//Disable all GUI components so they can't change anything during processing
+			setGuiEnabled(false);
+
+			//Run in new thread
+			controller.getGeneralThreadPool().execute(new Runnable() {
+				public void run() {
+					try {
+						start();
+					} catch (final Exception e) {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								String message = "Error: " + e.getLocalizedMessage()
+										+ "\n" + e.getCause().getLocalizedMessage()
+										+ "\nSee Log for more information";
+								String title = e.getLocalizedMessage();
+								JOptionPane.showMessageDialog(frame, message, title, JOptionPane.ERROR_MESSAGE);
+							}
+						});
+					}
+				}
+			});
+		}
+
+		protected void start() throws Exception {
+			//Try to connect to the database
+			try {
+				DatabaseWriter.setUsername(username.getText());
+				DatabaseWriter.setPassword(password.getText());
+				DatabaseWriter.setDialect(dialect.getText());
+				DatabaseWriter.setDriver(driver.getText());
+				DatabaseWriter.setJdbcString(jdbcString.getText());
+				DatabaseWriter.init();
+			} catch (Exception e) {
+				throw new Exception("Cannot connect to database", e);
+			}
+			
+			//Connected
+		}
+	}
+
+	protected void setGuiEnabled(boolean enabled) {
+		username.setEnabled(enabled);
+		password.setEnabled(enabled);
+		dialect.setEnabled(enabled);
+		driver.setEnabled(enabled);
+		jdbcString.setEnabled(enabled);
+		importButton.setEnabled(enabled);
+		disableCreateTables.setEnabled(enabled);
+		lowerMemoryUsage.setEnabled(enabled);
+		globalTablePrefix.setEnabled(enabled);
 	}
 
 	protected JComponent genList() {
