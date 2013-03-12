@@ -17,7 +17,8 @@ public class Controller {
 	protected GUI gui;
 	@Getter
 	protected LinkedHashMap<DumpParser, DatabaseWriter> parsers = new LinkedHashMap();
-	protected ExecutorService threadPool = Executors.newCachedThreadPool();
+	@Getter
+	protected ExecutorService generalThreadPool = Executors.newCachedThreadPool();
 
 	public Controller() {
 		gui = new GUI(this);
@@ -34,7 +35,7 @@ public class Controller {
 			log.debug("Ignoring file " + file.getAbsolutePath());
 			return;
 		}
-		threadPool.execute(new Runnable() {
+		generalThreadPool.execute(new Runnable() {
 			public void run() {
 				try {
 					parsers.put(new DumpParser(file), new DatabaseWriter());
