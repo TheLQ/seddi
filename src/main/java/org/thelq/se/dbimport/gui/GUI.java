@@ -1,6 +1,5 @@
 package org.thelq.se.dbimport.gui;
 
-import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.AppenderBase;
 import com.google.common.collect.Iterables;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -35,13 +34,9 @@ import javax.swing.WindowConstants;
 import javax.swing.table.AbstractTableModel;
 import lombok.Getter;
 import ch.qos.logback.classic.Logger;
-import com.jgoodies.forms.debug.FormDebugPanel;
-import com.jgoodies.forms.layout.CellConstraints;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 import org.thelq.se.dbimport.DatabaseWriter;
@@ -185,6 +180,7 @@ public class GUI {
 										+ "\n" + e.getCause().getLocalizedMessage()
 										+ "\nSee Log for more information";
 								String title = e.getLocalizedMessage();
+								LoggerFactory.getLogger(getClass()).error(message, e);
 								JOptionPane.showMessageDialog(frame, message, title, JOptionPane.ERROR_MESSAGE);
 							}
 						});
@@ -205,7 +201,7 @@ public class GUI {
 			} catch (Exception e) {
 				throw new Exception("Cannot connect to database", e);
 			}
-			
+
 			//Connected
 		}
 	}
