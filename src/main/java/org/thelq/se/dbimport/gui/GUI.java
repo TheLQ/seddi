@@ -36,6 +36,8 @@ import javax.swing.table.AbstractTableModel;
 import lombok.Getter;
 import ch.qos.logback.classic.Logger;
 import com.jgoodies.forms.debug.FormDebugPanel;
+import com.jgoodies.forms.layout.CellConstraints;
+import javax.swing.JButton;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 
@@ -95,7 +97,7 @@ public class GUI {
 		//DB Config panel
 		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow", 
 				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
-		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout, new FormDebugPanel())
+		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout)
 				.leadingColumnOffset(1);
 		configBuilder.appendSeparator("Database Configuration");
 		configBuilder.append("Preset", dbType = new JComboBox(new String[]{"MySQL", "SQlite", "MSSQL"}));
@@ -107,6 +109,9 @@ public class GUI {
 		configBuilder.nextLine();
 		configBuilder.nextLine();
 		configBuilder.append("Dialect", dialect = new JTextField(10), 3);
+		configBuilder.nextColumn();
+		configBuilder.nextColumn();
+		configBuilder.append(new JButton("Import"), 3);
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
 		//Options
