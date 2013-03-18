@@ -38,16 +38,9 @@ public class Controller {
 			log.info("Ignoring non-XML file " + file.getAbsolutePath());
 			return;
 		}
-		generalThreadPool.execute(new Runnable() {
-			public void run() {
-				try {
-					parsers.add(new DumpParser(file));
-				} catch (Exception e) {
-					//TODO: Inform other parts of failure?
-					log.error("Cannot load " + file, e);
-				}
-			}
-		});
+
+		//Good, load
+		parsers.add(new DumpParser(file));
 	}
 
 	public static void main(String[] args) {
