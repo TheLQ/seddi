@@ -101,65 +101,65 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 
 		//Primary panel
-		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 6dlu, pref", "pref, pref, fill:pref:grow, fill:80dlu");
-		DefaultFormBuilder primaryBuilder = new DefaultFormBuilder(primaryLayout)
-				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5))
-				.leadingColumnOffset(1);
+		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 5dlu, 5dlu, pref", 
+				"pref, top:pref, pref, fill:pref:grow, pref, fill:80dlu");
+		PanelBuilder primaryBuilder = new PanelBuilder(primaryLayout)
+				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 		//DB Config panel
-		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref",
+		primaryBuilder.addSeparator("Database Configuration", CC.xyw(1, 1, 2));
+		FormLayout configLayout = new FormLayout("pref, 3dlu, pref:grow, 6dlu, pref",
 				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
-		configLayout.setColumnGroups(new int[][]{{4, 6}});
+		configLayout.setColumnGroups(new int[][]{{3, 5}});
 		configLayout.setHonorsVisibility(true);
 		PanelBuilder configBuilder = new PanelBuilder(configLayout);
-		configBuilder.addSeparator("Database Configuration");
-		configBuilder.addLabel("Preset", CC.xy(2, 2), dbType = new JComboBox(), CC.xy(4, 2));
-		configBuilder.add(dbAdvanced = new JCheckBox("Show advanced options"), CC.xy(6, 2));
-		configBuilder.addLabel("JDBC Connection", CC.xy(2, 4), jdbcString = new JTextField(15), CC.xyw(4, 4, 3));
-		configBuilder.addLabel("Username", CC.xy(2, 6), username = new JTextField(10), CC.xy(4, 6));
-		configBuilder.addLabel("Password", CC.xy(2, 8), password = new JPasswordField(10), CC.xy(4, 8));
-		configBuilder.add(importButton = new JButton("Import"), CC.xywh(6, 6, 1, 3));
+		configBuilder.addLabel("Preset", CC.xy(1, 2), dbType = new JComboBox(), CC.xy(3, 2));
+		configBuilder.add(dbAdvanced = new JCheckBox("Show advanced options"), CC.xy(5, 2));
+		configBuilder.addLabel("JDBC Connection", CC.xy(1, 4), jdbcString = new JTextField(15), CC.xyw(3, 4, 3));
+		configBuilder.addLabel("Username", CC.xy(1, 6), username = new JTextField(10), CC.xy(3, 6));
+		configBuilder.addLabel("Password", CC.xy(1, 8), password = new JPasswordField(10), CC.xy(3, 8));
+		configBuilder.add(importButton = new JButton("Import"), CC.xywh(5, 6, 1, 3));
 		//Add hidden
 		JLabel dialectLabel = new JLabel("Dialect");
 		dialectLabel.setVisible(false);
-		configBuilder.add(dialectLabel, CC.xy(2, 10), dialect = new JTextField(10), CC.xyw(4, 10, 3));
+		configBuilder.add(dialectLabel, CC.xy(1, 10), dialect = new JTextField(10), CC.xyw(3, 10, 3));
 		dialect.setVisible(false);
 		JLabel driverLabel = new JLabel("Driver");
 		driverLabel.setVisible(false);
-		configBuilder.add(driverLabel, CC.xy(2, 12), driver = new JTextField(10), CC.xyw(4, 12, 3));
+		configBuilder.add(driverLabel, CC.xy(1, 12), driver = new JTextField(10), CC.xyw(3, 12, 3));
 		driver.setVisible(false);
-		primaryBuilder.append(configBuilder.getPanel(), 2);
+		primaryBuilder.add(configBuilder.getPanel(), CC.xy(2, 2));
 
 		//Options
-		FormLayout optionsLayout = new FormLayout("5dlu, pref, 3dlu, left:pref:grow, left:pref:grow", "");
-		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout)
-				.leadingColumnOffset(1);
-		optionsBuilder.appendSeparator("Options");
+		primaryBuilder.addSeparator("Options", CC.xyw(4, 1, 2));
+		FormLayout optionsLayout = new FormLayout("pref, 3dlu, left:pref:grow, left:pref:grow", "");
+		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout);
 		optionsBuilder.append("Disable Creating Tables", disableCreateTables = new JCheckBox());
 		optionsBuilder.append("Lower memory usage", lowerMemoryUsage = new JCheckBox());
 		optionsBuilder.append("Global Table Prefix", globalTablePrefix = new JTextField(7));
-		primaryBuilder.append(optionsBuilder.getPanel());
+		primaryBuilder.add(optionsBuilder.getPanel(), CC.xy(5, 2));
 
 		//Locations
+		primaryBuilder.addSeparator("Dump Locations", CC.xyw(1, 3, 5));
 		FormLayout locationsLayout = new FormLayout("pref:grow", "pref");
 		locationsBuilder = new DefaultFormBuilder(locationsLayout)
 				.background(Color.WHITE);
-		primaryBuilder.appendSeparator("Dump Locations");
 		for (int i = 0; i < 10; i++)
 			locationsBuilder.append(genList());
 		JScrollPane locationsPane = new JScrollPane(locationsBuilder.getPanel());
 		locationsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		locationsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		primaryBuilder.append(locationsPane, 3);
+		primaryBuilder.add(locationsPane, CC.xyw(2, 4, 4));
 
 		//Logger
+		primaryBuilder.addSeparator("Log", CC.xyw(1, 5, 5));
 		loggerText = new JTextPaneNW();
 		loggerText.setEditable(false);
 		loggerText.setAlignmentX(Component.CENTER_ALIGNMENT);
 		JScrollPane loggerPane = new JScrollPane(loggerText);
 		loggerPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		loggerPane.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		primaryBuilder.append(loggerPane, 3);
+		primaryBuilder.add(loggerPane, CC.xyw(2, 6, 4));
 
 		//Display
 		frame.setContentPane(primaryBuilder.getPanel());
