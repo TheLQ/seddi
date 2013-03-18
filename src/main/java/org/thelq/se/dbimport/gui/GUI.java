@@ -127,7 +127,7 @@ public class GUI {
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
 		//Options
-		FormLayout optionsLayout = new FormLayout("5dlu, pref, 3dlu, left:pref:grow, 6dlu, pref, 3dlu, left:pref:grow", "");
+		FormLayout optionsLayout = new FormLayout("5dlu, pref, 3dlu, left:pref:grow, left:pref:grow", "");
 		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout)
 				.leadingColumnOffset(1);
 		optionsBuilder.appendSeparator("Options");
