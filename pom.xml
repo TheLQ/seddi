@@ -15,58 +15,77 @@
 	</properties>
 
 	<dependencies>
-		<!--Project Lombok for annotation processing-->
+		<!--
+			Core Utilities
+		-->
+
+		<!-- Project Lombok for annotation processing -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>0.11.6</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--Extremely useful-->
+		<!-- Commons Lang for general utils -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
 		</dependency>
+		<!-- Guava for Collection utils -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-collections</artifactId>
+			<version>r03</version>
+		</dependency>
+		
+		<!-- Woodstox for XML parsing -->
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>woodstox-core-asl</artifactId>
 			<version>4.1.4</version>
 		</dependency>
+		<!-- Logback for Logging -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.0.9</version>
 		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>4.2.0.CR1</version>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.23</version>
-		</dependency>
-		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.1-901-1.jdbc4</version>
-		</dependency>
-		<dependency>
-			<groupId>com.jgoodies</groupId>
-			<artifactId>jgoodies-looks</artifactId>
-			<version>2.5.2</version>
-		</dependency>
+		<!-- JGoodies Forms for layout -->
 		<dependency>
 			<groupId>com.jgoodies</groupId>
 			<artifactId>jgoodies-forms</artifactId>
 			<version>1.6.0</version>
 		</dependency>
+		<!-- JGoodies Looks for Windows Look & Feel -->
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava-collections</artifactId>
-			<version>r03</version>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>jgoodies-looks</artifactId>
+			<version>2.5.2</version>
+		</dependency>
+		
+
+
+		<!-- 
+			Database
+		-->
+		<!-- Hibernate for Database Abstraction -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>4.2.0.CR1</version>
+		</dependency>
+		<!-- MySQL JDBC Driver -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.23</version>
+		</dependency>
+		<!-- PostgreSQL JDBC Driver -->
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.1-901-1.jdbc4</version>
 		</dependency>
 	</dependencies>
 </project>
