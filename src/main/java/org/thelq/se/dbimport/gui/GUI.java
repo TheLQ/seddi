@@ -115,18 +115,18 @@ public class GUI {
 		configBuilder.addSeparator("Database Configuration");
 		configBuilder.addLabel("Preset", CC.xy(2, 2), dbType = new JComboBox(), CC.xy(4, 2));
 		configBuilder.add(dbAdvanced = new JCheckBox("Show advanced options"), CC.xy(6, 2));
-		configBuilder.addLabel("JDBC Connection", CC.xy(2, 4), jdbcString = new JTextField(15), CC.xy(4, 4));
+		configBuilder.addLabel("JDBC Connection", CC.xy(2, 4), jdbcString = new JTextField(15), CC.xyw(4, 4, 3));
 		configBuilder.addLabel("Username", CC.xy(2, 6), username = new JTextField(10), CC.xy(4, 6));
 		configBuilder.addLabel("Password", CC.xy(2, 8), password = new JPasswordField(10), CC.xy(4, 8));
 		configBuilder.add(importButton = new JButton("Import"), CC.xywh(6, 6, 1, 3));
 		//Add hidden
 		JLabel dialectLabel = new JLabel("Dialect");
 		dialectLabel.setVisible(false);
-		configBuilder.add(dialectLabel, CC.xy(2, 10), dialect = new JTextField(10), CC.xy(4, 10));
+		configBuilder.add(dialectLabel, CC.xy(2, 10), dialect = new JTextField(10), CC.xyw(4, 10, 3));
 		dialect.setVisible(false);
 		JLabel driverLabel = new JLabel("Driver");
 		driverLabel.setVisible(false);
-		configBuilder.add(driverLabel, CC.xy(2, 12), driver = new JTextField(10), CC.xy(4, 12));
+		configBuilder.add(driverLabel, CC.xy(2, 12), driver = new JTextField(10), CC.xyw(4, 12, 3));
 		driver.setVisible(false);
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
