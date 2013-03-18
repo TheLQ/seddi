@@ -15,6 +15,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -38,7 +39,7 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 		
 		messageLayout = new PatternLayout();
 		messageLayout.setContext(getContext());
-		messageLayout.setPattern("%message%n");
+		messageLayout.setPattern("%logger{36} %message%n");
 		messageLayout.start();
 
 		//Configure logger
@@ -76,11 +77,12 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 
 			protected void runInsert() throws BadLocationException {
 				int prevLength = loggerStyle.getLength();
+				String[] messageArray = StringUtils.split(messageLayout.doLayout(event).trim(), " ", 2);
 				loggerStyle.insertString(loggerStyle.getLength(), "[" + dateFormatter.format(event.getTimeStamp()) + "] ", loggerStyle.getStyle("Normal")); //time
 				//doc.insertString(doc.getLength(), "["+event.getThreadName()+"] ", doc.getStyle("Thread")); //thread name
 				loggerStyle.insertString(loggerStyle.getLength(), event.getLevel().toString() + " ", loggerStyle.getStyle("Level")); //Logging level
-				loggerStyle.insertString(loggerStyle.getLength(), event.getLoggerName() + " ", loggerStyle.getStyle("Class"));
-				loggerStyle.insertString(loggerStyle.getLength(), messageLayout.doLayout(event).trim(), msgStyle);
+				loggerStyle.insertString(loggerStyle.getLength(), messageArray[0] + " ", loggerStyle.getStyle("Class"));
+				loggerStyle.insertString(loggerStyle.getLength(), messageArray[1], msgStyle);
 				loggerStyle.insertString(loggerStyle.getLength(), "\n", loggerStyle.getStyle("Normal"));
 				
 				//Only autoscroll if the scrollbar is at the bottom
