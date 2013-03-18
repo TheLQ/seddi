@@ -105,12 +105,13 @@ public class GUI {
 		DefaultFormBuilder primaryBuilder = new DefaultFormBuilder(primaryLayout)
 				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5))
 				.leadingColumnOffset(1);
-		
+
 		//DB Config panel
 		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref",
 				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
-		configLayout.setColumnGroups(new int[][]{{4,6}});
-		PanelBuilder configBuilder = new PanelBuilder(configLayout, new FormDebugPanel());
+		configLayout.setColumnGroups(new int[][]{{4, 6}});
+		configLayout.setHonorsVisibility(true);
+		PanelBuilder configBuilder = new PanelBuilder(configLayout);
 		configBuilder.addSeparator("Database Configuration");
 		configBuilder.addLabel("Preset", CC.xy(2, 2), dbType = new JComboBox(), CC.xy(4, 2));
 		configBuilder.add(dbAdvanced = new JCheckBox("Show advanced options"), CC.xy(6, 2));
@@ -118,8 +119,15 @@ public class GUI {
 		configBuilder.addLabel("Username", CC.xy(2, 6), username = new JTextField(10), CC.xy(4, 6));
 		configBuilder.addLabel("Password", CC.xy(2, 8), password = new JPasswordField(10), CC.xy(4, 8));
 		configBuilder.add(importButton = new JButton("Import"), CC.xywh(6, 6, 1, 3));
-		configBuilder.addLabel("Dialect", CC.xy(2, 10),dialect = new JTextField(10), CC.xy(4, 10));
-		configBuilder.addLabel("Driver", CC.xy(2, 12), driver = new JTextField(10), CC.xy(4, 12));
+		//Add hidden
+		JLabel dialectLabel = new JLabel("Dialect");
+		dialectLabel.setVisible(false);
+		configBuilder.add(dialectLabel, CC.xy(2, 10), dialect = new JTextField(10), CC.xy(4, 10));
+		dialect.setVisible(false);
+		JLabel driverLabel = new JLabel("Driver");
+		driverLabel.setVisible(false);
+		configBuilder.add(driverLabel, CC.xy(2, 12), driver = new JTextField(10), CC.xy(4, 12));
+		driver.setVisible(false);
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
 		//Options
@@ -183,7 +191,18 @@ public class GUI {
 				setDbOption((DatabaseOption) e.getItem());
 			}
 		});
-		setDbOption((DatabaseOption)dbType.getItemAt(0));
+		setDbOption((DatabaseOption) dbType.getItemAt(0));
+
+		//Show and hide advanced options with checkbox
+		dbAdvanced.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean selected = ((JCheckBox) e.getSource()).isSelected();
+				driver.setVisible(selected);
+				((JLabel) driver.getClientProperty("labeledBy")).setVisible(selected);
+				dialect.setVisible(selected);
+				((JLabel) dialect.getClientProperty("labeledBy")).setVisible(selected);
+			}
+		});
 	}
 
 	@Accessors(fluent = true)
