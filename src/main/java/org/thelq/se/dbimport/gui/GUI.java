@@ -166,10 +166,7 @@ public class GUI {
 		frame.setVisible(true);
 
 		//Initialize logger
-		Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-		logAppender = new GUILogAppender(this, rootLogger.getLoggerContext());
-		logAppender.start();
-		rootLogger.addAppender(logAppender);
+		logAppender = new GUILogAppender(this);
 
 		//Import start code
 		importButton.addActionListener(new ImportActionListener());

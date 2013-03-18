@@ -1,6 +1,7 @@
 package org.thelq.se.dbimport.gui;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -14,6 +15,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -27,11 +29,15 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 	protected SimpleDateFormat dateFormatter = new SimpleDateFormat("hh:mm:ss a");
 	protected PatternLayout messageLayout;
 
-	public GUILogAppender(GUI gui, LoggerContext context) {
+	public GUILogAppender(GUI gui) {
 		this.gui = gui;
-		setContext(context);
+		
+		//Grab the context from root logger
+		Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+		setContext(rootLogger.getLoggerContext());
+		
 		messageLayout = new PatternLayout();
-		messageLayout.setContext(context);
+		messageLayout.setContext(getContext());
 		messageLayout.setPattern("%message%n");
 		messageLayout.start();
 
@@ -44,6 +50,9 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 		StyleConstants.setItalic(loggerStyle.addStyle("Thread", null), true);
 		StyleConstants.setItalic(loggerStyle.addStyle("Level", null), true);
 		
+		//Init
+		start();
+		rootLogger.addAppender(this);
 		log.info("Added GUILogAppender");
 	}
 
