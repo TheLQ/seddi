@@ -114,7 +114,7 @@ public class GUI {
 		PanelBuilder configBuilder = new PanelBuilder(configLayout);
 		configBuilder.addLabel("Preset", CC.xy(1, 2), dbType = new JComboBox(), CC.xy(3, 2));
 		configBuilder.add(dbAdvanced = new JCheckBox("Show advanced options"), CC.xy(5, 2));
-		configBuilder.addLabel("JDBC Connection", CC.xy(1, 4), jdbcString = new JTextField(), CC.xyw(3, 4, 3));
+		configBuilder.addLabel("JDBC Connection", CC.xy(1, 4), jdbcString = new JTextField(15), CC.xyw(3, 4, 3));
 		configBuilder.addLabel("Username", CC.xy(1, 6), username = new JTextField(10), CC.xy(3, 6));
 		configBuilder.addLabel("Password", CC.xy(1, 8), password = new JPasswordField(10), CC.xy(3, 8));
 		configBuilder.add(importButton = new JButton("Import"), CC.xywh(5, 6, 1, 3));
