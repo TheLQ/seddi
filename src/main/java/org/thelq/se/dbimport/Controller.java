@@ -46,7 +46,7 @@ public class Controller {
 					parsers.add(new DumpParser(file));
 				} catch (Exception e) {
 					//TODO: Inform other parts of failure?
-					log.error("Cannot load " + file);
+					log.error("Cannot load " + file, e);
 				}
 			}
 		});
