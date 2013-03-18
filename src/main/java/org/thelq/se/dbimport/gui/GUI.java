@@ -199,6 +199,7 @@ public class GUI {
 				dialect.setVisible(selected);
 				((JLabel) dialect.getClientProperty("labeledBy")).setVisible(selected);
 				frame.pack();
+				frame.validate();
 			}
 		});
 	}
