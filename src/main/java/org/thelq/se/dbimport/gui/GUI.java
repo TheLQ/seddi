@@ -4,6 +4,7 @@ import ch.qos.logback.core.AppenderBase;
 import com.google.common.collect.Iterables;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
@@ -32,9 +33,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -69,6 +72,7 @@ public class GUI {
 	protected JCheckBox disableCreateTables;
 	protected JCheckBox lowerMemoryUsage;
 	protected JTextField globalTablePrefix;
+	protected JSpinner batchSize;
 	protected DefaultFormBuilder locationsBuilder;
 	@Getter
 	protected JTextPane loggerText;
@@ -131,11 +135,13 @@ public class GUI {
 
 		//Options
 		primaryBuilder.addSeparator("Options", CC.xyw(4, 1, 2));
-		FormLayout optionsLayout = new FormLayout("pref, 3dlu, left:pref:grow, left:pref:grow", "");
+		FormLayout optionsLayout = new FormLayout("pref, 3dlu, pref:grow", "");
 		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout);
 		optionsBuilder.append(disableCreateTables = new JCheckBox("Disable Creating Tables"), 3);
 		optionsBuilder.append(lowerMemoryUsage = new JCheckBox("Lower memory usage"), 3);
 		optionsBuilder.append("Global Table Prefix", globalTablePrefix = new JTextField(7));
+		optionsBuilder.append("Batch Size", batchSize = new JSpinner());
+		batchSize.setModel(new SpinnerNumberModel(500, 1, 500000, 1));
 		primaryBuilder.add(optionsBuilder.getPanel(), CC.xy(5, 2));
 
 		//Locations
@@ -183,7 +189,6 @@ public class GUI {
 			protected void runFileUpdate() {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						
 					}
 				});
 			}
@@ -281,6 +286,7 @@ public class GUI {
 				DatabaseWriter.setDialect(dialect.getText());
 				DatabaseWriter.setDriver(driver.getText());
 				DatabaseWriter.setJdbcString(jdbcString.getText());
+				DatabaseWriter.setBatchSize((Integer) batchSize.getValue());
 				DatabaseWriter.init();
 			} catch (Exception e) {
 				throw new Exception("Cannot connect to database", e);
