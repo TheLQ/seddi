@@ -133,8 +133,8 @@ public class GUI {
 		primaryBuilder.addSeparator("Options", CC.xyw(4, 1, 2));
 		FormLayout optionsLayout = new FormLayout("pref, 3dlu, left:pref:grow, left:pref:grow", "");
 		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout);
-		optionsBuilder.append("Disable Creating Tables", disableCreateTables = new JCheckBox());
-		optionsBuilder.append("Lower memory usage", lowerMemoryUsage = new JCheckBox());
+		optionsBuilder.append(disableCreateTables = new JCheckBox("Disable Creating Tables"), 3);
+		optionsBuilder.append(lowerMemoryUsage = new JCheckBox("Lower memory usage"), 3);
 		optionsBuilder.append("Global Table Prefix", globalTablePrefix = new JTextField(7));
 		primaryBuilder.add(optionsBuilder.getPanel(), CC.xy(5, 2));
 
