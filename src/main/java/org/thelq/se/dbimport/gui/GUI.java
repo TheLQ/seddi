@@ -72,9 +72,12 @@ public class GUI {
 	protected DefaultFormBuilder locationsBuilder;
 	@Getter
 	protected JTextPane loggerText;
-	protected AppenderBase logAppender;
+	protected GUILogAppender logAppender;
 
 	public GUI(Controller passedController) {
+		//Initialize logger
+		logAppender = new GUILogAppender(this);
+		
 		//Set our Look&Feel
 		Exception lafException = null;
 		try {
@@ -176,9 +179,6 @@ public class GUI {
 		frame.pack();
 		frame.setVisible(true);
 
-		//Initialize logger
-		logAppender = new GUILogAppender(this);
-
 		//Report L&F exceptions
 		if (lafException != null)
 			log.warn("Defaulting to Swing L&F due to exception", lafException);
@@ -216,6 +216,10 @@ public class GUI {
 				frame.validate();
 			}
 		});
+		
+		//Done, init logger
+		logAppender.init();
+		log.info("Finished creating GUI");
 	}
 
 	@Accessors(fluent = true)

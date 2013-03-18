@@ -2,12 +2,13 @@ package org.thelq.se.dbimport.gui;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import java.awt.Color;
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
+import java.util.Queue;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -25,11 +26,13 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 	protected final GUI gui;
+	protected boolean inited = false;
+	protected final LinkedList<ILoggingEvent> initMessageQueue = new LinkedList();
 	protected JTextPane loggerText;
 	protected StyledDocument loggerStyle;
 	protected SimpleDateFormat dateFormatter = new SimpleDateFormat("hh:mm:ss a");
 	protected PatternLayout messageLayout;
-
+	
 	public GUILogAppender(GUI gui) {
 		this.gui = gui;
 		
@@ -42,6 +45,13 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 		messageLayout.setPattern("%logger{36} %message%n");
 		messageLayout.start();
 
+		//Init
+		start();
+		rootLogger.addAppender(this);
+		log.debug("Added GUILogAppender, waiting for init");
+	}
+	
+	public void init() {
 		//Configure logger
 		loggerText = gui.getLoggerText();
 		loggerStyle = loggerText.getStyledDocument();
@@ -51,21 +61,30 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 		StyleConstants.setItalic(loggerStyle.addStyle("Thread", null), true);
 		StyleConstants.setItalic(loggerStyle.addStyle("Level", null), true);
 		
-		//Init
-		start();
-		rootLogger.addAppender(this);
-		log.info("Added GUILogAppender");
+		log.debug("Inited GUILogAppender, processing any saved messages");
+		synchronized (initMessageQueue) {
+			inited = true;
+			while (!initMessageQueue.isEmpty())
+				append(initMessageQueue.poll());
+		}
 	}
-
+	
 	@Override
 	protected void append(final ILoggingEvent event) {
+		if (!inited)
+			synchronized (initMessageQueue) {
+				if (!inited) {
+					initMessageQueue.add(event);
+					return;
+				}
+			}
 		//Color the message properly
 		final Style msgStyle;
 		if (event.getLevel().isGreaterOrEqual(Level.WARN))
 			msgStyle = loggerStyle.getStyle("Error");
 		else
 			msgStyle = loggerStyle.getStyle("Normal");
-
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -74,7 +93,7 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 					e.printStackTrace();
 				}
 			}
-
+			
 			protected void runInsert() throws BadLocationException {
 				int prevLength = loggerStyle.getLength();
 				String[] messageArray = StringUtils.split(messageLayout.doLayout(event).trim(), " ", 2);
@@ -84,7 +103,7 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 				loggerStyle.insertString(loggerStyle.getLength(), messageArray[0] + " ", loggerStyle.getStyle("Class"));
 				loggerStyle.insertString(loggerStyle.getLength(), messageArray[1], msgStyle);
 				loggerStyle.insertString(loggerStyle.getLength(), "\n", loggerStyle.getStyle("Normal"));
-				
+
 				//Only autoscroll if the scrollbar is at the bottom
 				//JScrollBar scrollBar = scroll.getVerticalScrollBar();
 				//if (scrollBar.getVisibleAmount() != scrollBar.getMaximum() && scrollBar.getValue() + scrollBar.getVisibleAmount() == scrollBar.getMaximum())
