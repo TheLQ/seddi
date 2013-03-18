@@ -243,6 +243,7 @@ public class GUI {
 							}
 						});
 					}
+					setGuiEnabled(true);
 				}
 			});
 		}
