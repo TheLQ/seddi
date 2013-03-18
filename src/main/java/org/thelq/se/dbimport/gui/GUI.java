@@ -110,7 +110,6 @@ public class GUI {
 		primaryBuilder.addSeparator("Database Configuration", CC.xyw(1, 1, 2));
 		FormLayout configLayout = new FormLayout("pref, 3dlu, pref:grow, 6dlu, pref",
 				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
-		configLayout.setColumnGroups(new int[][]{{3, 5}});
 		configLayout.setHonorsVisibility(true);
 		PanelBuilder configBuilder = new PanelBuilder(configLayout);
 		configBuilder.addLabel("Preset", CC.xy(1, 2), dbType = new JComboBox(), CC.xy(3, 2));
