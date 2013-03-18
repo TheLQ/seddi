@@ -31,13 +31,11 @@ public class Controller {
 
 	public void addFile(final File file) {
 		if (file.isDirectory()) {
-			for (File curFile : file.listFiles())
-				addFile(curFile);
+			log.info("Ignoring folder " + file.getAbsolutePath());
 			return;
 		}
-		//Only care about xml files
 		if (!file.getName().endsWith(".xml")) {
-			log.debug("Ignoring file " + file.getAbsolutePath());
+			log.info("Ignoring non-XML file " + file.getAbsolutePath());
 			return;
 		}
 		generalThreadPool.execute(new Runnable() {
