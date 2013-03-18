@@ -46,6 +46,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 import org.thelq.se.dbimport.DatabaseWriter;
@@ -101,7 +102,7 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 
 		//Primary panel
-		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 5dlu, 5dlu, pref", 
+		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 5dlu, 5dlu, pref",
 				"pref, top:pref, pref, fill:pref:grow, pref, fill:80dlu");
 		PanelBuilder primaryBuilder = new PanelBuilder(primaryLayout)
 				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -230,8 +231,11 @@ public class GUI {
 					} catch (final Exception e) {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
+								String root = "";
+								if (e.getCause() != null)
+									root = "\n" + ExceptionUtils.getRootCauseMessage(e);
 								String message = "Error: " + e.getLocalizedMessage()
-										+ "\n" + e.getCause().getLocalizedMessage()
+										+ root
 										+ "\nSee Log for more information";
 								String title = e.getLocalizedMessage();
 								LoggerFactory.getLogger(getClass()).error(message, e);
