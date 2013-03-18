@@ -197,6 +197,7 @@ public class GUI {
 				((JLabel) driver.getClientProperty("labeledBy")).setVisible(selected);
 				dialect.setVisible(selected);
 				((JLabel) dialect.getClientProperty("labeledBy")).setVisible(selected);
+				frame.pack();
 			}
 		});
 	}
