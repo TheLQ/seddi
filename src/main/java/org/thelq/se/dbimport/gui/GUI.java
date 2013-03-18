@@ -38,6 +38,7 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.ComponentFactory;
 import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JButton;
@@ -46,6 +47,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
@@ -55,6 +58,7 @@ import org.thelq.se.dbimport.DatabaseWriter;
  *
  * @author Leon
  */
+@Slf4j
 public class GUI {
 	protected Controller controller;
 	protected JFrame frame;
@@ -76,6 +80,17 @@ public class GUI {
 	protected AppenderBase logAppender;
 
 	public GUI(Controller passedController) {
+		//Set our Look&Feel
+		Exception lafException = null;
+		try {
+			if (SystemUtils.IS_OS_WINDOWS)
+				UIManager.setLookAndFeel(new WindowsLookAndFeel());
+			else
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			lafException = e;
+		}
+
 		this.controller = passedController;
 		frame = new JFrame();
 		frame.setTitle("Unified StackExchange Data Dump Importer");
@@ -168,6 +183,10 @@ public class GUI {
 
 		//Initialize logger
 		logAppender = new GUILogAppender(this);
+
+		//Report L&F exceptions
+		if (lafException != null)
+			log.warn("Defaulting to Swing L&F due to exception", lafException);
 
 		//Import start code
 		importButton.addActionListener(new ImportActionListener());
