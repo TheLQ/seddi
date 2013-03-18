@@ -34,9 +34,18 @@ import javax.swing.WindowConstants;
 import javax.swing.table.AbstractTableModel;
 import lombok.Getter;
 import ch.qos.logback.classic.Logger;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+import lombok.experimental.Value;
+import lombok.experimental.Wither;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 import org.thelq.se.dbimport.DatabaseWriter;
@@ -102,7 +111,7 @@ public class GUI {
 		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout)
 				.leadingColumnOffset(1);
 		configBuilder.appendSeparator("Database Configuration");
-		configBuilder.append("Preset", dbType = new JComboBox(new String[]{"MySQL", "SQlite", "MSSQL"}));
+		configBuilder.append("Preset", dbType = new JComboBox());
 		configBuilder.append("Username", username = new JTextField(10));
 		configBuilder.append("Password", password = new JPasswordField(10));
 		configBuilder.nextLine();
@@ -161,6 +170,39 @@ public class GUI {
 
 		//Import start code
 		importButton.addActionListener(new ImportActionListener());
+
+		//Add options (Could be in a map, but this is cleaner)
+		dbType.addItem(new DatabaseOption()
+				.name("MySQL")
+				.jdbcString("jdbc:mysql://127.0.0.1:3306/so_new?rewriteBatchedStatements=true")
+				.dialect("org.hibernate.dialect.MySQL5Dialect")
+				.driver("com.mysql.jdbc.Driver"));
+		dbType.addItem(new DatabaseOption()
+				.name("PostgreSQL")
+				.jdbcString("jdbc:mysql://127.0.0.1:5432/so_new")
+				.dialect("org.hibernate.dialect.PostgreSQLDialect")
+				.driver("org.postgresql.Driver"));
+		dbType.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				setDbOption((DatabaseOption) e.getItem());
+			}
+		});
+		setDbOption((DatabaseOption)dbType.getItemAt(0));
+	}
+
+	@Accessors(fluent = true)
+	@Setter
+	@Getter
+	protected class DatabaseOption {
+		String name;
+		String jdbcString;
+		String driver;
+		String dialect;
+
+		@Override
+		public String toString() {
+			return name;
+		}
 	}
 
 	protected class ImportActionListener implements ActionListener {
@@ -201,9 +243,14 @@ public class GUI {
 			} catch (Exception e) {
 				throw new Exception("Cannot connect to database", e);
 			}
-
-			//Connected
 		}
+	}
+
+	protected void setDbOption(DatabaseOption option) {
+		dbType.setSelectedItem(option);
+		driver.setText(option.driver());
+		dialect.setText(option.dialect());
+		jdbcString.setText(option.jdbcString());
 	}
 
 	protected void setGuiEnabled(boolean enabled) {
