@@ -180,7 +180,7 @@ public class GUI {
 				.driver("com.mysql.jdbc.Driver"));
 		dbType.addItem(new DatabaseOption()
 				.name("PostgreSQL")
-				.jdbcString("jdbc:mysql://127.0.0.1:5432/so_new")
+				.jdbcString("jdbc:postgresql://127.0.0.1:5432/so_new")
 				.dialect("org.hibernate.dialect.PostgreSQLDialect")
 				.driver("org.postgresql.Driver"));
 		dbType.addItemListener(new ItemListener() {
