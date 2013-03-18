@@ -263,8 +263,11 @@ public class GUI {
 	protected void setDbOption(DatabaseOption option) {
 		dbType.setSelectedItem(option);
 		driver.setText(option.driver());
+		driver.setCaretPosition(0);
 		dialect.setText(option.dialect());
+		dialect.setCaretPosition(0);
 		jdbcString.setText(option.jdbcString());
+		jdbcString.setCaretPosition(0);
 	}
 
 	protected void setGuiEnabled(boolean enabled) {
