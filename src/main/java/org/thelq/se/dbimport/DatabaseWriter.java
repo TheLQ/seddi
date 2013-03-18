@@ -1,14 +1,14 @@
 package org.thelq.se.dbimport;
 
-import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.CacheMode;
+import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
@@ -35,6 +35,9 @@ public class DatabaseWriter {
 	protected static String driver;
 	@Setter
 	protected static String dialect;
+	protected int count = 0;
+	protected final int batchSize;
+	protected final String table;
 
 	public static void init() throws HibernateException {
 		configuration = new Configuration();
@@ -53,23 +56,27 @@ public class DatabaseWriter {
 		testSession.close();
 		log.info("Test connection successful, database is inited");
 	}
-	protected StatelessSession session;
+	protected Session session;
 
-	public DatabaseWriter() {
-		session = sessionFactory.openStatelessSession();
-		//session.setCacheMode(CacheMode.IGNORE);
-		//session.setFlushMode(FlushMode.MANUAL);
+	public DatabaseWriter(String table, int batchSize) {
+		this.table = table;
+		this.batchSize = batchSize;
+		session = sessionFactory.openSession();
+		session.setCacheMode(CacheMode.IGNORE);
+		session.setFlushMode(FlushMode.MANUAL);
+		session.beginTransaction();
 	}
 
-	public void insertData(String table, List<Map<String, Object>> data) throws Exception {
-		Transaction tx = session.beginTransaction();
+	public void insertData(Map<String, Object> data) throws Exception {
 		try {
-			for (Map<String, Object> curDataEntry : data)
-				session.insert(table, curDataEntry);
-			//session.flush();
-			tx.commit();
+			session.save(table, data);
+			count++;
+			if (count % batchSize == 0) {
+				session.flush();
+				session.clear();
+			}
 		} catch (Exception e) {
-			tx.rollback();
+			session.getTransaction().rollback();
 			throw e;
 		}
 	}
@@ -82,6 +89,7 @@ public class DatabaseWriter {
 	}
 
 	public void close() {
+		session.getTransaction().commit();
 		session.close();
 	}
 }

@@ -1,7 +1,7 @@
 package org.thelq.se.dbimport;
 
 import java.io.File;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.SwingUtilities;
@@ -17,7 +17,7 @@ import org.thelq.se.dbimport.gui.GUI;
 public class Controller {
 	protected GUI gui;
 	@Getter
-	protected LinkedHashMap<DumpParser, DatabaseWriter> parsers = new LinkedHashMap();
+	protected LinkedList<DumpParser> parsers = new LinkedList();
 	@Getter
 	protected ExecutorService generalThreadPool = Executors.newCachedThreadPool();
 
@@ -43,7 +43,7 @@ public class Controller {
 		generalThreadPool.execute(new Runnable() {
 			public void run() {
 				try {
-					parsers.put(new DumpParser(file), new DatabaseWriter());
+					parsers.add(new DumpParser(file));
 				} catch (Exception e) {
 					//TODO: Inform other parts of failure?
 					log.error("Cannot load " + file);

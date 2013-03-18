@@ -77,7 +77,7 @@ public class GUI {
 	public GUI(Controller passedController) {
 		//Initialize logger
 		logAppender = new GUILogAppender(this);
-		
+
 		//Set our Look&Feel
 		try {
 			if (SystemUtils.IS_OS_WINDOWS)
@@ -97,19 +97,6 @@ public class GUI {
 		JMenuBar menuBar = new JMenuBar();
 		JMenuItem menuAdd = new JMenuItem("Add Files/Folders");
 		menuAdd.setMnemonic(KeyEvent.VK_F);
-		menuAdd.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser fc = new JFileChooser();
-				fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				fc.setMultiSelectionEnabled(true);
-				fc.setDialogTitle("Select Folders/Files/Archives");
-
-				if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
-					return;
-				for (File curFile : fc.getSelectedFiles())
-					controller.addFile(curFile);
-			}
-		});
 		menuBar.add(menuAdd);
 		frame.setJMenuBar(menuBar);
 
@@ -178,6 +165,30 @@ public class GUI {
 		frame.pack();
 		frame.setVisible(true);
 
+		menuAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fc = new JFileChooser();
+				fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				fc.setMultiSelectionEnabled(true);
+				fc.setDialogTitle("Select Folders/Files/Archives");
+
+				if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
+					return;
+
+
+				for (File curFile : fc.getSelectedFiles())
+					controller.addFile(curFile);
+			}
+
+			protected void runFileUpdate() {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						
+					}
+				});
+			}
+		});
+
 		//Import start code
 		importButton.addActionListener(new ImportActionListener());
 
@@ -211,7 +222,7 @@ public class GUI {
 				frame.validate();
 			}
 		});
-		
+
 		//Done, init logger
 		logAppender.init();
 		log.info("Finished creating GUI");
@@ -392,7 +403,7 @@ public class GUI {
 			public Object getValueAt(int rowIndex, int columnIndex) {
 				if (columnIndex == 0)
 					//Enabled status
-					return Iterables.get(controller.getParsers().keySet(), rowIndex).isEnabled();
+					return Iterables.get(controller.getParsers(), rowIndex).isEnabled();
 				throw new RuntimeException("Unknown column " + columnIndex);
 			}
 		});

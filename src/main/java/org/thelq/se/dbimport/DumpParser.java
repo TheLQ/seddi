@@ -53,6 +53,8 @@ public class DumpParser {
 	@Getter
 	@Setter
 	protected boolean enabled = true;
+	@Setter
+	protected DatabaseWriter dbWriter;
 
 	public DumpParser(File file) {
 		try {
@@ -69,19 +71,7 @@ public class DumpParser {
 		}
 	}
 
-	public List<Map<String, Object>> parseNextBatch() {
-		List<Map<String, Object>> entries = new ArrayList();
-		for (int i = 0; i < BATCH_SIZE; i++) {
-			Map<String, Object> newEntry = parseNextEntry();
-			if (newEntry == null)
-				//Were done
-				break;
-			entries.add(newEntry);
-		}
-		return entries;
-	}
-
-	public Map<String, Object> parseNextEntry() {
+	public void parseNextEntry() {
 		try {
 			if(!enabled)
 				throw new RuntimeException("Parser is disabled");
@@ -92,7 +82,7 @@ public class DumpParser {
 				//Were done, shutdown this parser
 				log.info("Done with " + file.getName() + ", parsed " + parsedCount + " enteries");
 				close();
-				return null;
+				return;
 			} else if (eventType != XMLEvent.START_ELEMENT)
 				throw new RuntimeException("Unexpected event " + ErrorConsts.tokenTypeDesc(eventType)
 						+ " at " + xmlReader.getLocation().toString());
@@ -138,7 +128,7 @@ public class DumpParser {
 			}
 
 			parsedCount++;
-			return attributesMap;
+			dbWriter.insertData(attributesMap);
 		} catch (Exception e) {
 			throw new RuntimeException("Cannot parse entry #" + (parsedCount + 1)
 					+ " at " + xmlReader.getLocation(), e);
@@ -148,6 +138,7 @@ public class DumpParser {
 	protected void close() {
 		try {
 			endOfFile = true;
+			dbWriter.close();
 			xmlReader.close();
 			xmlReader.closeCompletely();
 		} catch (XMLStreamException e) {
