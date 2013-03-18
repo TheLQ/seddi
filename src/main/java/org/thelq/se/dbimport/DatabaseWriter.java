@@ -51,6 +51,7 @@ public class DatabaseWriter {
 		Session testSession = sessionFactory.openSession();
 		testSession.beginTransaction();
 		testSession.close();
+		log.info("Test connection successful, database is inited");
 	}
 	protected StatelessSession session;
 
