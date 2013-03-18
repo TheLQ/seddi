@@ -79,14 +79,13 @@ public class GUI {
 		logAppender = new GUILogAppender(this);
 		
 		//Set our Look&Feel
-		Exception lafException = null;
 		try {
 			if (SystemUtils.IS_OS_WINDOWS)
 				UIManager.setLookAndFeel(new WindowsLookAndFeel());
 			else
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
-			lafException = e;
+			log.warn("Defaulting to Swing L&F due to exception", e);
 		}
 
 		this.controller = passedController;
@@ -178,10 +177,6 @@ public class GUI {
 		frame.setContentPane(primaryBuilder.getPanel());
 		frame.pack();
 		frame.setVisible(true);
-
-		//Report L&F exceptions
-		if (lafException != null)
-			log.warn("Defaulting to Swing L&F due to exception", lafException);
 
 		//Import start code
 		importButton.addActionListener(new ImportActionListener());
