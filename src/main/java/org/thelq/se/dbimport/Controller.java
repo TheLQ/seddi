@@ -1,12 +1,13 @@
 package org.thelq.se.dbimport;
 
-import org.thelq.se.dbimport.gui.GUI;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.thelq.se.dbimport.gui.GUI;
 
 /**
  *
@@ -21,7 +22,11 @@ public class Controller {
 	protected ExecutorService generalThreadPool = Executors.newCachedThreadPool();
 
 	public Controller() {
-		gui = new GUI(this);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				gui = new GUI(Controller.this);
+			}
+		});
 	}
 
 	public void addFile(final File file) {
@@ -46,7 +51,7 @@ public class Controller {
 			}
 		});
 	}
-	
+
 	public static void main(String[] args) {
 		new Controller();
 	}
