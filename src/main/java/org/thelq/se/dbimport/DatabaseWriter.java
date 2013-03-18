@@ -35,8 +35,9 @@ public class DatabaseWriter {
 	protected static String driver;
 	@Setter
 	protected static String dialect;
+	@Setter
+	protected static int batchSize;
 	protected int count = 0;
-	protected final int batchSize;
 	protected final String table;
 
 	public static void init() throws HibernateException {
@@ -47,6 +48,7 @@ public class DatabaseWriter {
 		configuration.setProperty("hibernate.connection.url", jdbcString);
 		configuration.setProperty("hibernate.connection.driver_class", driver);
 		configuration.setProperty("hibernate.dialect", dialect);
+		configuration.setProperty("hibernate.jdbc.batch_size", Integer.toString(batchSize));
 		serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
 		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
@@ -58,9 +60,8 @@ public class DatabaseWriter {
 	}
 	protected Session session;
 
-	public DatabaseWriter(String table, int batchSize) {
+	public DatabaseWriter(String table) {
 		this.table = table;
-		this.batchSize = batchSize;
 		session = sessionFactory.openSession();
 		session.setCacheMode(CacheMode.IGNORE);
 		session.setFlushMode(FlushMode.MANUAL);
