@@ -34,18 +34,18 @@ import javax.swing.WindowConstants;
 import javax.swing.table.AbstractTableModel;
 import lombok.Getter;
 import ch.qos.logback.classic.Logger;
+import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.debug.FormDebugPanel;
+import com.jgoodies.forms.factories.ComponentFactory;
+import com.jgoodies.forms.layout.CellConstraints;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.Accessors;
-import lombok.experimental.Value;
-import lombok.experimental.Wither;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 import org.thelq.se.dbimport.DatabaseWriter;
@@ -64,6 +64,7 @@ public class GUI {
 	protected JTextField jdbcString;
 	protected JTextField dialect;
 	protected JTextField driver;
+	protected JCheckBox dbAdvanced;
 	protected JButton importButton;
 	protected JCheckBox disableCreateTables;
 	protected JCheckBox lowerMemoryUsage;
@@ -104,26 +105,21 @@ public class GUI {
 		DefaultFormBuilder primaryBuilder = new DefaultFormBuilder(primaryLayout)
 				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5))
 				.leadingColumnOffset(1);
-
+		
 		//DB Config panel
-		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow, 6dlu, pref, 3dlu, pref:grow",
-				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
-		DefaultFormBuilder configBuilder = new DefaultFormBuilder(configLayout)
-				.leadingColumnOffset(1);
-		configBuilder.appendSeparator("Database Configuration");
-		configBuilder.append("Preset", dbType = new JComboBox());
-		configBuilder.append("Username", username = new JTextField(10));
-		configBuilder.append("Password", password = new JPasswordField(10));
-		configBuilder.nextLine();
-		configBuilder.nextLine();
-		configBuilder.append("JDBC Connection", jdbcString = new JTextField(15), 9);
-		configBuilder.nextLine();
-		configBuilder.nextLine();
-		configBuilder.append("Dialect", dialect = new JTextField(10), 5);
-		configBuilder.nextLine();
-		configBuilder.nextLine();
-		configBuilder.append("Driver", driver = new JTextField(10), 5);
-		configBuilder.add(importButton = new JButton("Import"), CC.xywh(10, 6, 3, 3));
+		FormLayout configLayout = new FormLayout("5dlu, pref, 3dlu, pref:grow, 6dlu, pref",
+				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
+		configLayout.setColumnGroups(new int[][]{{4,6}});
+		PanelBuilder configBuilder = new PanelBuilder(configLayout, new FormDebugPanel());
+		configBuilder.addSeparator("Database Configuration");
+		configBuilder.addLabel("Preset", CC.xy(2, 2), dbType = new JComboBox(), CC.xy(4, 2));
+		configBuilder.add(dbAdvanced = new JCheckBox("Show advanced options"), CC.xy(6, 2));
+		configBuilder.addLabel("JDBC Connection", CC.xy(2, 4), jdbcString = new JTextField(15), CC.xy(4, 4));
+		configBuilder.addLabel("Username", CC.xy(2, 6), username = new JTextField(10), CC.xy(4, 6));
+		configBuilder.addLabel("Password", CC.xy(2, 8), password = new JPasswordField(10), CC.xy(4, 8));
+		configBuilder.add(importButton = new JButton("Import"), CC.xywh(6, 6, 1, 3));
+		configBuilder.addLabel("Dialect", CC.xy(2, 10),dialect = new JTextField(10), CC.xy(4, 10));
+		configBuilder.addLabel("Driver", CC.xy(2, 12), driver = new JTextField(10), CC.xy(4, 12));
 		primaryBuilder.append(configBuilder.getPanel(), 2);
 
 		//Options
