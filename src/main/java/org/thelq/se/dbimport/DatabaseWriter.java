@@ -67,6 +67,13 @@ public class DatabaseWriter {
 		session.setFlushMode(FlushMode.MANUAL);
 		session.beginTransaction();
 	}
+	
+	/**
+	 * Dummy constructor to allow benchmark class to mock this
+	 */
+	protected DatabaseWriter() {
+		this.table = null;
+	}
 
 	public void insertData(Map<String, Object> data) throws Exception {
 		try {
