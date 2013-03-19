@@ -5,7 +5,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.stream.XMLInputFactory;
@@ -86,9 +85,9 @@ public class DumpParser {
 			} else if (eventType != XMLEvent.START_ELEMENT)
 				throw new RuntimeException("Unexpected event " + ErrorConsts.tokenTypeDesc(eventType)
 						+ " at " + xmlReader.getLocation().toString());
-
+			
 			//Build attributes map
-			Map<String, Object> attributesMap = new HashMap();
+			Map<String, Object> attributesMap = ArrayMap.create(xmlReader.getAttributeCount());
 			for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
 				String normalName = Utils.getCaseInsensitive(properties.keySet(), xmlReader.getAttributeLocalName(i));
 				Type attributeType = properties.get(normalName);
