@@ -236,7 +236,7 @@ public class GUI {
 	@Accessors(fluent = true)
 	@Setter
 	@Getter
-	protected class DatabaseOption {
+	protected static class DatabaseOption {
 		String name;
 		String jdbcString;
 		String driver;
