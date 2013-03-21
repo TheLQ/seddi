@@ -1,10 +1,8 @@
 package org.thelq.se.dbimport.gui;
 
-import ch.qos.logback.core.AppenderBase;
 import com.google.common.collect.Iterables;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
@@ -41,11 +39,13 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
 import javax.swing.table.AbstractTableModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
@@ -208,12 +208,53 @@ public class GUI {
 				.jdbcString("jdbc:postgresql://127.0.0.1:5432/so_new")
 				.dialect("org.hibernate.dialect.PostgreSQLDialect")
 				.driver("org.postgresql.Driver"));
+		dbType.addItem(DatabaseOption.CUSTOM);
+		setDbOption((DatabaseOption) dbType.getItemAt(0));
 		dbType.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				setDbOption((DatabaseOption) e.getItem());
+				//Don't run this twice for a single select
+				if (e.getStateChange() == ItemEvent.DESELECTED)
+					return;
+
+				//Do not change anything if Custom is selected so user can edit it
+				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
+				if (selectedOption != DatabaseOption.CUSTOM)
+					setDbOption(selectedOption);
 			}
 		});
-		setDbOption((DatabaseOption) dbType.getItemAt(0));
+
+		//Change type to custom when a field is edited 
+		jdbcString.getDocument().addDocumentListener(new SimpleDocumentListener() {
+			@Override
+			public void updatePerformed(DocumentEvent e) {
+				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
+				if (selectedOption == DatabaseOption.CUSTOM)
+					//Nothing to match
+					return;
+				String jdbcUser = jdbcString.getText();
+				String jdbcOption = selectedOption.jdbcString();
+				if (!StringUtils.substringBefore(jdbcUser, "://").equals(StringUtils.substringBefore(jdbcOption, "://"))
+						|| !StringUtils.substringAfter(jdbcUser, "?").equals(StringUtils.substringAfter(jdbcOption, "?")))
+					dbType.setSelectedItem(DatabaseOption.CUSTOM);
+			}
+		});
+		dialect.getDocument().addDocumentListener(new SimpleDocumentListener() {
+			@Override
+			public void updatePerformed(DocumentEvent e) {
+				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
+				if (!dialect.getText().equals(selectedOption.dialect()) && selectedOption != DatabaseOption.CUSTOM)
+					dbType.setSelectedItem(DatabaseOption.CUSTOM);
+			}
+		});
+		driver.getDocument().addDocumentListener(new SimpleDocumentListener() {
+			@Override
+			public void updatePerformed(DocumentEvent e) {
+				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
+				if (!driver.getText().equals(selectedOption.driver()) && selectedOption != DatabaseOption.CUSTOM)
+					dbType.setSelectedItem(DatabaseOption.CUSTOM);
+			}
+		});
+
 
 		//Show and hide advanced options with checkbox
 		dbAdvanced.addActionListener(new ActionListener() {
@@ -237,6 +278,7 @@ public class GUI {
 	@Setter
 	@Getter
 	protected static class DatabaseOption {
+		public static DatabaseOption CUSTOM = new DatabaseOption().name("Custom");
 		String name;
 		String jdbcString;
 		String driver;
