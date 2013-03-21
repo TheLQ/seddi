@@ -1,7 +1,9 @@
 package org.thelq.se.dbimport;
 
 import java.io.File;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.SwingUtilities;
@@ -17,7 +19,7 @@ import org.thelq.se.dbimport.gui.GUI;
 public class Controller {
 	protected GUI gui;
 	@Getter
-	protected LinkedList<DumpParser> parsers = new LinkedList();
+	protected LinkedHashMap<File, List<DumpParser>> parsers = new LinkedHashMap();
 	@Getter
 	protected ExecutorService generalThreadPool = Executors.newCachedThreadPool();
 
@@ -29,18 +31,19 @@ public class Controller {
 		});
 	}
 
-	public void addFile(final File file) {
-		if (file.isDirectory()) {
-			log.info("Ignoring folder " + file.getAbsolutePath());
-			return;
+	public void addFolder(final File folder) {
+		if (!folder.isDirectory())
+			throw new IllegalArgumentException("File " + folder.getAbsolutePath() + " is not a folder");
+		if (parsers.containsKey(folder))
+			throw new IllegalArgumentException("Already added folder " + folder.getAbsolutePath());
+		File[] folderFiles = folder.listFiles();
+		ArrayList<DumpParser> parserList = new ArrayList(folderFiles.length);
+		for (File curFile : folderFiles) {
+			if (!curFile.getName().endsWith(".xml"))
+				log.info("Ignoring non-XML file " + curFile.getAbsolutePath());
+			parserList.add(new DumpParser(curFile));
 		}
-		if (!file.getName().endsWith(".xml")) {
-			log.info("Ignoring non-XML file " + file.getAbsolutePath());
-			return;
-		}
-
-		//Good, load
-		parsers.add(new DumpParser(file));
+		parsers.put(folder, parserList);
 	}
 
 	public static void main(String[] args) {
