@@ -65,7 +65,6 @@ import org.thelq.se.dbimport.sources.FolderDumpContainer;
 public class GUI {
 	protected Controller controller;
 	protected JFrame frame;
-	protected JTable workerTable;
 	protected JComboBox dbType;
 	protected JTextField username;
 	protected JTextField password;
@@ -393,7 +392,7 @@ public class GUI {
 			//Generate a table
 			final JTable table = new JTable();
 			table.setVisible(false);
-			workerTable.setFillsViewportHeight(true);
+			table.setFillsViewportHeight(true);
 			curLocationBuilder.add(table, CC.xy(2, 2));
 			guiDumpContainer.setTable(table);
 
