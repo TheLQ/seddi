@@ -55,6 +55,7 @@ public class Utils {
 		//Basic make valid for SQL
 		//TODO: more validation?
 		name = StringUtils.remove(name, " ");
+		name = StringUtils.remove(name, ".");
 		return name + "_";
 	}
 }
