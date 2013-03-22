@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FolderDumpContainer implements DumpContainer {
 	protected final File folder;
+	protected String tablePrefix;
 	protected String type = "Folder";
 	protected List<FileDumpEntry> entries = new ArrayList();
 

@@ -11,4 +11,5 @@ public interface DumpContainer {
 	public List<? extends DumpEntry> getEntries();
 	public String getLocation();
 	public String getType();
+	public String getTablePrefix();
 }
