@@ -26,6 +26,11 @@ public class FileDumpEntry implements DumpEntry {
 	public String getLocation() {
 		return file.getAbsolutePath();
 	}
+	
+	@Override
+	public String getName() {
+		return file.getName();
+	}
 
 	@Override
 	public InputStream getInput() {

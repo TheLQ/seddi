@@ -11,6 +11,7 @@ import org.thelq.se.dbimport.DumpParser;
  */
 public interface DumpEntry {
 	public String getLocation();
+	public String getName();
 	public InputStream getInput();
 	public DumpParser getParser();
 	public DatabaseWriter getDatabaseWriter();
