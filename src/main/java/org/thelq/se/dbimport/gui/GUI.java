@@ -188,23 +188,11 @@ public class GUI {
 
 				//Add files and folders in a seperate thread while updating gui in EDT
 				importButton.setEnabled(false);
-				controller.getGeneralThreadPool().execute(new Runnable() {
-					public void run() {
-						for (File curFile : fc.getSelectedFiles()) {
-							controller.addDumpContainer(new FolderDumpContainer(curFile));
-							Utils.invokeAndWaitUnchecked(new Runnable() {
-								public void run() {
-									updateLocations();
-								}
-							});
-						}
-						Utils.invokeAndWaitUnchecked(new Runnable() {
-							public void run() {
-								importButton.setEnabled(true);
-							}
-						});
-					}
-				});
+				for (File curFile : fc.getSelectedFiles()) {
+					controller.addDumpContainer(new FolderDumpContainer(curFile));
+					updateLocations();
+				}
+				importButton.setEnabled(true);
 			}
 		});
 
@@ -425,7 +413,7 @@ public class GUI {
 			locationsBuilder.append(curLocationBuilder.getPanel());
 		}
 	}
-	
+
 	@RequiredArgsConstructor
 	protected static class DumpContainerTableModel extends AbstractTableModel {
 		protected final GUIDumpContainer guiDumpContainer;
@@ -445,13 +433,13 @@ public class GUI {
 		public Object getValueAt(int row, int col) {
 			DumpEntry entry = guiDumpContainer.getDumpEntryById(row);
 			DumpContainerColumn column = DumpContainerColumn.getById(col);
-			if(column == DumpContainerColumn.NAME)
+			if (column == DumpContainerColumn.NAME)
 				return entry.getName();
-			else if(column == DumpContainerColumn.SIZE)
+			else if (column == DumpContainerColumn.SIZE)
 				return entry.getSizeBytes();
-			else if(column == DumpContainerColumn.PARSER)
+			else if (column == DumpContainerColumn.PARSER)
 				return guiDumpContainer.getLogParserMap().get(entry);
-			else if(column == DumpContainerColumn.DATABASE)
+			else if (column == DumpContainerColumn.DATABASE)
 				return guiDumpContainer.getLogDatabaseMap().get(entry);
 			else
 				throw new IllegalArgumentException("Unknown column " + col);
