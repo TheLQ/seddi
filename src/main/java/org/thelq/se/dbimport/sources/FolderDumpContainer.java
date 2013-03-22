@@ -3,6 +3,7 @@ package org.thelq.se.dbimport.sources;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author Leon
  */
-@Getter
+@Data
 @Slf4j
 public class FolderDumpContainer implements DumpContainer {
 	protected final File folder;

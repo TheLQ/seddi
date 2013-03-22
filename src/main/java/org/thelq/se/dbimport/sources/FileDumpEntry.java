@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.thelq.se.dbimport.DatabaseWriter;
@@ -15,8 +16,7 @@ import org.thelq.se.dbimport.DumpParser;
  *
  * @author Leon
  */
-@RequiredArgsConstructor
-@Getter
+@Data
 public class FileDumpEntry implements DumpEntry {
 	protected final File file;
 	protected DumpParser parser;
