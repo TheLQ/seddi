@@ -32,24 +32,25 @@ public class Utils {
 	}
 
 	public static String genTablePrefix(String containerName) {
-		String name = containerName;
+		String name = containerName.trim().toLowerCase();
 		//Hardcoded conversions
-		if (StringUtils.contains(name, "Stackoverflow"))
-			name = "so";
+		name = StringUtils.removeEnd(name, ".stackexchange.com");
+		if (StringUtils.contains(name, "stackoverflow"))
+			name = StringUtils.replace(name, "stackoverflow", "so");
 		else if (StringUtils.contains(name, "serverfault"))
-			name = "sf";
-		else if (StringUtils.contains(name, "superuser"))
-			name = "su";
-		else if (StringUtils.startsWith(name, "meta"))
-			name = StringUtils.remove(name, "meta") + "_m";
-		else if (StringUtils.startsWith(name, "meta."))
-			name = StringUtils.remove(name, "meta.") + "_m";
+			name = StringUtils.replace(name, "serverfault", "sf");
+		else if (StringUtils.containsIgnoreCase(name, "superuser"))
+			name = StringUtils.replace(name, "superuser", "su");
 
-		//Remove domain .com
-		if (StringUtils.contains(name, ".com"))
-			name = StringUtils.remove(name, ".com");
-		else if (StringUtils.contains(name, "7z"))
-			name = StringUtils.remove(name, ".7z");
+		//Meta handling
+		if (StringUtils.startsWith(name, "meta"))
+			name = StringUtils.removeStart(name, "meta") + "_m";
+		else if (StringUtils.startsWith(name, "meta."))
+			name = StringUtils.removeStart(name, "meta.") + "_m";
+
+		//Remove unnessesary extensions
+		name = StringUtils.removeEnd(name, ".com");
+		name = StringUtils.removeEnd(name, ".7z");
 		return name + "_";
 	}
 }
