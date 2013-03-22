@@ -51,6 +51,10 @@ public class Utils {
 		//Remove unnessesary extensions
 		name = StringUtils.removeEnd(name, ".com");
 		name = StringUtils.removeEnd(name, ".7z");
+		
+		//Basic make valid for SQL
+		//TODO: more validation?
+		name = StringUtils.remove(name, " ");
 		return name + "_";
 	}
 }
