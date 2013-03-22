@@ -1,6 +1,5 @@
 package org.thelq.se.dbimport.gui;
 
-import com.google.common.collect.Iterables;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.factories.CC;
@@ -17,6 +16,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -28,7 +29,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -42,6 +42,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.AbstractTableModel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 import org.thelq.se.dbimport.DatabaseWriter;
+import org.thelq.se.dbimport.Utils;
+import org.thelq.se.dbimport.sources.DumpContainer;
+import org.thelq.se.dbimport.sources.DumpEntry;
+import org.thelq.se.dbimport.sources.FolderDumpContainer;
 
 /**
  *
@@ -77,6 +82,7 @@ public class GUI {
 	@Getter
 	protected JTextPane loggerText;
 	protected GUILogAppender logAppender;
+	protected List<GUIDumpContainer> guiDumpContainers = new ArrayList();
 
 	public GUI(Controller passedController) {
 		//Initialize logger
@@ -149,8 +155,6 @@ public class GUI {
 		FormLayout locationsLayout = new FormLayout("pref:grow", "pref");
 		locationsBuilder = new DefaultFormBuilder(locationsLayout)
 				.background(Color.WHITE);
-		for (int i = 0; i < 10; i++)
-			locationsBuilder.append(genList());
 		JScrollPane locationsPane = new JScrollPane(locationsBuilder.getPanel());
 		locationsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		locationsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -173,22 +177,32 @@ public class GUI {
 
 		menuAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fc = new JFileChooser();
-				fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				//TODO: Allow 7z files but handle corner cases
+				final JFileChooser fc = new JFileChooser();
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				fc.setMultiSelectionEnabled(true);
 				fc.setDialogTitle("Select Folders/Files/Archives");
 
 				if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
 					return;
 
-
-				for (File curFile : fc.getSelectedFiles())
-					controller.addFile(curFile);
-			}
-
-			protected void runFileUpdate() {
-				SwingUtilities.invokeLater(new Runnable() {
+				//Add files and folders in a seperate thread while updating gui in EDT
+				importButton.setEnabled(false);
+				controller.getGeneralThreadPool().execute(new Runnable() {
 					public void run() {
+						for (File curFile : fc.getSelectedFiles()) {
+							controller.addDumpContainer(new FolderDumpContainer(curFile));
+							Utils.invokeAndWaitUnchecked(new Runnable() {
+								public void run() {
+									updateLocations();
+								}
+							});
+						}
+						Utils.invokeAndWaitUnchecked(new Runnable() {
+							public void run() {
+								importButton.setEnabled(true);
+							}
+						});
 					}
 				});
 			}
@@ -358,105 +372,95 @@ public class GUI {
 		globalTablePrefix.setEnabled(enabled);
 	}
 
-	protected JComponent genList() {
-		FormLayout layout = new FormLayout("15dlu, pref:grow", "pref:grow, pref:grow");
-		final JPanel panel = new JPanel(layout);
-		panel.setBackground(Color.WHITE);
-		//panel.add(new JLabel("Directory:"), CC.xy(1, 1));
-		final JLabel label = new JLabel("Directory: C:/df/df/asdf/afdsawe/3/dsafadsc.jpg");
-		label.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
-		final JComponent table = genJTableExample();
-		label.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				table.setVisible(!table.isVisible());
-				if (table.isVisible())
-					label.setIcon(UIManager.getIcon("Tree.expandedIcon"));
-				else
-					label.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
-				panel.repaint();
-			}
-		});
-		table.setVisible(false);
-		panel.add(label, CC.xyw(1, 1, 2));
-		panel.add(table, CC.xy(2, 2));
-		//panel.setBorder(BorderFactory.createLineBorder(Color.RED));
-		return panel;
+	protected void updateLocations() {
+		Outer:
+		for (DumpContainer curDumpContainer : controller.getDumpContainers()) {
+			//Have we already added this?
+			for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers)
+				if (curGuiDumpContainer.getDumpContainer() == curDumpContainer)
+					continue Outer;
+
+			//No, create a new entery in the locations pane
+			GUIDumpContainer guiDumpContainer = new GUIDumpContainer(curDumpContainer);
+
+			FormLayout layout = new FormLayout("15dlu, pref:grow, pref, 3dlu, pref", "pref:grow, pref:grow");
+			final PanelBuilder curLocationBuilder = new PanelBuilder(layout)
+					.background(Color.WHITE);
+			final JLabel headerLabel = new JLabel(curDumpContainer.getType() + " " + curDumpContainer.getLocation());
+			headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
+			curLocationBuilder.add(headerLabel, CC.xyw(1, 1, 2));
+			final JTextField headerPrefix = new JTextField(6);
+			curLocationBuilder.add(headerPrefix, CC.xy(5, 1));
+			guiDumpContainer.setTablePrefix(headerPrefix);
+
+			//Try to generate a prefix from the container name
+			String containerName = StringUtils.substringAfterLast(curDumpContainer.getLocation(), "/");
+			if (StringUtils.isBlank(containerName))
+				containerName = StringUtils.substringAfterLast(curDumpContainer.getLocation(), "\\");
+			if (!StringUtils.isBlank(containerName))
+				headerPrefix.setText(Utils.genTablePrefix(containerName));
+			else
+				log.warn("Unable to generate a table prefix for " + curDumpContainer.getLocation());
+
+			//Generate a table
+			final JTable table = new JTable();
+			table.setVisible(false);
+			workerTable.setFillsViewportHeight(true);
+			curLocationBuilder.add(table, CC.xy(2, 2));
+			guiDumpContainer.setTable(table);
+
+			//Handlers
+			headerLabel.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					table.setVisible(!table.isVisible());
+					if (table.isVisible())
+						headerLabel.setIcon(UIManager.getIcon("Tree.expandedIcon"));
+					else
+						headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
+					curLocationBuilder.getPanel().repaint();
+				}
+			});
+
+			locationsBuilder.append(curLocationBuilder.getPanel());
+		}
 	}
+	
+	@RequiredArgsConstructor
+	protected static class DumpContainerTableModel extends AbstractTableModel {
+		protected final GUIDumpContainer guiDumpContainer;
 
-	protected JComponent genJTableExample() {
-		final String[] columnNames = {"First Name",
-			"Last Name",
-			"Sport",
-			"# of Years",
-			"Vegetarian"};
-		final Object[][] rowData = {
-			{"Kathy", "Smith",
-				"Snowboarding", new Integer(5), new Boolean(false)},
-			{"John", "Doe",
-				"Rowing", new Integer(3), new Boolean(true)},
-			{"Sue", "Black",
-				"Knitting", new Integer(2), new Boolean(false)},
-			{"Jane", "White",
-				"Speed reading", new Integer(20), new Boolean(true)},
-			{"Joe", "Brown",
-				"Pool", new Integer(10), new Boolean(false)}
-		};
-		JTable exampleTable = new JTable(new AbstractTableModel() {
-			public String getColumnName(int col) {
-				return columnNames[col].toString();
-			}
+		public String getColumnName(int col) {
+			return DumpContainerColumn.getById(col).getName();
+		}
 
-			public int getRowCount() {
-				return rowData.length;
-			}
+		public int getColumnCount() {
+			return DumpContainerColumn.values().length;
+		}
 
-			public int getColumnCount() {
-				return columnNames.length;
-			}
+		public int getRowCount() {
+			return guiDumpContainer.getDumpContainer().getEntries().size();
+		}
 
-			public Object getValueAt(int row, int col) {
-				return rowData[row][col];
-			}
+		public Object getValueAt(int row, int col) {
+			DumpEntry entry = guiDumpContainer.getDumpEntryById(row);
+			DumpContainerColumn column = DumpContainerColumn.getById(col);
+			if(column == DumpContainerColumn.NAME)
+				return entry.getName();
+			else if(column == DumpContainerColumn.SIZE)
+				return entry.getSizeBytes();
+			else if(column == DumpContainerColumn.PARSER)
+				return guiDumpContainer.getLogParserMap().get(entry);
+			else if(column == DumpContainerColumn.DATABASE)
+				return guiDumpContainer.getLogDatabaseMap().get(entry);
+			else
+				throw new IllegalArgumentException("Unknown column " + col);
+		}
 
-			public boolean isCellEditable(int row, int col) {
-				return true;
-			}
-
-			public void setValueAt(Object value, int row, int col) {
-				rowData[row][col] = value;
-				fireTableCellUpdated(row, col);
-			}
-		});
-		return exampleTable;
-	}
-
-	protected JComponent genJTable() {
-		JTable workerTable = new JTable(new AbstractTableModel() {
-			String[] columns = {"Enabled", "Source", "# Processed", "Parser Status", "Database Status"};
-
-			@Override
-			public String getColumnName(int column) {
-				return columns[column];
-			}
-
-			public int getColumnCount() {
-				return columns.length;
-			}
-
-			public int getRowCount() {
-				return controller.getParsers().size();
-			}
-
-			public Object getValueAt(int rowIndex, int columnIndex) {
-				if (columnIndex == 0)
-					//Enabled status
-					return Iterables.get(controller.getParsers(), rowIndex).isEnabled();
-				throw new RuntimeException("Unknown column " + columnIndex);
-			}
-		});
-		workerTable.setFillsViewportHeight(true);
-		return workerTable;
+		@Override
+		public boolean isCellEditable(int row, int col) {
+			return false;
+		}
 	}
 
 	public class JTextPaneNW extends JTextPane {
