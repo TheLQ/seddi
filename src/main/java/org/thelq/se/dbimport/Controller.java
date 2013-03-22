@@ -1,8 +1,7 @@
 package org.thelq.se.dbimport;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -10,6 +9,7 @@ import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.thelq.se.dbimport.gui.GUI;
+import org.thelq.se.dbimport.sources.DumpContainer;
 
 /**
  *
@@ -19,7 +19,7 @@ import org.thelq.se.dbimport.gui.GUI;
 public class Controller {
 	protected GUI gui;
 	@Getter
-	protected LinkedHashMap<File, List<DumpParser>> parsers = new LinkedHashMap();
+	protected List<DumpContainer> dumpContainers = Collections.synchronizedList(new LinkedList());
 	@Getter
 	protected ExecutorService generalThreadPool = Executors.newCachedThreadPool();
 
@@ -30,20 +30,13 @@ public class Controller {
 			}
 		});
 	}
-
-	public void addFolder(final File folder) {
-		if (!folder.isDirectory())
-			throw new IllegalArgumentException("File " + folder.getAbsolutePath() + " is not a folder");
-		if (parsers.containsKey(folder))
-			throw new IllegalArgumentException("Already added folder " + folder.getAbsolutePath());
-		File[] folderFiles = folder.listFiles();
-		ArrayList<DumpParser> parserList = new ArrayList(folderFiles.length);
-		for (File curFile : folderFiles) {
-			if (!curFile.getName().endsWith(".xml"))
-				log.info("Ignoring non-XML file " + curFile.getAbsolutePath());
-			parserList.add(new DumpParser(curFile));
-		}
-		parsers.put(folder, parserList);
+	
+	public void addDumpContainer(DumpContainer container) {
+		//Make sure it doesn't exist already
+		for(DumpContainer curContainer : dumpContainers)
+			if(curContainer.getLocation().equals(container.getLocation()))
+				throw new IllegalArgumentException(container.getType() + " " + container.getLocation() 
+						+ " has already been added");
 	}
 
 	public static void main(String[] args) {

@@ -1,7 +1,7 @@
 package org.thelq.se.dbimport;
 
 import com.ctc.wstx.cfg.ErrorConsts;
-import java.io.File;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +17,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 import org.hibernate.type.Type;
+import org.thelq.se.dbimport.sources.DumpEntry;
 
 /**
  *
@@ -36,8 +37,6 @@ public class DumpParser {
 	}
 	protected XMLStreamReader2 xmlReader;
 	@Getter
-	protected File file;
-	@Getter
 	protected String root;
 	@Getter
 	protected int parsedCount;
@@ -53,15 +52,17 @@ public class DumpParser {
 	@Setter
 	protected boolean enabled = true;
 	@Setter
-	protected DatabaseWriter dbWriter;
+	protected DumpEntry dumpEntry;
+	protected InputStream dumpEntryInput;
 
-	public DumpParser(File file) {
+	public DumpParser(DumpEntry dumpEntry) {
 		try {
-			this.file = file;
+			this.dumpEntry = dumpEntry;
 
 			//Initialize the reader
-			this.xmlReader = (XMLStreamReader2) xmlFactory.createXMLStreamReader(file);
-
+			dumpEntryInput = dumpEntry.getInput();
+			this.xmlReader = (XMLStreamReader2) xmlFactory.createXMLStreamReader(dumpEntry.getInput());
+			
 			//Get root element
 			xmlReader.next();
 			this.root = xmlReader.getLocalName();
@@ -72,20 +73,19 @@ public class DumpParser {
 
 	public void parseNextEntry() {
 		try {
-			if(!enabled)
+			if (!enabled)
 				throw new RuntimeException("Parser is disabled");
 			int eventType = xmlReader.nextTag();
 			String curElement = xmlReader.getName().toString();
 			//System.out.println("Current element: " + curElement);
 			if (curElement.equals(getRoot())) {
 				//Were done, shutdown this parser
-				log.info("Done with " + file.getName() + ", parsed " + parsedCount + " enteries");
-				close();
+				log.info("Done with " + dumpEntry.getLocation() + ", parsed " + parsedCount + " enteries");
 				return;
 			} else if (eventType != XMLEvent.START_ELEMENT)
 				throw new RuntimeException("Unexpected event " + ErrorConsts.tokenTypeDesc(eventType)
 						+ " at " + xmlReader.getLocation().toString());
-			
+
 			//Build attributes map
 			Map<String, Object> attributesMap = ArrayMap.create(xmlReader.getAttributeCount());
 			for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
@@ -127,20 +127,20 @@ public class DumpParser {
 			}
 
 			parsedCount++;
-			dbWriter.insertData(attributesMap);
+			dumpEntry.getDatabaseWriter().insertData(attributesMap);
 		} catch (Exception e) {
 			throw new RuntimeException("Cannot parse entry #" + (parsedCount + 1)
 					+ " at " + xmlReader.getLocation(), e);
 		}
 	}
 
-	protected void close() {
+	public void close() {
 		try {
 			endOfFile = true;
-			dbWriter.close();
+			dumpEntryInput.close();
 			xmlReader.close();
 			xmlReader.closeCompletely();
-		} catch (XMLStreamException e) {
+		} catch (Exception e) {
 			throw new RuntimeException("Cannot close xmlReader for " + getRoot(), e);
 		}
 	}
