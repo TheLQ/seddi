@@ -30,4 +30,28 @@ public class Utils {
 			throw new RuntimeException("Cannot wait for invokeAndWait", e);
 		}
 	}
+
+	public static String genTablePrefix(File location) {
+		if (!location.isDirectory())
+			throw new IllegalArgumentException("File " + location.getAbsolutePath() + " is not a folder");
+		String name = location.getName();
+		//Hardcoded conversions
+		if (StringUtils.contains(name, "Stackoverflow"))
+			name = "so";
+		else if (StringUtils.contains(name, "serverfault"))
+			name = "sf";
+		else if (StringUtils.contains(name, "superuser"))
+			name = "su";
+		else if (StringUtils.startsWith(name, "meta"))
+			name = StringUtils.remove(name, "meta") + "_m";
+		else if (StringUtils.startsWith(name, "meta."))
+			name = StringUtils.remove(name, "meta.") + "_m";
+
+		//Remove domain .com
+		if (StringUtils.contains(name, ".com"))
+			name = StringUtils.remove(name, ".com");
+		else if (StringUtils.contains(name, "7z"))
+			name = StringUtils.remove(name, ".7z");
+		return name + "_";
+	}
 }
