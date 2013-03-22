@@ -15,4 +15,5 @@ public interface DumpEntry {
 	public DumpParser getParser();
 	public DatabaseWriter getDatabaseWriter();
 	public void close();
+	public long getSizeBytes();
 }

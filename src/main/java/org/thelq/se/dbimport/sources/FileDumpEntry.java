@@ -41,4 +41,8 @@ public class FileDumpEntry implements DumpEntry {
 		parser.close();
 		databaseWriter.close();
 	}
+
+	public long getSizeBytes() {
+		return file.length();
+	}
 }
