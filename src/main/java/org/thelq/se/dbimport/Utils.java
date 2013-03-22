@@ -31,10 +31,8 @@ public class Utils {
 		}
 	}
 
-	public static String genTablePrefix(File location) {
-		if (!location.isDirectory())
-			throw new IllegalArgumentException("File " + location.getAbsolutePath() + " is not a folder");
-		String name = location.getName();
+	public static String genTablePrefix(String containerName) {
+		String name = containerName;
 		//Hardcoded conversions
 		if (StringUtils.contains(name, "Stackoverflow"))
 			name = "so";
