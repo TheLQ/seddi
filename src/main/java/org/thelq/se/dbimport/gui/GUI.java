@@ -112,7 +112,7 @@ public class GUI {
 
 		//Primary panel
 		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 5dlu, 5dlu, pref",
-				"pref, top:pref, pref, fill:pref:grow, pref, fill:80dlu");
+				"pref, top:pref, pref, fill:140dlu, pref, fill:80dlu");
 		PanelBuilder primaryBuilder = new PanelBuilder(primaryLayout)
 				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
