@@ -265,8 +265,7 @@ public class GUI {
 				((JLabel) driver.getClientProperty("labeledBy")).setVisible(selected);
 				dialect.setVisible(selected);
 				((JLabel) dialect.getClientProperty("labeledBy")).setVisible(selected);
-				frame.pack();
-				frame.validate();
+				updateGuiLayout();
 			}
 		});
 
@@ -359,6 +358,11 @@ public class GUI {
 		globalTablePrefix.setEnabled(enabled);
 	}
 
+	protected void updateGuiLayout() {
+		frame.pack();
+		frame.validate();
+	}
+
 	protected void updateLocations() {
 		Outer:
 		for (DumpContainer curDumpContainer : controller.getDumpContainers()) {
@@ -410,6 +414,7 @@ public class GUI {
 			});
 
 			locationsBuilder.append(curLocationBuilder.getPanel());
+			updateGuiLayout();
 		}
 	}
 
