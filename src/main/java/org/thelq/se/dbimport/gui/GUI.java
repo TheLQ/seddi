@@ -157,7 +157,7 @@ public class GUI {
 
 		//Logger
 		primaryBuilder.addSeparator("Log", CC.xyw(1, 5, 5));
-		loggerText = new JTextPaneNW();
+		loggerText = new NoWrapJTextPane();
 		loggerText.setEditable(false);
 		loggerText.setAlignmentX(Component.CENTER_ALIGNMENT);
 		JScrollPane loggerPane = new JScrollPane(loggerText);
@@ -467,19 +467,5 @@ public class GUI {
 				max = Math.max(max, width);
 		}
 		return max;
-	}
-
-	public class JTextPaneNW extends JTextPane {
-		@Override
-		public void setSize(Dimension d) {
-			if (d.width < getParent().getSize().width)
-				d.width = getParent().getSize().width;
-			super.setSize(d);
-		}
-
-		@Override
-		public boolean getScrollableTracksViewportWidth() {
-			return false;
-		}
 	}
 }
