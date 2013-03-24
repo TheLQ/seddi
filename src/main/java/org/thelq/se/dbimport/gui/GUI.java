@@ -22,7 +22,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,6 +40,8 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -373,6 +374,7 @@ public class GUI {
 
 			//No, create a new entery in the locations pane
 			GUIDumpContainer guiDumpContainer = new GUIDumpContainer(curDumpContainer);
+			guiDumpContainers.add(guiDumpContainer);
 
 			FormLayout layout = new FormLayout("15dlu, pref:grow, pref, 3dlu, pref", "pref:grow, pref:grow");
 			final PanelBuilder curLocationBuilder = new PanelBuilder(layout)
@@ -397,8 +399,13 @@ public class GUI {
 			final JTable table = new JTable(new DumpContainerTableModel(guiDumpContainer));
 			table.setVisible(false);
 			table.setFillsViewportHeight(true);
+			table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			curLocationBuilder.add(table, CC.xyw(2, 2, 4));
 			guiDumpContainer.setTable(table);
+
+			//Add to builder
+			locationsBuilder.append(curLocationBuilder.getPanel());
+			updateGuiLayout();
 
 			//Handlers
 			headerLabel.addMouseListener(new MouseAdapter() {
@@ -409,13 +416,50 @@ public class GUI {
 						headerLabel.setIcon(UIManager.getIcon("Tree.expandedIcon"));
 					else
 						headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
-					updateGuiLayout();
+					curLocationBuilder.getPanel().revalidate();
 				}
 			});
-
-			locationsBuilder.append(curLocationBuilder.getPanel());
-			updateGuiLayout();
 		}
+
+		//Update all column sizes
+		int maxNameWidth = 0;
+		int maxSizeWidth = 0;
+		for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers) {
+			JTable curTable = curGuiDumpContainer.getTable();
+			maxNameWidth = Math.max(maxNameWidth, getMaxColumnSize(curTable, DumpContainerColumn.NAME));
+			maxSizeWidth = Math.max(maxSizeWidth, getMaxColumnSize(curTable, DumpContainerColumn.SIZE));
+		}
+		for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers) {
+			JTable curTable = curGuiDumpContainer.getTable();
+			int logLength = (curTable.getWidth() - maxNameWidth - maxSizeWidth) / 2;
+			setColumnWidth(curTable, DumpContainerColumn.NAME, maxNameWidth);
+			setColumnWidth(curTable, DumpContainerColumn.SIZE, maxSizeWidth);
+			setColumnWidth(curTable, DumpContainerColumn.PARSER, logLength);
+			setColumnWidth(curTable, DumpContainerColumn.DATABASE, logLength);
+		}
+	}
+
+	protected static void setColumnWidth(JTable table, DumpContainerColumn column, int width) {
+		int PADDING = 6;
+		TableColumn tableColumn = table.getColumnModel().getColumn(column.getId());
+		tableColumn.setWidth(width + PADDING);
+		table.getTableHeader().setResizingColumn(tableColumn);
+	}
+
+	protected static int getMaxColumnSize(JTable table, DumpContainerColumn column) {
+		int max = 0;
+		int maxWidth = table.getColumnModel().getColumn(column.getId()).getMaxWidth();
+		for (int row = 0; row < table.getRowCount(); row++) {
+			TableCellRenderer cellRenderer = table.getCellRenderer(row, column.getId());
+			Component c = table.prepareRenderer(cellRenderer, row, column.getId());
+			int width = c.getPreferredSize().width + table.getIntercellSpacing().width;
+			if (width >= maxWidth) {
+				max = maxWidth;
+				break;
+			} else
+				max = Math.max(max, width);
+		}
+		return max;
 	}
 
 	@RequiredArgsConstructor
