@@ -397,7 +397,7 @@ public class GUI {
 			final JTable table = new JTable(new DumpContainerTableModel(guiDumpContainer));
 			table.setVisible(false);
 			table.setFillsViewportHeight(true);
-			curLocationBuilder.add(table, CC.xy(2, 2));
+			curLocationBuilder.add(table, CC.xyw(2, 2, 4));
 			guiDumpContainer.setTable(table);
 
 			//Handlers
