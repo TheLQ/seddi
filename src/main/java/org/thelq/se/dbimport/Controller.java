@@ -37,6 +37,8 @@ public class Controller {
 			if(curContainer.getLocation().equals(container.getLocation()))
 				throw new IllegalArgumentException(container.getType() + " " + container.getLocation() 
 						+ " has already been added");
+		dumpContainers.add(container);
+		log.info("Added " + container.getType() + " " + container.getLocation());
 	}
 
 	public static void main(String[] args) {
