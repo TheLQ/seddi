@@ -394,7 +394,7 @@ public class GUI {
 				log.warn("Unable to generate a table prefix for " + curDumpContainer.getLocation());
 
 			//Generate a table
-			final JTable table = new JTable();
+			final JTable table = new JTable(new DumpContainerTableModel(guiDumpContainer));
 			table.setVisible(false);
 			table.setFillsViewportHeight(true);
 			curLocationBuilder.add(table, CC.xy(2, 2));
