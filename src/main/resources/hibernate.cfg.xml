@@ -9,11 +9,11 @@
 		<property name="hibernate.order_updates">true</property>
 		<property name="hibernate.cache.use_second_level_cache">false</property>
 		<property name="cache.use_query_cache">false</property>
-		
+
 		<!-- Use unicode -->
 		<property name="hibernate.connection.useUnicode">true</property>
 		<property name="hibernate.connection.characterEncoding">UTF-8</property>
-		<property name="hibernate.connection.charSet">UTF-8</property> 
+		<property name="hibernate.connection.charSet">UTF-8</property>
 
 		<!-- Our mapping file -->
 		<mapping resource="mapping.hbm.xml"/>
