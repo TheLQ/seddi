@@ -409,7 +409,7 @@ public class GUI {
 						headerLabel.setIcon(UIManager.getIcon("Tree.expandedIcon"));
 					else
 						headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
-					curLocationBuilder.getPanel().repaint();
+					updateGuiLayout();
 				}
 			});
 
