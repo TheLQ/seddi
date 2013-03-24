@@ -337,6 +337,10 @@ public class GUI {
 		}
 	}
 
+	/**
+	 * Set the dbType, driver, dialect, and jdbcString to the specified DatabaseOption
+	 * @param option 
+	 */
 	protected void setDbOption(DatabaseOption option) {
 		dbType.setSelectedItem(option);
 		driver.setText(option.driver());
@@ -347,6 +351,10 @@ public class GUI {
 		jdbcString.setCaretPosition(0);
 	}
 
+	/**
+	 * Disable or enable the fields in the GUI
+	 * @param enabled 
+	 */
 	protected void setGuiEnabled(boolean enabled) {
 		username.setEnabled(enabled);
 		password.setEnabled(enabled);
@@ -359,11 +367,17 @@ public class GUI {
 		globalTablePrefix.setEnabled(enabled);
 	}
 
+	/**
+	 * Validate and pack the entire frame
+	 */
 	protected void updateGuiLayout() {
 		frame.pack();
 		frame.validate();
 	}
 
+	/**
+	 * Update the list of locations
+	 */
 	protected void updateLocations() {
 		Outer:
 		for (DumpContainer curDumpContainer : controller.getDumpContainers()) {
@@ -439,6 +453,13 @@ public class GUI {
 		}
 	}
 
+	/**
+	 * Set the column width on the specified table
+	 * Modified from https://tips4java.wordpress.com/2008/11/10/table-column-adjuster/
+	 * @param table
+	 * @param column
+	 * @param width 
+	 */
 	protected static void setColumnWidth(JTable table, DumpContainerColumn column, int width) {
 		int PADDING = 6;
 		TableColumn tableColumn = table.getColumnModel().getColumn(column.getId());
@@ -446,6 +467,13 @@ public class GUI {
 		table.getTableHeader().setResizingColumn(tableColumn);
 	}
 
+	/**
+	 * Get the maximum size of a column in the specified table
+	 * Modified from https://tips4java.wordpress.com/2008/11/10/table-column-adjuster/
+	 * @param table 
+	 * @param column
+	 * @return 
+	 */
 	protected static int getMaxColumnSize(JTable table, DumpContainerColumn column) {
 		int max = 0;
 		int maxWidth = table.getColumnModel().getColumn(column.getId()).getMaxWidth();
