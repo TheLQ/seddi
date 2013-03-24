@@ -39,13 +39,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -55,7 +51,6 @@ import org.thelq.se.dbimport.Controller;
 import org.thelq.se.dbimport.DatabaseWriter;
 import org.thelq.se.dbimport.Utils;
 import org.thelq.se.dbimport.sources.DumpContainer;
-import org.thelq.se.dbimport.sources.DumpEntry;
 import org.thelq.se.dbimport.sources.FolderDumpContainer;
 
 /**
@@ -275,22 +270,6 @@ public class GUI {
 		log.info("Finished creating GUI");
 	}
 
-	@Accessors(fluent = true)
-	@Setter
-	@Getter
-	protected static class DatabaseOption {
-		public static DatabaseOption CUSTOM = new DatabaseOption().name("Custom");
-		String name;
-		String jdbcString;
-		String driver;
-		String dialect;
-
-		@Override
-		public String toString() {
-			return name;
-		}
-	}
-
 	protected class ImportActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			//Disable all GUI components so they can't change anything during processing
@@ -488,43 +467,6 @@ public class GUI {
 				max = Math.max(max, width);
 		}
 		return max;
-	}
-
-	@RequiredArgsConstructor
-	protected static class DumpContainerTableModel extends AbstractTableModel {
-		protected final GUIDumpContainer guiDumpContainer;
-
-		public String getColumnName(int col) {
-			return DumpContainerColumn.getById(col).getName();
-		}
-
-		public int getColumnCount() {
-			return DumpContainerColumn.values().length;
-		}
-
-		public int getRowCount() {
-			return guiDumpContainer.getDumpContainer().getEntries().size();
-		}
-
-		public Object getValueAt(int row, int col) {
-			DumpEntry entry = guiDumpContainer.getDumpEntryById(row);
-			DumpContainerColumn column = DumpContainerColumn.getById(col);
-			if (column == DumpContainerColumn.NAME)
-				return entry.getName();
-			else if (column == DumpContainerColumn.SIZE)
-				return entry.getSizeBytes();
-			else if (column == DumpContainerColumn.PARSER)
-				return guiDumpContainer.getLogParserMap().get(entry);
-			else if (column == DumpContainerColumn.DATABASE)
-				return guiDumpContainer.getLogDatabaseMap().get(entry);
-			else
-				throw new IllegalArgumentException("Unknown column " + col);
-		}
-
-		@Override
-		public boolean isCellEditable(int row, int col) {
-			return false;
-		}
 	}
 
 	public class JTextPaneNW extends JTextPane {
