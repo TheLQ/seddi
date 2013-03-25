@@ -92,11 +92,19 @@ public class ArchiveDumpEntry implements DumpEntry {
 	}
 
 	public void close() {
-		throw new UnsupportedOperationException("Not supported yet.");
+		try {
+			pipedOutput.close();
+			pipedInput.close();
+			archive7.close();
+			archiveRandomFile.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Cannot close " + getLocation(), e);
+		}
 	}
 
 	protected class OutputExtractCallback implements IArchiveExtractCallback {
 		protected boolean skipFile = false;
+
 		public ISequentialOutStream getStream(int index, ExtractAskMode extractAskMode) throws SevenZipException {
 			if (index != itemId) {
 				if (extractAskMode == ExtractAskMode.EXTRACT)
@@ -121,7 +129,7 @@ public class ArchiveDumpEntry implements DumpEntry {
 		}
 
 		public void setOperationResult(ExtractOperationResult extractOperationResult) throws SevenZipException {
-			if(skipFile)
+			if (skipFile)
 				return;
 			if (extractOperationResult != ExtractOperationResult.OK)
 				throw new SevenZipException("Extraction halted with " + extractOperationResult.name());
