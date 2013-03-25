@@ -59,6 +59,8 @@ public class ArchiveDumpEntry implements DumpEntry {
 			this.name = (String) archive7.getProperty(itemId, PropID.PATH);
 			this.location = archiveFile.getAbsolutePath() + System.getProperty("file.separator") + name;
 			this.sizeBytes = (Long) archive7.getProperty(itemId, PropID.SIZE);
+			
+			parser = new DumpParser(this);
 		} catch (Exception ex) {
 			throw new RuntimeException("Cannot open archive", ex);
 		}
