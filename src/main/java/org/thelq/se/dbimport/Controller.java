@@ -23,25 +23,26 @@ public class Controller {
 	@Getter
 	protected ExecutorService generalThreadPool = Executors.newCachedThreadPool();
 
-	public Controller() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui = new GUI(Controller.this);
-			}
-		});
+	public Controller(boolean createGui) {
+		if (createGui)
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					gui = new GUI(Controller.this);
+				}
+			});
 	}
-	
+
 	public void addDumpContainer(DumpContainer container) {
 		//Make sure it doesn't exist already
-		for(DumpContainer curContainer : dumpContainers)
-			if(curContainer.getLocation().equals(container.getLocation()))
-				throw new IllegalArgumentException(container.getType() + " " + container.getLocation() 
+		for (DumpContainer curContainer : dumpContainers)
+			if (curContainer.getLocation().equals(container.getLocation()))
+				throw new IllegalArgumentException(container.getType() + " " + container.getLocation()
 						+ " has already been added");
 		dumpContainers.add(container);
 		log.info("Added " + container.getType() + " " + container.getLocation());
 	}
 
 	public static void main(String[] args) {
-		new Controller();
+		new Controller(true);
 	}
 }
