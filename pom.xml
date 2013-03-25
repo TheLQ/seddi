@@ -65,6 +65,18 @@
 			<artifactId>jgoodies-looks</artifactId>
 			<version>2.5.2</version>
 		</dependency>
+		<!-- 7-zip Java bindings - API -->
+		<dependency>
+			<groupId>net.sf.sevenzipjbinding</groupId>
+			<artifactId>core</artifactId>
+			<version>4.65-1.06rc-extr-only</version>
+		</dependency>
+		<!-- 7-zip Java Bindings - All native libraries -->
+		<dependency>
+			<groupId>net.sf.sevenzipjbinding</groupId>
+			<artifactId>allplatforms</artifactId>
+			<version>4.65-1.06rc-extr-only</version>
+		</dependency>
 		
 		<!-- 
 			Database
@@ -88,4 +100,60 @@
 			<version>9.1-901-1.jdbc4</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.savage7.maven.plugins</groupId>
+				<artifactId>maven-external-dependency-plugin</artifactId>
+				<version>0.5</version>
+				<inherited>false</inherited>
+				<configuration>
+					<stagingDirectory>${project.build.directory}/dependencies/</stagingDirectory>
+					<createChecksum>true</createChecksum>
+					<skipChecksumVerification>false</skipChecksumVerification>
+					<force>false</force>
+					<artifactItems>
+						<artifactItem>
+							<groupId>net.sf.sevenzipjbinding</groupId>
+							<artifactId>core</artifactId>
+							<version>4.65-1.06rc-extr-only</version>
+							<packaging>jar</packaging>
+							<install>true</install>
+							<force>false</force>
+							<downloadUrl>http://downloads.sourceforge.net/project/sevenzipjbind/7-Zip-JBinding/4.65-1.06rc-extr-only/sevenzipjbinding-4.65-1.06-rc-extr-only-AllPlatforms.zip</downloadUrl>
+							<checksum>d695ecb61db61b7b717e9f544ea9d19f51ca5e44</checksum>
+							<extractFile>sevenzipjbinding-4.65-1.06-rc-extr-only-AllPlatforms/lib/sevenzipjbinding.jar</extractFile>
+							<extractFileChecksum>ddd98c425902d253bfec5387eda5177005d69999</extractFileChecksum>
+						</artifactItem>
+						<artifactItem>
+							<groupId>net.sf.sevenzipjbinding</groupId>
+							<artifactId>allplatforms</artifactId>
+							<version>4.65-1.06rc-extr-only</version>
+							<packaging>jar</packaging>
+							<install>true</install>
+							<force>false</force>
+							<downloadUrl>http://downloads.sourceforge.net/project/sevenzipjbind/7-Zip-JBinding/4.65-1.06rc-extr-only/sevenzipjbinding-4.65-1.06-rc-extr-only-AllPlatforms.zip</downloadUrl>
+							<checksum>d695ecb61db61b7b717e9f544ea9d19f51ca5e44</checksum>
+							<extractFile>sevenzipjbinding-4.65-1.06-rc-extr-only-AllPlatforms/lib/sevenzipjbinding-AllPlatforms.jar</extractFile>
+							<extractFileChecksum>f5d59a41bdebb77e2757ceb69ea063a5f49d4aa7</extractFileChecksum>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+				<executions>
+					<execution>
+						<id>resolve-install-external-dependencies</id>
+						<phase>process-resources</phase>
+						<goals>
+							<!-- mvn com.savage7.maven.plugins:maven-external-dependency-plugin:resolve-external -->
+							<goal>resolve-external</goal>
+
+							<!-- mvn com.savage7.maven.plugins:maven-external-dependency-plugin:install-external -->
+							<goal>install-external</goal>
+						</goals>                     
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

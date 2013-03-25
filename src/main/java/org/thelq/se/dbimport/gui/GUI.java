@@ -40,6 +40,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import lombok.Getter;
@@ -51,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 import org.thelq.se.dbimport.DatabaseWriter;
 import org.thelq.se.dbimport.Utils;
+import org.thelq.se.dbimport.sources.ArchiveDumpContainer;
 import org.thelq.se.dbimport.sources.DumpContainer;
 import org.thelq.se.dbimport.sources.FolderDumpContainer;
 
@@ -101,7 +104,7 @@ public class GUI {
 
 		//Setup menu
 		JMenuBar menuBar = new JMenuBar();
-		JMenuItem menuAdd = new JMenuItem("Add Files/Folders");
+		JMenuItem menuAdd = new JMenuItem("Add Folders/Archives");
 		menuAdd.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menuAdd);
 		frame.setJMenuBar(menuBar);
@@ -176,9 +179,19 @@ public class GUI {
 			public void actionPerformed(ActionEvent e) {
 				//TODO: Allow 7z files but handle corner cases
 				final JFileChooser fc = new JFileChooser();
-				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				fc.setMultiSelectionEnabled(true);
-				fc.setDialogTitle("Select Folders/Files/Archives");
+				fc.setDialogTitle("Select Folders/Archives");
+				fc.addChoosableFileFilter(new FileNameExtensionFilter("Archives", "7z", "zip"));
+				fc.addChoosableFileFilter(new FileFilter() {
+					@Getter
+					protected String description = "Folders";
+
+					@Override
+					public boolean accept(File file) {
+						return file.isDirectory();
+					}
+				});
 
 				if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
 					return;
@@ -186,7 +199,19 @@ public class GUI {
 				//Add files and folders in a seperate thread while updating gui in EDT
 				importButton.setEnabled(false);
 				for (File curFile : fc.getSelectedFiles()) {
-					controller.addDumpContainer(new FolderDumpContainer(curFile));
+					if (curFile.isDirectory())
+						controller.addDumpContainer(new FolderDumpContainer(curFile));
+					else
+						try {
+							controller.addDumpContainer(new ArchiveDumpContainer(controller, curFile));
+						} catch (Exception ex) {
+							JOptionPane.showMessageDialog(frame, "Cannot open archive: "
+									+ "\n" + curFile.getAbsolutePath()
+									+ "\n\nError: " + ex.getLocalizedMessage()
+									+ "\n" + ExceptionUtils.getRootCauseMessage(ex)
+									 + "\nSee Log for more information",
+									"Cannot Open Archive",	JOptionPane.ERROR_MESSAGE);
+						}
 					updateLocations();
 				}
 				importButton.setEnabled(true);
