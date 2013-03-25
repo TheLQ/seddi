@@ -359,6 +359,7 @@ public class GUI {
 	 * Update the list of locations
 	 */
 	protected void updateLocations() {
+		int previousContainerSize = guiDumpContainers.size();
 		Outer:
 		for (DumpContainer curDumpContainer : controller.getDumpContainers()) {
 			//Have we already added this?
@@ -415,25 +416,27 @@ public class GUI {
 			});
 		}
 
-		//Update all column sizes
-		int maxNameWidth = 0;
-		int maxSizeWidth = 0;
-		for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers) {
-			JTable curTable = curGuiDumpContainer.getTable();
-			maxNameWidth = Math.max(maxNameWidth, getMaxColumnSize(curTable, DumpContainerColumn.NAME));
-			maxSizeWidth = Math.max(maxSizeWidth, getMaxColumnSize(curTable, DumpContainerColumn.SIZE));
-		}
-		maxNameWidth += 6;
-		maxSizeWidth += 6;
-		for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers) {
-			JTable curTable = curGuiDumpContainer.getTable();
-			setColumnWidth(curTable, DumpContainerColumn.NAME, maxNameWidth);
-			setColumnWidth(curTable, DumpContainerColumn.SIZE, maxSizeWidth);
+		if (previousContainerSize != guiDumpContainers.size()) {
+			//Update all column sizes
+			int maxNameWidth = 0;
+			int maxSizeWidth = 0;
+			for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers) {
+				JTable curTable = curGuiDumpContainer.getTable();
+				maxNameWidth = Math.max(maxNameWidth, getMaxColumnSize(curTable, DumpContainerColumn.NAME));
+				maxSizeWidth = Math.max(maxSizeWidth, getMaxColumnSize(curTable, DumpContainerColumn.SIZE));
+			}
+			maxNameWidth += 6;
+			maxSizeWidth += 6;
+			for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers) {
+				JTable curTable = curGuiDumpContainer.getTable();
+				setColumnWidth(curTable, DumpContainerColumn.NAME, maxNameWidth);
+				setColumnWidth(curTable, DumpContainerColumn.SIZE, maxSizeWidth);
 
-			//Split remaining width
-			int totalRemaining = (int) curTable.getSize().getWidth() - maxNameWidth - maxSizeWidth;
-			setColumnWidth(curTable, DumpContainerColumn.PARSER, totalRemaining / 2);
-			setColumnWidth(curTable, DumpContainerColumn.DATABASE, totalRemaining / 2);
+				//Split remaining width
+				int totalRemaining = (int) curTable.getSize().getWidth() - maxNameWidth - maxSizeWidth;
+				setColumnWidth(curTable, DumpContainerColumn.PARSER, totalRemaining / 2);
+				setColumnWidth(curTable, DumpContainerColumn.DATABASE, totalRemaining / 2);
+			}
 		}
 	}
 
