@@ -75,11 +75,14 @@ public class DumpParser {
 		try {
 			if (!enabled)
 				throw new RuntimeException("Parser is disabled");
+			if(endOfFile)
+				throw new RuntimeException("Reached end of file, cannot continue");
 			int eventType = xmlReader.nextTag();
 			String curElement = xmlReader.getName().toString();
 			//System.out.println("Current element: " + curElement);
 			if (curElement.equals(getRoot())) {
 				//Were done, shutdown this parser
+				endOfFile = true;
 				log.info("Done with " + dumpEntry.getLocation() + ", parsed " + parsedCount + " enteries");
 				return;
 			} else if (eventType != XMLEvent.START_ELEMENT)
@@ -136,7 +139,6 @@ public class DumpParser {
 
 	public void close() {
 		try {
-			endOfFile = true;
 			dumpEntryInput.close();
 			xmlReader.close();
 			xmlReader.closeCompletely();
