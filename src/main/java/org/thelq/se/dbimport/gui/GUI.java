@@ -2,6 +2,7 @@ package org.thelq.se.dbimport.gui;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
@@ -106,7 +107,7 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 
 		//Primary panel
-		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 5dlu, 5dlu, pref",
+		FormLayout primaryLayout = new FormLayout("5dlu, max(140dlu;pref), 5dlu, 5dlu, pref",
 				"pref, top:pref, pref, fill:140dlu, pref, fill:80dlu");
 		PanelBuilder primaryBuilder = new PanelBuilder(primaryLayout)
 				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -369,8 +370,8 @@ public class GUI {
 			GUIDumpContainer guiDumpContainer = new GUIDumpContainer(curDumpContainer);
 			guiDumpContainers.add(guiDumpContainer);
 
-			FormLayout layout = new FormLayout("15dlu, pref:grow, pref, 3dlu, pref", "pref:grow, pref:grow");
-			final PanelBuilder curLocationBuilder = new PanelBuilder(layout)
+			FormLayout layout = new FormLayout("15dlu, fill:pref:grow, pref, 3dlu, pref", "pref:grow, pref:grow");
+			final PanelBuilder curLocationBuilder = new PanelBuilder(layout, new FormDebugPanel())
 					.background(Color.WHITE);
 			final JLabel headerLabel = new JLabel(curDumpContainer.getType() + " " + curDumpContainer.getLocation());
 			headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
@@ -422,13 +423,17 @@ public class GUI {
 			maxNameWidth = Math.max(maxNameWidth, getMaxColumnSize(curTable, DumpContainerColumn.NAME));
 			maxSizeWidth = Math.max(maxSizeWidth, getMaxColumnSize(curTable, DumpContainerColumn.SIZE));
 		}
+		maxNameWidth += 6;
+		maxSizeWidth += 6;
 		for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers) {
 			JTable curTable = curGuiDumpContainer.getTable();
-			int logLength = (curTable.getWidth() - maxNameWidth - maxSizeWidth) / 2;
 			setColumnWidth(curTable, DumpContainerColumn.NAME, maxNameWidth);
 			setColumnWidth(curTable, DumpContainerColumn.SIZE, maxSizeWidth);
-			setColumnWidth(curTable, DumpContainerColumn.PARSER, logLength);
-			setColumnWidth(curTable, DumpContainerColumn.DATABASE, logLength);
+
+			//Split remaining width
+			int totalRemaining = (int) curTable.getSize().getWidth() - maxNameWidth - maxSizeWidth;
+			setColumnWidth(curTable, DumpContainerColumn.PARSER, totalRemaining / 2);
+			setColumnWidth(curTable, DumpContainerColumn.DATABASE, totalRemaining / 2);
 		}
 	}
 
@@ -440,9 +445,9 @@ public class GUI {
 	 * @param width 
 	 */
 	protected static void setColumnWidth(JTable table, DumpContainerColumn column, int width) {
-		int PADDING = 6;
 		TableColumn tableColumn = table.getColumnModel().getColumn(column.getId());
-		tableColumn.setWidth(width + PADDING);
+		tableColumn.setMaxWidth(width);
+		tableColumn.setWidth(width);
 		table.getTableHeader().setResizingColumn(tableColumn);
 	}
 
