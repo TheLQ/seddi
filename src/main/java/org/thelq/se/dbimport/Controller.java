@@ -5,9 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.thelq.se.dbimport.gui.GUI;
 import org.thelq.se.dbimport.sources.DumpContainer;
 
@@ -21,9 +24,14 @@ public class Controller {
 	@Getter
 	protected List<DumpContainer> dumpContainers = Collections.synchronizedList(new LinkedList());
 	@Getter
-	protected ExecutorService generalThreadPool = Executors.newCachedThreadPool();
+	protected ExecutorService generalThreadPool;
 
 	public Controller(boolean createGui) {
+		//Copied from Executors.newCachedThreadPool()
+		generalThreadPool = Executors.newCachedThreadPool(new BasicThreadFactory.Builder()
+				.namingPattern("seGeneral-pool-%d")
+				.daemon(true)
+				.build());
 		if (createGui)
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
