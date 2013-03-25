@@ -2,20 +2,12 @@ package org.thelq.se.dbimport.sources;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.sevenzipjbinding.ExtractAskMode;
-import net.sf.sevenzipjbinding.ExtractOperationResult;
-import net.sf.sevenzipjbinding.IArchiveExtractCallback;
-import net.sf.sevenzipjbinding.ISequentialOutStream;
 import net.sf.sevenzipjbinding.ISevenZipInArchive;
 import net.sf.sevenzipjbinding.PropID;
 import net.sf.sevenzipjbinding.SevenZip;
@@ -32,6 +24,9 @@ public class ArchiveDumpContainer implements DumpContainer {
 	@Getter
 	protected String type = "Archive";
 	protected final File archiveFile;
+	@Getter
+	@Setter
+	protected String tablePrefix;
 	protected RandomAccessFile archiveRandomFile;
 	@Getter
 	protected ISevenZipInArchive archive7;
@@ -54,9 +49,5 @@ public class ArchiveDumpContainer implements DumpContainer {
 
 	public String getLocation() {
 		return archiveFile.getAbsolutePath();
-	}
-
-	public String getTablePrefix() {
-		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }
