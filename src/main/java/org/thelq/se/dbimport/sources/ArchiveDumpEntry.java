@@ -42,6 +42,10 @@ public class ArchiveDumpEntry implements DumpEntry {
 	protected String location;
 	@Getter
 	protected long sizeBytes;
+	@Getter
+	protected DatabaseWriter databaseWriter;
+	@Getter
+	protected DumpParser parser;
 
 	public ArchiveDumpEntry(Controller controller, File archiveFile, int itemId) {
 		this.controller = controller;
@@ -54,7 +58,7 @@ public class ArchiveDumpEntry implements DumpEntry {
 			//Set properties that don't actually change, so might as well pre-fetch them
 			this.name = (String) archive7.getProperty(itemId, PropID.PATH);
 			this.location = archiveFile.getAbsolutePath() + System.getProperty("file.separator") + name;
-			this.sizeBytes = (Long) archive7.getProperty(itemId, PropID.SIZE);;
+			this.sizeBytes = (Long) archive7.getProperty(itemId, PropID.SIZE);
 		} catch (Exception ex) {
 			throw new RuntimeException("Cannot open archive", ex);
 		}
@@ -81,14 +85,6 @@ public class ArchiveDumpEntry implements DumpEntry {
 			}
 		});
 		return pipedInput;
-	}
-
-	public DumpParser getParser() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	public DatabaseWriter getDatabaseWriter() {
-		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	public void close() {
