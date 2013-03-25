@@ -53,14 +53,12 @@ public class DumpParser {
 	protected boolean enabled = true;
 	@Setter
 	protected DumpEntry dumpEntry;
-	protected InputStream dumpEntryInput;
 
 	public DumpParser(DumpEntry dumpEntry) {
 		try {
 			this.dumpEntry = dumpEntry;
 
 			//Initialize the reader
-			dumpEntryInput = dumpEntry.getInput();
 			this.xmlReader = (XMLStreamReader2) xmlFactory.createXMLStreamReader(dumpEntry.getInput());
 			
 			//Get root element
@@ -139,7 +137,6 @@ public class DumpParser {
 
 	public void close() {
 		try {
-			dumpEntryInput.close();
 			xmlReader.close();
 			xmlReader.closeCompletely();
 		} catch (Exception e) {
