@@ -18,7 +18,6 @@
 		<!--
 			Core Utilities
 		-->
-
 		<!-- Project Lombok for annotation processing -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -38,7 +37,10 @@
 			<artifactId>guava-collections</artifactId>
 			<version>r03</version>
 		</dependency>
-		
+
+		<!-- 
+			Helpful Libraries
+		-->
 		<!-- Woodstox for XML parsing -->
 		<dependency>
 			<groupId>org.codehaus.woodstox</groupId>
@@ -64,8 +66,6 @@
 			<version>2.5.2</version>
 		</dependency>
 		
-
-
 		<!-- 
 			Database
 		-->
