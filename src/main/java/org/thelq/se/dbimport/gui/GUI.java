@@ -169,6 +169,7 @@ public class GUI {
 		//Display
 		frame.setContentPane(primaryBuilder.getPanel());
 		frame.pack();
+		frame.setMinimumSize(frame.getSize());
 		frame.setVisible(true);
 
 		menuAdd.addActionListener(new ActionListener() {
