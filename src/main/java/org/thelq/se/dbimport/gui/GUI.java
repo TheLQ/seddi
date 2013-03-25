@@ -107,8 +107,8 @@ public class GUI {
 		frame.setJMenuBar(menuBar);
 
 		//Primary panel
-		FormLayout primaryLayout = new FormLayout("5dlu, max(140dlu;pref), 5dlu, 5dlu, pref",
-				"pref, top:pref, pref, fill:140dlu, pref, fill:80dlu");
+		FormLayout primaryLayout = new FormLayout("5dlu, pref:grow, 5dlu, 5dlu, pref",
+				"pref, top:pref, pref, fill:140dlu:grow, pref, fill:80dlu");
 		PanelBuilder primaryBuilder = new PanelBuilder(primaryLayout)
 				.border(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
