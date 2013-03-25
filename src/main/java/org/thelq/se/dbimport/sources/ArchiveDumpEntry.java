@@ -43,6 +43,7 @@ public class ArchiveDumpEntry implements DumpEntry {
 	@Getter
 	protected long sizeBytes;
 	@Getter
+	@Setter
 	protected DatabaseWriter databaseWriter;
 	@Getter
 	protected DumpParser parser;

@@ -15,6 +15,7 @@ public interface DumpEntry {
 	public InputStream getInput();
 	public DumpParser getParser();
 	public DatabaseWriter getDatabaseWriter();
+	public void setDatabaseWriter(DatabaseWriter dbWriter);
 	public void close();
 	public long getSizeBytes();
 }
