@@ -42,15 +42,15 @@ public class Utils {
 		else if (StringUtils.containsIgnoreCase(name, "superuser"))
 			name = StringUtils.replace(name, "superuser", "su");
 
+		//Remove unnessesary extensions
+		name = StringUtils.removeEnd(name, ".7z");
+		name = StringUtils.removeEnd(name, ".com");
+		
 		//Meta handling
 		if (StringUtils.startsWith(name, "meta"))
 			name = StringUtils.removeStart(name, "meta") + "_m";
 		else if (StringUtils.startsWith(name, "meta."))
 			name = StringUtils.removeStart(name, "meta.") + "_m";
-
-		//Remove unnessesary extensions
-		name = StringUtils.removeEnd(name, ".com");
-		name = StringUtils.removeEnd(name, ".7z");
 		
 		//Basic make valid for SQL
 		//TODO: more validation?
