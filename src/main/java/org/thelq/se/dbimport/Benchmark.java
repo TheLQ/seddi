@@ -25,6 +25,8 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.relational.Size;
 import org.hibernate.type.ForeignKeyDirection;
 import org.hibernate.type.Type;
+import org.thelq.se.dbimport.sources.DumpEntry;
+import org.thelq.se.dbimport.sources.FileDumpEntry;
 
 /**
  *
@@ -33,9 +35,10 @@ import org.hibernate.type.Type;
 @Slf4j
 public class Benchmark {
 	public static void main(String[] args) {
-		File file = new File("C:/Users/Leon/Downloads/Stack Exchange Data Dump - Aug 2012/Meta.SO/posthistory.xml");
-		DumpParser parser = new DumpParser(file);
-		parser.setDbWriter(new MockDatabaseWriter());
+		DumpEntry entry = new FileDumpEntry(new File("C:/Users/Leon/Downloads/Stack Exchange Data Dump - Aug 2012/Meta.SO/posthistory.xml"));
+		DumpParser parser = new DumpParser(entry);
+		entry.setDatabaseWriter(new MockDatabaseWriter());
+		
 		Map<String, Type> properties = new HashMap();
 		properties.put("postHistoryTypeId", new MockType(Byte.class));
 		properties.put("postId", new MockType(Integer.class));
