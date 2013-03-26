@@ -97,6 +97,9 @@ public class DatabaseWriter {
 	}
 
 	public void close() {
+		//Make sure the session is fully done
+		session.flush();
+		session.clear();
 		session.getTransaction().commit();
 		session.close();
 	}
