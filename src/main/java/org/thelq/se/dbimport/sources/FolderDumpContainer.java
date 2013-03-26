@@ -26,8 +26,10 @@ public class FolderDumpContainer implements DumpContainer {
 
 		//Add all the files
 		for (File curFile : folder.listFiles()) {
-			if (!curFile.getName().endsWith(".xml"))
+			if (!curFile.getName().endsWith(".xml")) {
 				log.info("Ignoring non-XML file " + curFile.getAbsolutePath());
+				continue;
+			}
 			entries.add(new FileDumpEntry(curFile));
 		}
 	}
