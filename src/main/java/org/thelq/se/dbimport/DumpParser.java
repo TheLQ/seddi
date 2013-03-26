@@ -65,7 +65,7 @@ public class DumpParser {
 			xmlReader.next();
 			this.root = xmlReader.getLocalName();
 		} catch (XMLStreamException ex) {
-			throw new RuntimeException("Cannot initially load XML document", ex);
+			throw new RuntimeException("Cannot initially load file " + dumpEntry.getLocation(), ex);
 		}
 	}
 
