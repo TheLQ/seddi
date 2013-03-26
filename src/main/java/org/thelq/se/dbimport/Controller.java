@@ -1,5 +1,7 @@
 package org.thelq.se.dbimport;
 
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableSortedMap.Builder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,14 +47,16 @@ public class Controller {
 	}
 
 	public void initMetadataMap() {
+		Builder<String, Map<String, Type>> metadataMapBuilder = ImmutableSortedMap.orderedBy(String.CASE_INSENSITIVE_ORDER);
 		for (Map.Entry<String, ClassMetadata> curEntry : DatabaseWriter.getSessionFactory().getAllClassMetadata().entrySet()) {
 			ClassMetadata tableDataRaw = curEntry.getValue();
-			Map<String, Type> properties = new TreeMap(String.CASE_INSENSITIVE_ORDER);
-			properties.put(tableDataRaw.getIdentifierPropertyName(), tableDataRaw.getIdentifierType());
+			Builder<String, Type> propertiesBuilder = ImmutableSortedMap.orderedBy(String.CASE_INSENSITIVE_ORDER);
+			propertiesBuilder.put(tableDataRaw.getIdentifierPropertyName(), tableDataRaw.getIdentifierType());
 			for (String curPropertyName : tableDataRaw.getPropertyNames())
-				properties.put(curPropertyName, tableDataRaw.getPropertyType(curPropertyName));
-			metadataMap.put(curEntry.getKey(), properties);
+				propertiesBuilder.put(curPropertyName, tableDataRaw.getPropertyType(curPropertyName));
+			metadataMapBuilder.put(curEntry.getKey(), propertiesBuilder.build());
 		}
+		metadataMap = metadataMapBuilder.build();
 	}
 
 	public void addDumpContainer(DumpContainer container) {
