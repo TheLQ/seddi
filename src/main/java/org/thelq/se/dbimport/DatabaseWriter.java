@@ -37,10 +37,13 @@ public class DatabaseWriter {
 	protected static String dialect;
 	@Setter
 	protected static int batchSize;
+	@Getter
+	protected static boolean isInited = false;
 	protected int count = 0;
 	protected final String table;
 
 	public static void init() throws HibernateException {
+		isInited = false;
 		configuration = new Configuration();
 		configuration.configure();
 		configuration.setProperty("hibernate.connection.username", username);
@@ -57,6 +60,7 @@ public class DatabaseWriter {
 		testSession.beginTransaction();
 		testSession.close();
 		log.info("Test connection successful, database is inited");
+		isInited = true;
 	}
 	protected Session session;
 
