@@ -81,13 +81,14 @@ public class DumpParser {
 			if (curElement.equals(getRoot())) {
 				//Were done, shutdown this parser
 				endOfFile = true;
-				log.info("Done with " + dumpEntry.getLocation() + ", parsed " + parsedCount + " enteries");
+				log.info("Done with {}, parsed {} enteries", dumpEntry.getLocation(), parsedCount);
 				return;
 			} else if (eventType != XMLEvent.START_ELEMENT)
 				throw new RuntimeException("Unexpected event " + ErrorConsts.tokenTypeDesc(eventType)
 						+ " at " + xmlReader.getLocation().toString());
 
 			//Build attributes map
+			log.debug("Parsing entry {}", parsedCount);
 			Map<String, Object> attributesMap = ArrayMap.create(xmlReader.getAttributeCount());
 			for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
 				String normalName = Utils.getCaseInsensitive(properties.keySet(), xmlReader.getAttributeLocalName(i));
@@ -103,16 +104,16 @@ public class DumpParser {
 				//Attempt to convert to number if nessesary
 				Object attributeValue;
 				if (attributeTypeClass == Date.class) {
-					log.debug("Converting " + attributeValueRaw + " to a date");
+					log.debug("Converting {} to a date", attributeValueRaw);
 					if (attributeValueRaw.length() < 11)
 						attributeValue = dateFormatterShort.parse(attributeValueRaw);
 					else
 						attributeValue = dateFormatterLong.parse(attributeValueRaw);
 				} else if (attributeTypeClass == Byte.class) {
-					log.debug("Converting " + attributeValueRaw + " to a byte");
+					log.debug("Converting {} to a byte", attributeValueRaw);
 					attributeValue = Byte.parseByte(attributeValueRaw);
 				} else if (attributeTypeClass != String.class) {
-					log.debug("Converting " + attributeValueRaw + " to class " + attributeTypeClass);
+					log.debug("Converting {} to class {}", attributeValueRaw, attributeTypeClass);
 					if (attributeValueRaw.isEmpty())
 						attributeValue = 0;
 					else
