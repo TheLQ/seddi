@@ -90,8 +90,8 @@ public class DumpParser {
 			log.debug("Parsing entry {}", parsedCount);
 			Map<String, Object> attributesMap = ArrayMap.create(xmlReader.getAttributeCount());
 			for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
-				String normalName = Utils.getCaseInsensitive(properties.keySet(), xmlReader.getAttributeLocalName(i));
-				Type attributeType = properties.get(normalName);
+				String attributeName = xmlReader.getAttributeLocalName(i);
+				Type attributeType = properties.get(attributeName);
 				if (attributeType == null) {
 					errors.add("Unknown column " + xmlReader.getAttributeLocalName(i)
 							+ " at " + xmlReader.getLocation().toString());
@@ -120,7 +120,7 @@ public class DumpParser {
 				} else
 					attributeValue = attributeValueRaw;
 
-				attributesMap.put(normalName, attributeValue);
+				attributesMap.put(attributeName, attributeValue);
 			}
 
 			//Advance to END_ELEMENT, skipping the attributes and other stuff
