@@ -84,8 +84,7 @@ public class DumpParser {
 				log.info("Done with {}, parsed {} enteries", dumpEntry.getLocation(), parsedCount);
 				return;
 			} else if (eventType != XMLEvent.START_ELEMENT)
-				throw new RuntimeException("Unexpected event " + ErrorConsts.tokenTypeDesc(eventType)
-						+ " at " + xmlReader.getLocation().toString());
+				throw new RuntimeException("Unexpected event " + ErrorConsts.tokenTypeDesc(eventType));
 
 			//Build attributes map
 			log.debug("Parsing entry {}", parsedCount);
