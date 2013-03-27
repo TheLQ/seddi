@@ -60,7 +60,7 @@ public class DumpParser {
 
 			//Initialize the reader
 			this.xmlReader = (XMLStreamReader2) xmlFactory.createXMLStreamReader(dumpEntry.getInput());
-			
+
 			//Get root element
 			xmlReader.next();
 			this.root = xmlReader.getLocalName();
@@ -73,7 +73,7 @@ public class DumpParser {
 		try {
 			if (!enabled)
 				throw new RuntimeException("Parser is disabled");
-			if(endOfFile)
+			if (endOfFile)
 				throw new RuntimeException("Reached end of file, cannot continue");
 			int eventType = xmlReader.nextTag();
 			String curElement = xmlReader.getName().toString();
@@ -130,8 +130,8 @@ public class DumpParser {
 			parsedCount++;
 			dumpEntry.getDatabaseWriter().insertData(attributesMap);
 		} catch (Exception e) {
-			throw new RuntimeException("Cannot parse entry #" + (parsedCount + 1)
-					+ " at " + xmlReader.getLocation(), e);
+			throw new RuntimeException("Cannot parse entry in " + dumpEntry.getLocation()
+					+ " #" + (parsedCount + 1) + " at " + xmlReader.getLocation(), e);
 		}
 	}
 
