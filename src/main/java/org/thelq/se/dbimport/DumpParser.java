@@ -103,7 +103,7 @@ public class DumpParser {
 				//Attempt to convert to number if nessesary
 				Object attributeValue;
 				if (attributeTypeClass == Date.class) {
-					log.debug("Attempting to parse " + attributeValueRaw + " as a date");
+					log.debug("Converting " + attributeValueRaw + " to a date");
 					if (attributeValueRaw.length() < 11)
 						attributeValue = dateFormatterShort.parse(attributeValueRaw);
 					else
@@ -112,7 +112,7 @@ public class DumpParser {
 					log.debug("Converting " + attributeValueRaw + " to a byte");
 					attributeValue = Byte.parseByte(attributeValueRaw);
 				} else if (attributeTypeClass != String.class) {
-					log.debug("Converting " + attributeValueRaw + " ( " + xmlReader.getAttributeLocalName(i) + " to class " + attributeTypeClass);
+					log.debug("Converting " + attributeValueRaw + " to class " + attributeTypeClass);
 					if (attributeValueRaw.isEmpty())
 						attributeValue = 0;
 					else
