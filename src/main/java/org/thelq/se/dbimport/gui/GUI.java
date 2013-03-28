@@ -199,19 +199,21 @@ public class GUI {
 				//Add files and folders in a seperate thread while updating gui in EDT
 				importButton.setEnabled(false);
 				for (File curFile : fc.getSelectedFiles()) {
-					if (curFile.isDirectory())
-						controller.addDumpContainer(new FolderDumpContainer(curFile));
-					else
-						try {
-							controller.addDumpContainer(new ArchiveDumpContainer(controller, curFile));
-						} catch (Exception ex) {
-							JOptionPane.showMessageDialog(frame, "Cannot open archive: "
-									+ "\n" + curFile.getAbsolutePath()
-									+ "\n\nError: " + ex.getLocalizedMessage()
-									+ "\n" + ExceptionUtils.getRootCauseMessage(ex)
-									 + "\nSee Log for more information",
-									"Cannot Open Archive",	JOptionPane.ERROR_MESSAGE);
-						}
+					DumpContainer container;
+					try {
+						if (curFile.isDirectory())
+							container = new FolderDumpContainer(curFile);
+						else
+							container = new ArchiveDumpContainer(controller, curFile);
+						controller.addDumpContainer(container);
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(frame, "Cannot open archive: "
+								+ "\n" + curFile.getAbsolutePath()
+								+ "\n\nError: " + ex.getLocalizedMessage()
+								+ "\n" + ExceptionUtils.getRootCauseMessage(ex)
+								+ "\nSee Log for more information",
+								"Cannot Open Archive", JOptionPane.ERROR_MESSAGE);
+					}
 					updateLocations();
 				}
 				importButton.setEnabled(true);
