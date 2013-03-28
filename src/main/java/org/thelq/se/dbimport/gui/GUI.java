@@ -6,9 +6,9 @@ import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -29,6 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -161,11 +162,13 @@ public class GUI {
 
 		//Logger
 		primaryBuilder.addSeparator("Log", CC.xyw(1, 5, 5));
-		loggerText = new NoWrapJTextPane();
+		loggerText = new JTextPane();
 		loggerText.setEditable(false);
-		loggerText.setAlignmentX(Component.CENTER_ALIGNMENT);
-		JScrollPane loggerPane = new JScrollPane(loggerText);
+		JPanel loggerTextPanel = new JPanel(new BorderLayout());
+		loggerTextPanel.add(loggerText);
+		JScrollPane loggerPane = new JScrollPane(loggerTextPanel);
 		loggerPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		loggerPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		loggerPane.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		primaryBuilder.add(loggerPane, CC.xyw(2, 6, 4));
 
