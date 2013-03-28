@@ -66,6 +66,8 @@ public class Controller {
 				throw new IllegalArgumentException(container.getType() + " " + container.getLocation()
 						+ " has already been added");
 		dumpContainers.add(container);
+		if (container.getEntries().isEmpty())
+			throw new RuntimeException(container.getType() + " doesn't have any dump files");
 		log.info("Added " + container.getType() + " " + container.getLocation());
 	}
 
