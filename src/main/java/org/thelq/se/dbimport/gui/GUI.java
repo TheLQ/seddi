@@ -83,6 +83,7 @@ public class GUI {
 	protected JTextPane loggerText;
 	protected GUILogAppender logAppender;
 	protected List<GUIDumpContainer> guiDumpContainers = new ArrayList();
+	protected JMenuItem menuAdd;
 
 	public GUI(Controller passedController) {
 		//Initialize logger
@@ -105,7 +106,7 @@ public class GUI {
 
 		//Setup menu
 		JMenuBar menuBar = new JMenuBar();
-		JMenuItem menuAdd = new JMenuItem("Add Folders/Archives");
+		menuAdd = new JMenuItem("Add Folders/Archives");
 		menuAdd.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menuAdd);
 		frame.setJMenuBar(menuBar);
@@ -209,6 +210,7 @@ public class GUI {
 							container = new ArchiveDumpContainer(controller, curFile);
 						controller.addDumpContainer(container);
 					} catch (Exception ex) {
+						LoggerFactory.getLogger(getClass()).error("Cannot open " + container.getType(), ex);
 						showErrorDialog(ex, "Cannot open " + container.getType(), curFile.getAbsolutePath());
 					}
 					updateLocations();
@@ -216,9 +218,6 @@ public class GUI {
 				importButton.setEnabled(true);
 			}
 		});
-
-		//Import start code
-		importButton.addActionListener(new ImportActionListener());
 
 		//Add options (Could be in a map, but this is cleaner)
 		dbType.addItem(new DatabaseOption()
@@ -291,53 +290,66 @@ public class GUI {
 			}
 		});
 
+		importButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(true) {
+					updateGuiLayout();
+					return;
+				}
+				
+				if (guiDumpContainers.isEmpty()) {
+					JOptionPane.showMessageDialog(frame, "Please add dump folders/archives", "Import Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				//Disable all GUI components so they can't change anything during processing
+				setGuiEnabled(false);
+
+				//Run in new thread
+				controller.getGeneralThreadPool().execute(new Runnable() {
+					public void run() {
+						try {
+							start();
+						} catch (final Exception e) {
+							//Show an error message box
+							SwingUtilities.invokeLater(new Runnable() {
+								public void run() {
+									LoggerFactory.getLogger(getClass()).error("Cannot import", e);
+									showErrorDialog(e, "Cannot import", null);
+								}
+							});
+						}
+						//Renable GUI
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setGuiEnabled(true);
+							}
+						});
+					}
+				});
+			}
+		});
+
 		//Done, init logger
 		logAppender.init();
 		log.info("Finished creating GUI");
 	}
 
-	protected class ImportActionListener implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			if (guiDumpContainers.isEmpty()) {
-				JOptionPane.showMessageDialog(frame, "Please add dump folders/archives", "Import Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			//Disable all GUI components so they can't change anything during processing
-			setGuiEnabled(false);
-
-			//Run in new thread
-			controller.getGeneralThreadPool().execute(new Runnable() {
-				public void run() {
-					try {
-						start();
-					} catch (final Exception e) {
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								showErrorDialog(e, "Cannot import", null);
-								LoggerFactory.getLogger(getClass()).error("Cannot import", e);
-							}
-						});
-					}
-					setGuiEnabled(true);
-				}
-			});
+	protected void start() throws Exception {
+		//Try to connect to the database
+		try {
+			DatabaseWriter.setUsername(username.getText());
+			DatabaseWriter.setPassword(password.getText());
+			DatabaseWriter.setDialect(dialect.getText());
+			DatabaseWriter.setDriver(driver.getText());
+			DatabaseWriter.setJdbcString(jdbcString.getText());
+			DatabaseWriter.setBatchSize((Integer) batchSize.getValue());
+			DatabaseWriter.init();
+		} catch (Exception e) {
+			throw new Exception("Cannot connect to database", e);
 		}
-
-		protected void start() throws Exception {
-			//Try to connect to the database
-			try {
-				DatabaseWriter.setUsername(username.getText());
-				DatabaseWriter.setPassword(password.getText());
-				DatabaseWriter.setDialect(dialect.getText());
-				DatabaseWriter.setDriver(driver.getText());
-				DatabaseWriter.setJdbcString(jdbcString.getText());
-				DatabaseWriter.setBatchSize((Integer) batchSize.getValue());
-				DatabaseWriter.init();
-			} catch (Exception e) {
-				throw new Exception("Cannot connect to database", e);
-			}
-		}
+		
+		controller.importAll(4);
 	}
 
 	/**
@@ -368,6 +380,7 @@ public class GUI {
 		disableCreateTables.setEnabled(enabled);
 		lowerMemoryUsage.setEnabled(enabled);
 		globalTablePrefix.setEnabled(enabled);
+		menuAdd.setEnabled(enabled);
 	}
 
 	/**
