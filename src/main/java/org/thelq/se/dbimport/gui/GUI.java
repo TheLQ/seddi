@@ -199,7 +199,7 @@ public class GUI {
 				//Add files and folders in a seperate thread while updating gui in EDT
 				importButton.setEnabled(false);
 				for (File curFile : fc.getSelectedFiles()) {
-					DumpContainer container;
+					DumpContainer container = null;
 					try {
 						if (curFile.isDirectory())
 							container = new FolderDumpContainer(curFile);
@@ -207,12 +207,7 @@ public class GUI {
 							container = new ArchiveDumpContainer(controller, curFile);
 						controller.addDumpContainer(container);
 					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(frame, "Cannot open archive: "
-								+ "\n" + curFile.getAbsolutePath()
-								+ "\n\nError: " + ex.getLocalizedMessage()
-								+ "\n" + ExceptionUtils.getRootCauseMessage(ex)
-								+ "\nSee Log for more information",
-								"Cannot Open Archive", JOptionPane.ERROR_MESSAGE);
+						showErrorDialog(ex, "Cannot open " + container.getType(), curFile.getAbsolutePath());
 					}
 					updateLocations();
 				}
@@ -312,15 +307,8 @@ public class GUI {
 					} catch (final Exception e) {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
-								String root = "";
-								if (e.getCause() != null)
-									root = "\n" + ExceptionUtils.getRootCauseMessage(e);
-								String message = "Error: " + e.getLocalizedMessage()
-										+ root
-										+ "\nSee Log for more information";
-								String title = e.getLocalizedMessage();
-								LoggerFactory.getLogger(getClass()).error(message, e);
-								JOptionPane.showMessageDialog(frame, message, title, JOptionPane.ERROR_MESSAGE);
+								showErrorDialog(e, "Cannot import", null);
+								LoggerFactory.getLogger(getClass()).error("Cannot import", e);
 							}
 						});
 					}
@@ -466,6 +454,21 @@ public class GUI {
 				setColumnWidth(curTable, DumpContainerColumn.DATABASE, totalRemaining / 2);
 			}
 		}
+	}
+
+	protected void showErrorDialog(Exception ex, String title, String messageRaw) {
+		String root = "";
+		if (ex.getCause() != null)
+			root = "\n" + ExceptionUtils.getRootCauseMessage(ex);
+		String message = "";
+		if (!StringUtils.isBlank(messageRaw))
+			message = "\n" + messageRaw.trim();
+		JOptionPane.showMessageDialog(frame, title
+				+ message
+				+ "\n\nError: " + ex.getLocalizedMessage()
+				+ root
+				+ "\nSee Log for more information",
+				title, JOptionPane.ERROR_MESSAGE);
 	}
 
 	/**
