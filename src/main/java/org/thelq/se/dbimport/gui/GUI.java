@@ -296,6 +296,11 @@ public class GUI {
 
 	protected class ImportActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			if (guiDumpContainers.isEmpty()) {
+				JOptionPane.showMessageDialog(frame, "Please add dump folders/archives", "Import Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
 			//Disable all GUI components so they can't change anything during processing
 			setGuiEnabled(false);
 
