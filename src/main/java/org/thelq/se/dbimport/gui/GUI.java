@@ -169,7 +169,6 @@ public class GUI {
 		JScrollPane loggerPane = new JScrollPane(loggerTextPanel);
 		loggerPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		loggerPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		loggerPane.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		primaryBuilder.add(loggerPane, CC.xyw(2, 6, 4));
 
 		//Display
