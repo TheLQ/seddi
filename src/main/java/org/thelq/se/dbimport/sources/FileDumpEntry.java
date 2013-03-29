@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import lombok.Data;
-import org.thelq.se.dbimport.DatabaseWriter;
-import org.thelq.se.dbimport.DumpParser;
 
 /**
  *
@@ -15,13 +13,10 @@ import org.thelq.se.dbimport.DumpParser;
 @Data
 public class FileDumpEntry implements DumpEntry {
 	protected final File file;
-	protected DumpParser parser;
-	protected DatabaseWriter databaseWriter;
 	protected FileInputStream inputStream;
 
 	public FileDumpEntry(File file) {
 		this.file = file;
-		parser = new DumpParser(this);
 	}
 
 	@Override
@@ -48,8 +43,6 @@ public class FileDumpEntry implements DumpEntry {
 	@Override
 	public void close() {
 		try {
-			parser.close();
-			databaseWriter.close();
 			inputStream.close();
 		} catch (IOException ex) {
 			throw new RuntimeException("Cannot fully close File", ex);

@@ -13,9 +13,6 @@ public interface DumpEntry {
 	public String getLocation();
 	public String getName();
 	public InputStream getInput();
-	public DumpParser getParser();
-	public DatabaseWriter getDatabaseWriter();
-	public void setDatabaseWriter(DatabaseWriter dbWriter);
 	public void close();
 	public long getSizeBytes();
 }

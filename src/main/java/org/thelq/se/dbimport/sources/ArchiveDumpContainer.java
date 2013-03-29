@@ -32,9 +32,6 @@ public class ArchiveDumpContainer implements DumpContainer {
 	protected String type = "Archive";
 	protected final File archiveFile;
 	@Getter
-	@Setter
-	protected String tablePrefix;
-	@Getter
 	protected List<ArchiveDumpEntry> entries = new ArrayList();
 
 	public ArchiveDumpContainer(Controller controller, File archiveFile) throws FileNotFoundException, SevenZipException {
