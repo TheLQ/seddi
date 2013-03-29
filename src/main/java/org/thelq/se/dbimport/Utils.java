@@ -19,6 +19,16 @@ public class Utils {
 	}
 
 	/**
+	 * Get long form of location in "Type Location" format
+	 * @param container
+	 * @return 
+	 */
+	public static String getLongLocation(ImportContainer container) {
+		return container.getDumpContainer().getType() + " "
+				+ container.getDumpContainer().getLocation();
+	}
+
+	/**
 	 * SwingUtilities.invokeAndWait exceptions rethrown as unchecked RuntimeExceptions.
 	 * Saves an extra layer of indentation
 	 * @param runnable 
@@ -45,13 +55,13 @@ public class Utils {
 		//Remove unnessesary extensions
 		name = StringUtils.removeEnd(name, ".7z");
 		name = StringUtils.removeEnd(name, ".com");
-		
+
 		//Meta handling
 		if (StringUtils.startsWith(name, "meta"))
 			name = StringUtils.removeStart(name, "meta") + "_m";
 		else if (StringUtils.startsWith(name, "meta."))
 			name = StringUtils.removeStart(name, "meta.") + "_m";
-		
+
 		//Basic make valid for SQL
 		//TODO: more validation?
 		name = StringUtils.remove(name, " ");
