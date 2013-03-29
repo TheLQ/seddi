@@ -1,6 +1,7 @@
 package org.thelq.se.dbimport;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import lombok.Data;
@@ -17,8 +18,8 @@ import org.thelq.se.dbimport.sources.DumpEntry;
 @Data
 public class ImportContainer {
 	protected DumpContainer dumpContainer;
-	protected final Map<DumpEntry, DumpParser> parserMap;
-	protected final Map<DumpEntry, DatabaseWriter> databaseWriterMap;
+	protected final Map<DumpEntry, DumpParser> parserMap = new ConcurrentHashMap();
+	protected final Map<DumpEntry, DatabaseWriter> databaseWriterMap = new ConcurrentHashMap();
 	protected SessionFactory sessionFactory;
 	protected ServiceRegistry serviceRegistry;
 	protected Configuration hibernateConfiguration;
