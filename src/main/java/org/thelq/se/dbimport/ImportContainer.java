@@ -17,7 +17,7 @@ import org.thelq.se.dbimport.sources.DumpEntry;
  */
 @Data
 public class ImportContainer {
-	protected DumpContainer dumpContainer;
+	protected final DumpContainer dumpContainer;
 	protected final Map<DumpEntry, DumpParser> parserMap = new ConcurrentHashMap();
 	protected final Map<DumpEntry, DatabaseWriter> databaseWriterMap = new ConcurrentHashMap();
 	protected SessionFactory sessionFactory;
