@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collection;
 import javax.swing.SwingUtilities;
 import org.apache.commons.lang3.StringUtils;
+import org.thelq.se.dbimport.sources.DumpContainer;
 
 /**
  *
@@ -23,9 +24,12 @@ public class Utils {
 	 * @param container
 	 * @return 
 	 */
-	public static String getLongLocation(ImportContainer container) {
-		return container.getDumpContainer().getType() + " "
-				+ container.getDumpContainer().getLocation();
+	public static String getLongLocation(ImportContainer importContainer) {
+		return getLongLocation(importContainer.getDumpContainer());
+	}
+
+	public static String getLongLocation(DumpContainer dumpContainer) {
+		return dumpContainer.getType() + " " + dumpContainer.getLocation();
 	}
 
 	/**
