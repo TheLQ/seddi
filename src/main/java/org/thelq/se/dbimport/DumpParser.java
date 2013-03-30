@@ -51,8 +51,9 @@ public class DumpParser {
 	@Getter
 	@Setter
 	protected boolean enabled = true;
+	protected final DumpEntry dumpEntry;
 	@Setter
-	protected DumpEntry dumpEntry;
+	protected DatabaseWriter databaseWriter;
 
 	public DumpParser(DumpEntry dumpEntry) {
 		try {
@@ -128,7 +129,7 @@ public class DumpParser {
 			}
 
 			parsedCount++;
-			dumpEntry.getDatabaseWriter().insertData(attributesMap);
+			databaseWriter.insertData(attributesMap);
 		} catch (Exception e) {
 			throw new RuntimeException("Cannot parse entry in " + dumpEntry.getLocation()
 					+ " #" + (parsedCount + 1) + " at " + xmlReader.getLocation(), e);

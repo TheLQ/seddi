@@ -2,6 +2,7 @@ package org.thelq.se.dbimport.gui;
 
 import javax.swing.table.AbstractTableModel;
 import lombok.RequiredArgsConstructor;
+import org.thelq.se.dbimport.ImportContainer;
 import org.thelq.se.dbimport.sources.DumpEntry;
 
 /**
@@ -10,8 +11,9 @@ import org.thelq.se.dbimport.sources.DumpEntry;
  */
 @RequiredArgsConstructor
 public class DumpContainerTableModel extends AbstractTableModel {
-	protected final GUIDumpContainer guiDumpContainer;
+	protected final ImportContainer importContainer;
 
+	@Override
 	public String getColumnName(int col) {
 		return DumpContainerColumn.getById(col).getName();
 	}
@@ -21,20 +23,22 @@ public class DumpContainerTableModel extends AbstractTableModel {
 	}
 
 	public int getRowCount() {
-		return guiDumpContainer.getDumpContainer().getEntries().size();
+		return importContainer.getDumpContainer().getEntries().size();
 	}
 
 	public Object getValueAt(int row, int col) {
-		DumpEntry entry = guiDumpContainer.getDumpEntryById(row);
+		DumpEntry entry = importContainer.getDumpContainer().getEntries().get(row);
 		DumpContainerColumn column = DumpContainerColumn.getById(col);
 		if (column == DumpContainerColumn.NAME)
 			return entry.getName();
 		else if (column == DumpContainerColumn.SIZE)
 			return entry.getSizeBytes();
 		else if (column == DumpContainerColumn.PARSER)
-			return guiDumpContainer.getLogParserMap().get(entry);
+			//return importContainer.getLogParserMap().get(entry);
+			return "";
 		else if (column == DumpContainerColumn.DATABASE)
-			return guiDumpContainer.getLogDatabaseMap().get(entry);
+			//return importContainer.getLogDatabaseMap().get(entry);
+			return "";
 		else
 			throw new IllegalArgumentException("Unknown column " + col);
 	}
@@ -43,5 +47,4 @@ public class DumpContainerTableModel extends AbstractTableModel {
 	public boolean isCellEditable(int row, int col) {
 		return false;
 	}
-	
 }

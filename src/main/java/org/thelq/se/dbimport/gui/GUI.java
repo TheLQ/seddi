@@ -53,6 +53,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 import org.thelq.se.dbimport.DatabaseWriter;
+import org.thelq.se.dbimport.ImportContainer;
 import org.thelq.se.dbimport.Utils;
 import org.thelq.se.dbimport.sources.ArchiveDumpContainer;
 import org.thelq.se.dbimport.sources.DumpContainer;
@@ -82,7 +83,6 @@ public class GUI {
 	@Getter
 	protected JTextPane loggerText;
 	protected GUILogAppender logAppender;
-	protected List<GUIDumpContainer> guiDumpContainers = new ArrayList();
 	protected JMenuItem menuAdd;
 
 	public GUI(Controller passedController) {
@@ -170,7 +170,9 @@ public class GUI {
 		JScrollPane loggerPane = new JScrollPane(loggerTextPanel);
 		loggerPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		loggerPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		primaryBuilder.add(loggerPane, CC.xyw(2, 6, 4));
+		JPanel loggerPanePanel = new JPanel(new BorderLayout());
+		loggerPanePanel.add(loggerPane);
+		primaryBuilder.add(loggerPanePanel, CC.xyw(2, 6, 4));
 
 		//Display
 		frame.setContentPane(primaryBuilder.getPanel());
@@ -202,18 +204,20 @@ public class GUI {
 				//Add files and folders in a seperate thread while updating gui in EDT
 				importButton.setEnabled(false);
 				for (File curFile : fc.getSelectedFiles()) {
-					DumpContainer container = null;
+					DumpContainer dumpContainer = null;
+					ImportContainer importContainer = null;
 					try {
 						if (curFile.isDirectory())
-							container = new FolderDumpContainer(curFile);
+							dumpContainer = new FolderDumpContainer(curFile);
 						else
-							container = new ArchiveDumpContainer(controller, curFile);
-						controller.addDumpContainer(container);
+							dumpContainer = new ArchiveDumpContainer(controller, curFile);
+						importContainer = controller.addDumpContainer(dumpContainer);
 					} catch (Exception ex) {
-						LoggerFactory.getLogger(getClass()).error("Cannot open " + container.getType(), ex);
-						showErrorDialog(ex, "Cannot open " + container.getType(), curFile.getAbsolutePath());
+						LoggerFactory.getLogger(getClass()).error("Cannot open " + dumpContainer.getType(), ex);
+						showErrorDialog(ex, "Cannot open " + Utils.getLongLocation(dumpContainer), curFile.getAbsolutePath());
+						continue;
 					}
-					updateLocations();
+					updateLocations(importContainer);
 				}
 				importButton.setEnabled(true);
 			}
@@ -292,12 +296,7 @@ public class GUI {
 
 		importButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(true) {
-					updateGuiLayout();
-					return;
-				}
-				
-				if (guiDumpContainers.isEmpty()) {
+				if (controller.getImportContainers().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Please add dump folders/archives", "Import Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -336,20 +335,22 @@ public class GUI {
 	}
 
 	protected void start() throws Exception {
-		//Try to connect to the database
-		try {
-			DatabaseWriter.setUsername(username.getText());
-			DatabaseWriter.setPassword(password.getText());
-			DatabaseWriter.setDialect(dialect.getText());
-			DatabaseWriter.setDriver(driver.getText());
-			DatabaseWriter.setJdbcString(jdbcString.getText());
-			DatabaseWriter.setBatchSize((Integer) batchSize.getValue());
-			DatabaseWriter.init();
-		} catch (Exception e) {
-			throw new Exception("Cannot connect to database", e);
+		//Set database info
+		DatabaseWriter.setUsername(username.getText());
+		DatabaseWriter.setPassword(password.getText());
+		DatabaseWriter.setDialect(dialect.getText());
+		DatabaseWriter.setDriver(driver.getText());
+		DatabaseWriter.setJdbcString(jdbcString.getText());
+		DatabaseWriter.setBatchSize((Integer) batchSize.getValue());
+		DatabaseWriter.setGlobalPrefix(globalTablePrefix.getText());
+
+		//Need to set the table prefix so everything else sees it
+		for (ImportContainer curContainer : controller.getImportContainers()) {
+			log.info("Setting prefix on " + curContainer.getDumpContainer().getLocation() + " to " + curContainer.getGuiTablePrefix().getText());
+			curContainer.setTablePrefix(curContainer.getGuiTablePrefix().getText());
 		}
-		
-		controller.importAll(4);
+
+		controller.importAll(1, !disableCreateTables.isSelected());
 	}
 
 	/**
@@ -394,85 +395,71 @@ public class GUI {
 	/**
 	 * Update the list of locations
 	 */
-	protected void updateLocations() {
-		int previousContainerSize = guiDumpContainers.size();
-		Outer:
-		for (DumpContainer curDumpContainer : controller.getDumpContainers()) {
-			//Have we already added this?
-			for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers)
-				if (curGuiDumpContainer.getDumpContainer() == curDumpContainer)
-					continue Outer;
+	protected void updateLocations(ImportContainer container) {
+		FormLayout layout = new FormLayout("15dlu, fill:pref:grow, pref, 3dlu, pref", "pref:grow, pref:grow");
+		final PanelBuilder curLocationBuilder = new PanelBuilder(layout, new FormDebugPanel())
+				.background(Color.WHITE);
+		final JLabel headerLabel = new JLabel(Utils.getLongLocation(container));
+		headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
+		curLocationBuilder.add(headerLabel, CC.xyw(1, 1, 2));
+		final JTextField headerPrefix = new JTextField(6);
+		curLocationBuilder.add(headerPrefix, CC.xy(5, 1));
+		container.setGuiTablePrefix(globalTablePrefix);
 
-			//No, create a new entery in the locations pane
-			GUIDumpContainer guiDumpContainer = new GUIDumpContainer(curDumpContainer);
-			guiDumpContainers.add(guiDumpContainer);
+		//Try to generate a prefix from the container name
+		String dumpLocation = container.getDumpContainer().getLocation();
+		String containerName = StringUtils.substringAfterLast(dumpLocation, "/");
+		if (StringUtils.isBlank(containerName))
+			containerName = StringUtils.substringAfterLast(dumpLocation, "\\");
+		if (!StringUtils.isBlank(containerName))
+			headerPrefix.setText(Utils.genTablePrefix(containerName));
+		else
+			log.warn("Unable to generate a table prefix for " + dumpLocation);
 
-			FormLayout layout = new FormLayout("15dlu, fill:pref:grow, pref, 3dlu, pref", "pref:grow, pref:grow");
-			final PanelBuilder curLocationBuilder = new PanelBuilder(layout, new FormDebugPanel())
-					.background(Color.WHITE);
-			final JLabel headerLabel = new JLabel(curDumpContainer.getType() + " " + curDumpContainer.getLocation());
-			headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
-			curLocationBuilder.add(headerLabel, CC.xyw(1, 1, 2));
-			final JTextField headerPrefix = new JTextField(6);
-			curLocationBuilder.add(headerPrefix, CC.xy(5, 1));
-			guiDumpContainer.setTablePrefix(headerPrefix);
+		//Generate a table
+		final JTable table = new JTable(new DumpContainerTableModel(container));
+		table.setVisible(false);
+		table.setFillsViewportHeight(true);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		curLocationBuilder.add(table, CC.xyw(2, 2, 4));
+		container.setGuiTable(table);
 
-			//Try to generate a prefix from the container name
-			String containerName = StringUtils.substringAfterLast(curDumpContainer.getLocation(), "/");
-			if (StringUtils.isBlank(containerName))
-				containerName = StringUtils.substringAfterLast(curDumpContainer.getLocation(), "\\");
-			if (!StringUtils.isBlank(containerName))
-				headerPrefix.setText(Utils.genTablePrefix(containerName));
-			else
-				log.warn("Unable to generate a table prefix for " + curDumpContainer.getLocation());
+		//Add to builder
+		locationsBuilder.append(curLocationBuilder.getPanel());
+		updateGuiLayout();
 
-			//Generate a table
-			final JTable table = new JTable(new DumpContainerTableModel(guiDumpContainer));
-			table.setVisible(false);
-			table.setFillsViewportHeight(true);
-			table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-			curLocationBuilder.add(table, CC.xyw(2, 2, 4));
-			guiDumpContainer.setTable(table);
+		//Handlers
+		headerLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				table.setVisible(!table.isVisible());
+				if (table.isVisible())
+					headerLabel.setIcon(UIManager.getIcon("Tree.expandedIcon"));
+				else
+					headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
+				curLocationBuilder.getPanel().revalidate();
+			}
+		});
 
-			//Add to builder
-			locationsBuilder.append(curLocationBuilder.getPanel());
-			updateGuiLayout();
-
-			//Handlers
-			headerLabel.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					table.setVisible(!table.isVisible());
-					if (table.isVisible())
-						headerLabel.setIcon(UIManager.getIcon("Tree.expandedIcon"));
-					else
-						headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
-					curLocationBuilder.getPanel().revalidate();
-				}
-			});
+		//Update all column sizes
+		int maxNameWidth = 0;
+		int maxSizeWidth = 0;
+		for (ImportContainer curImportContainer : controller.getImportContainers()) {
+			JTable curTable = curImportContainer.getGuiTable();
+			maxNameWidth = Math.max(maxNameWidth, getMaxColumnSize(curTable, DumpContainerColumn.NAME));
+			maxSizeWidth = Math.max(maxSizeWidth, getMaxColumnSize(curTable, DumpContainerColumn.SIZE));
 		}
+		maxNameWidth += 6;
+		maxSizeWidth += 6;
+		for (ImportContainer curImportContainer : controller.getImportContainers()) {
+			JTable curTable = curImportContainer.getGuiTable();
+			setColumnWidth(curTable, DumpContainerColumn.NAME, maxNameWidth);
+			setColumnWidth(curTable, DumpContainerColumn.SIZE, maxSizeWidth);
 
-		if (previousContainerSize != guiDumpContainers.size()) {
-			//Update all column sizes
-			int maxNameWidth = 0;
-			int maxSizeWidth = 0;
-			for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers) {
-				JTable curTable = curGuiDumpContainer.getTable();
-				maxNameWidth = Math.max(maxNameWidth, getMaxColumnSize(curTable, DumpContainerColumn.NAME));
-				maxSizeWidth = Math.max(maxSizeWidth, getMaxColumnSize(curTable, DumpContainerColumn.SIZE));
-			}
-			maxNameWidth += 6;
-			maxSizeWidth += 6;
-			for (GUIDumpContainer curGuiDumpContainer : guiDumpContainers) {
-				JTable curTable = curGuiDumpContainer.getTable();
-				setColumnWidth(curTable, DumpContainerColumn.NAME, maxNameWidth);
-				setColumnWidth(curTable, DumpContainerColumn.SIZE, maxSizeWidth);
-
-				//Split remaining width
-				int totalRemaining = (int) curTable.getSize().getWidth() - maxNameWidth - maxSizeWidth;
-				setColumnWidth(curTable, DumpContainerColumn.PARSER, totalRemaining / 2);
-				setColumnWidth(curTable, DumpContainerColumn.DATABASE, totalRemaining / 2);
-			}
+			//Split remaining width
+			int totalRemaining = (int) curTable.getSize().getWidth() - maxNameWidth - maxSizeWidth;
+			setColumnWidth(curTable, DumpContainerColumn.PARSER, totalRemaining / 2);
+			setColumnWidth(curTable, DumpContainerColumn.DATABASE, totalRemaining / 2);
 		}
 	}
 

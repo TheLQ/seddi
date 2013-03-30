@@ -21,10 +21,6 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
  */
 @Slf4j
 public class DatabaseWriter {
-	@Getter
-	protected static SessionFactory sessionFactory;
-	protected static Configuration configuration;
-	protected static ServiceRegistry serviceRegistry;
 	@Setter
 	protected static String username;
 	@Setter
@@ -36,47 +32,42 @@ public class DatabaseWriter {
 	@Setter
 	protected static String dialect;
 	@Setter
+	protected static String globalPrefix;
+	@Setter
 	protected static int batchSize;
-	@Getter
-	protected static boolean isInited = false;
 	protected int count = 0;
 	protected final String table;
+	protected final ImportContainer container;
 
-	public static void init() throws HibernateException {
-		isInited = false;
-		configuration = new Configuration();
-		configuration.configure();
-		configuration.setProperty("hibernate.connection.username", username);
-		configuration.setProperty("hibernate.connection.password", password);
-		configuration.setProperty("hibernate.connection.url", jdbcString);
-		configuration.setProperty("hibernate.connection.driver_class", driver);
-		configuration.setProperty("hibernate.dialect", dialect);
-		configuration.setProperty("hibernate.jdbc.batch_size", Integer.toString(batchSize));
-		serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
-		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+	public static void buildSessionFactory(ImportContainer container) throws HibernateException {
+		container.setHibernateConfiguration(new Configuration());
+		container.getHibernateConfiguration().configure();
+		container.getHibernateConfiguration().setProperty("hibernate.connection.username", username);
+		container.getHibernateConfiguration().setProperty("hibernate.connection.password", password);
+		container.getHibernateConfiguration().setProperty("hibernate.connection.url", jdbcString);
+		container.getHibernateConfiguration().setProperty("hibernate.connection.driver_class", driver);
+		container.getHibernateConfiguration().setProperty("hibernate.dialect", dialect);
+		container.getHibernateConfiguration().setProperty("hibernate.jdbc.batch_size", Integer.toString(batchSize));
+		container.getHibernateConfiguration().setNamingStrategy(new PrefixNamingStrategy(globalPrefix + container.getTablePrefix()));
+		container.setServiceRegistry(new ServiceRegistryBuilder().applySettings(container.getHibernateConfiguration().getProperties())
+				.buildServiceRegistry());
+		container.setSessionFactory(container.getHibernateConfiguration().buildSessionFactory(container.getServiceRegistry()));
 
 		//Make a test connection so we know if this actually works
-		Session testSession = sessionFactory.openSession();
+		Session testSession = container.getSessionFactory().openSession();
 		testSession.beginTransaction();
 		testSession.close();
-		log.info("Test connection successful, database is inited");
-		isInited = true;
+		log.info("Database ready for " + Utils.getLongLocation(container));
 	}
 	protected Session session;
 
-	public DatabaseWriter(String table) {
+	public DatabaseWriter(ImportContainer container, String table) {
 		this.table = table;
-		session = sessionFactory.openSession();
+		this.container = container;
+		session = container.getSessionFactory().openSession();
 		session.setCacheMode(CacheMode.IGNORE);
 		session.setFlushMode(FlushMode.MANUAL);
 		session.beginTransaction();
-	}
-	
-	/**
-	 * Dummy constructor to allow benchmark class to mock this
-	 */
-	protected DatabaseWriter() {
-		this.table = null;
 	}
 
 	public void insertData(Map<String, Object> data) throws Exception {
@@ -88,16 +79,17 @@ public class DatabaseWriter {
 				session.clear();
 			}
 		} catch (Exception e) {
+			log.info("Current data: " + data.toString());
 			session.getTransaction().rollback();
 			throw e;
 		}
 	}
 
-	public static void createTables() {
-		SchemaExport exporter = new SchemaExport(serviceRegistry, configuration);
+	public void createTables() {
+		SchemaExport exporter = new SchemaExport(container.getServiceRegistry(), container.getHibernateConfiguration());
 		exporter.setHaltOnError(true);
-		log.debug("----- BEGIN CREATE -----");
 		exporter.create(false, true);
+		log.info("Finished creating tables for " + Utils.getLongLocation(container));
 	}
 
 	public void close() {

@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -16,6 +15,7 @@ import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.hibernate.SessionFactory;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.Type;
 import org.thelq.se.dbimport.gui.GUI;
@@ -30,7 +30,7 @@ import org.thelq.se.dbimport.sources.DumpEntry;
 public class Controller {
 	protected GUI gui;
 	@Getter
-	protected List<DumpContainer> dumpContainers = Collections.synchronizedList(new LinkedList());
+	protected List<ImportContainer> importContainers = Collections.synchronizedList(new LinkedList());
 	@Getter
 	protected ExecutorService generalThreadPool;
 	protected Map<String, Map<String, Type>> metadataMap;
@@ -48,9 +48,9 @@ public class Controller {
 			});
 	}
 
-	public void initMetadataMap() {
+	public void initMetadataMap(SessionFactory sessionFactory) {
 		Builder<String, Map<String, Type>> metadataMapBuilder = ImmutableSortedMap.orderedBy(String.CASE_INSENSITIVE_ORDER);
-		for (Map.Entry<String, ClassMetadata> curEntry : DatabaseWriter.getSessionFactory().getAllClassMetadata().entrySet()) {
+		for (Map.Entry<String, ClassMetadata> curEntry : sessionFactory.getAllClassMetadata().entrySet()) {
 			ClassMetadata tableDataRaw = curEntry.getValue();
 			Builder<String, Type> propertiesBuilder = ImmutableSortedMap.orderedBy(String.CASE_INSENSITIVE_ORDER);
 			propertiesBuilder.put(tableDataRaw.getIdentifierPropertyName(), tableDataRaw.getIdentifierType());
@@ -61,11 +61,14 @@ public class Controller {
 		metadataMap = metadataMapBuilder.build();
 	}
 
-	public void importAll(int threads) {
-		if (!DatabaseWriter.isInited())
-			throw new RuntimeException("Database isn't inited!");
+	public void importAll(int threads, final boolean createTables) {
+		//Build a test session factory with the first entry to see if database credentials work
+		DatabaseWriter.buildSessionFactory(importContainers.get(0));
+		
 		if (metadataMap == null)
-			initMetadataMap();
+			initMetadataMap(importContainers.get(0).getSessionFactory());
+		
+		//Database wors, start importing
 		ThreadPoolExecutor importThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threads, new BasicThreadFactory.Builder()
 				.namingPattern("seImport-pool-%d")
 				.build());
@@ -78,25 +81,25 @@ public class Controller {
 		int curIndex = 0;
 		while (true) {
 			int numFailed = 0;
-			for (final DumpContainer curContainer : dumpContainers) {
+			for (final ImportContainer curContainer : importContainers) {
 				//Make sure this entry actually exists
-				List<? extends DumpEntry> entries = curContainer.getEntries();
+				List<? extends DumpEntry> entries = curContainer.getDumpContainer().getEntries();
 				if (curIndex >= entries.size()) {
 					numFailed++;
 					continue;
 				}
 
 				//Add to queue
-				final DumpEntry curEntry = curContainer.getEntries().get(curIndex);
+				final DumpEntry curEntry = curContainer.getDumpContainer().getEntries().get(curIndex);
 				futures.add(importThreadPool.submit(new Runnable() {
 					public void run() {
-						importSingle(curContainer, curEntry);
+						importSingle(curContainer, curEntry, createTables);
 					}
 				}));
 			}
 
 			//Check if we've exausted all DumpEntries
-			if (numFailed == dumpContainers.size())
+			if (numFailed == importContainers.size())
 				break;
 
 			//Nope, continue to the next index
@@ -112,32 +115,45 @@ public class Controller {
 			}
 	}
 
-	public void importSingle(DumpContainer container, DumpEntry entry) {
-		DumpParser parser = entry.getParser();
+	public void importSingle(ImportContainer container, DumpEntry entry, boolean createTables) {
+		//Init parser
+		DumpParser parser = new DumpParser(entry);
+		container.getParserMap().put(entry, parser);
 		if (!metadataMap.containsKey(parser.getRoot()))
 			throw new RuntimeException("Cannot find table mapping for root " + parser.getRoot()
 					+ " for file " + entry.getLocation());
 		parser.setProperties(metadataMap.get(parser.getRoot()));
-		entry.setDatabaseWriter(new DatabaseWriter(container.getTablePrefix(), parser.getRoot()));
+		
+		//Init database
+		DatabaseWriter databaseWriter = new DatabaseWriter(container, parser.getRoot());
+		container.getDatabaseWriterMap().put(entry, databaseWriter);
+		parser.setDatabaseWriter(databaseWriter);
+		
+		//Import!
+		if(createTables)
+			databaseWriter.createTables();
 		while (!parser.isEndOfFile())
 			parser.parseNextEntry();
 
 		//Done, close everything
 		parser.close();
-		entry.getDatabaseWriter().close();
+		databaseWriter.close();
 		entry.close();
 	}
 
-	public void addDumpContainer(DumpContainer container) {
+	public ImportContainer addDumpContainer(DumpContainer container) {
 		//Make sure it doesn't exist already
-		for (DumpContainer curContainer : dumpContainers)
-			if (curContainer.getLocation().equals(container.getLocation()))
+		for (ImportContainer curContainer : importContainers)
+			if (curContainer.getDumpContainer().getLocation().equals(container.getLocation()))
 				throw new IllegalArgumentException(container.getType() + " " + container.getLocation()
 						+ " has already been added");
 		if (container.getEntries().isEmpty())
 			throw new RuntimeException(container.getType() + " doesn't have any dump files");
-		dumpContainers.add(container);
-		log.info("Added " + container.getType() + " " + container.getLocation());
+		
+		ImportContainer importContainer = new ImportContainer(container);
+		importContainers.add(importContainer);
+		log.info("Added " + Utils.getLongLocation(importContainer));
+		return importContainer;
 	}
 
 	public static void main(String[] args) {
