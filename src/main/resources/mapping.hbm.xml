@@ -19,216 +19,216 @@
 		</property>
 	</class>
 	<class entity-name="comments" table="comments">
-		<id name="id" type="int">
+		<id name="Id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
 		</id>
-		<property name="creationDate" type="timestamp">
+		<property name="CreationDate" type="timestamp">
 			<column name="CreationDate" length="19" not-null="true" />
 		</property>
-		<property name="postId" type="int">
+		<property name="PostId" type="int">
 			<column name="PostId" not-null="true" />
 		</property>
-		<property name="score" type="int">
+		<property name="Score" type="int">
 			<column name="Score" />
 		</property>
-		<property name="text" type="string">
+		<property name="Text" type="string">
 			<column name="Text" length="600" not-null="true" />
 		</property>
-		<property name="userId" type="int">
+		<property name="UserId" type="int">
 			<column name="UserId" />
 		</property>
 	</class>
 	<class entity-name="posts" table="posts">
-		<id name="id" type="int">
+		<id name="Id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
 		</id>
-		<property name="acceptedAnswerId" type="int">
+		<property name="AcceptedAnswerId" type="int">
 			<column name="AcceptedAnswerId" />
 		</property>
-		<property name="answerCount" type="int">
+		<property name="AnswerCount" type="int">
 			<column name="AnswerCount" />
 		</property>
-		<property name="body" type="text">
+		<property name="Body" type="text">
 			<column name="Body" not-null="true" />
 		</property>
-		<property name="closedDate" type="timestamp">
+		<property name="ClosedDate" type="timestamp">
 			<column name="ClosedDate" length="19" />
 		</property>
-		<property name="commentCount" type="int">
+		<property name="CommentCount" type="int">
 			<column name="CommentCount" />
 		</property>
-		<property name="communityOwnedDate" type="timestamp">
+		<property name="CommunityOwnedDate" type="timestamp">
 			<column name="CommunityOwnedDate" length="19" />
 		</property>
-		<property name="creationDate" type="timestamp">
+		<property name="CreationDate" type="timestamp">
 			<column name="CreationDate" length="19" not-null="true" />
 		</property>
-		<property name="favoriteCount" type="int">
+		<property name="FavoriteCount" type="int">
 			<column name="FavoriteCount" />
 		</property>
-		<property name="lastActivityDate" type="timestamp">
+		<property name="LastActivityDate" type="timestamp">
 			<column name="LastActivityDate" length="19" not-null="true" />
 		</property>
-		<property name="lastEditDate" type="timestamp">
+		<property name="LastEditDate" type="timestamp">
 			<column name="LastEditDate" length="19" />
 		</property>
-		<property name="lastEditorDisplayName" type="string">
+		<property name="LastEditorDisplayName" type="string">
 			<column name="LastEditorDisplayName" length="40" />
 		</property>
-		<property name="lastEditorUserId" type="int">
+		<property name="LastEditorUserId" type="int">
 			<column name="LastEditorUserId" />
 		</property>
-		<property name="ownerUserId" type="int">
+		<property name="OwnerUserId" type="int">
 			<column name="OwnerUserId" />
 		</property>
-		<property name="parentId" type="int">
+		<property name="ParentId" type="int">
 			<column name="ParentId" />
 		</property>
-		<property name="postTypeId" type="byte">
+		<property name="PostTypeId" type="byte">
 			<column name="PostTypeId" not-null="true" length="2"/>
 		</property>
-		<property name="score" type="int">
+		<property name="Score" type="int">
 			<column name="Score" not-null="true" />
 		</property>
-		<property name="tags" type="string">
+		<property name="Tags" type="string">
 			<column name="Tags" length="150" />
 		</property>
-		<property name="title" type="string">
+		<property name="Title" type="string">
 			<column name="Title" length="250" />
 		</property>
-		<property name="viewCount" type="int">
+		<property name="ViewCount" type="int">
 			<column name="ViewCount" not-null="true" />
 		</property>
 	</class>
 	<class entity-name="posttags" table="posttags">
 		<composite-id name="id">
-			<key-property name="postId" type="int">
+			<key-property name="PostId" type="int">
 				<column name="PostId" />
 			</key-property>
-			<key-property name="tag" type="string">
+			<key-property name="Tag" type="string">
 				<column name="Tag" length="50" />
 			</key-property>
 		</composite-id>
 	</class>
 	<class entity-name="posttypes" table="posttypes">
-		<id name="id" type="int">
+		<id name="Id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
 		</id>
-		<property name="type" type="string">
+		<property name="Type" type="string">
 			<column name="Type" length="10" not-null="true" />
 		</property>
 	</class>
 	<class entity-name="posthistory" table="posthistory">
-		<id name="id" type="int">
+		<id name="Id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
 		</id>
-		<property name="postHistoryTypeId" type="byte">
+		<property name="PostHistoryTypeId" type="byte">
 			<column name="PostHistoryTypeId" />
 		</property>
-		<property name="postId" type="int">
+		<property name="PostId" type="int">
 			<column name="PostId" />
 		</property>
-		<property name="revisionGuid" type="string">
+		<property name="RevisionGUID" type="string">
 			<column name="RevisionGUID" length="38" />
 		</property>
-		<property name="creationDate" type="timestamp">
+		<property name="CreationDate" type="timestamp">
 			<column name="CreationDate" length="19" />
 		</property>
-		<property name="userId" type="int">
+		<property name="UserId" type="int">
 			<column name="UserId" />
 		</property>
-		<property name="userDisplayName" type="string">
+		<property name="UserDisplayName" type="string">
 			<column name="UserDisplayName" length="40" />
 		</property>
-		<property name="comment" type="string">
+		<property name="Comment" type="string">
 			<column name="Comment" length="400" />
 		</property>
-		<property name="text" type="text">
+		<property name="Text" type="text">
 			<column name="Text" length="65535" />
 		</property>
 	</class>
 	<class entity-name="users" table="users">
-		<id name="id" type="int">
+		<id name="Id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
 		</id>
-		<property name="aboutMe" type="text">
+		<property name="AboutMe" type="text">
 			<column name="AboutMe" length="65535" />
 		</property>
-		<property name="age" type="int">
+		<property name="Age" type="int">
 			<column name="Age" />
 		</property>
-		<property name="creationDate" type="timestamp">
+		<property name="CreationDate" type="timestamp">
 			<column name="CreationDate" length="19" not-null="true" />
 		</property>
-		<property name="displayName" type="string">
+		<property name="DisplayName" type="string">
 			<column name="DisplayName" length="40" not-null="true" />
 		</property>
-		<property name="downVotes" type="int">
+		<property name="DownVotes" type="int">
 			<column name="DownVotes" not-null="true" />
 		</property>
-		<property name="emailHash" type="string">
+		<property name="EmailHash" type="string">
 			<column name="EmailHash" length="32" />
 		</property>
-		<property name="lastAccessDate" type="timestamp">
+		<property name="LastAccessDate" type="timestamp">
 			<column name="LastAccessDate" length="19" not-null="true" />
 		</property>
-		<property name="location" type="string">
+		<property name="Location" type="string">
 			<column name="Location" length="100" />
 		</property>
-		<property name="reputation" type="int">
+		<property name="Reputation" type="int">
 			<column name="Reputation" not-null="true" />
 		</property>
-		<property name="upVotes" type="int">
+		<property name="UpVotes" type="int">
 			<column name="UpVotes" not-null="true" />
 		</property>
-		<property name="views" type="int">
+		<property name="Views" type="int">
 			<column name="Views" not-null="true" />
 		</property>
-		<property name="websiteUrl" type="string">
+		<property name="WebsiteUrl" type="string">
 			<column name="WebsiteUrl" length="200" />
 		</property>
 	</class>
 	<class entity-name="posthistorytypes" table="posthistorytypes">
-		<id name="id" type="byte">
+		<id name="Id" type="byte">
 			<column name="Id" />
 			<generator class="assigned" />
 		</id>
-		<property name="name" type="string">
-			<column name="name" length="50" not-null="true" />
+		<property name="Name" type="string">
+			<column name="Name" length="50" not-null="true" />
 		</property>
 	</class>
 	<class entity-name="votes" table="votes">
-		<id name="id" type="int">
+		<id name="Id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
 		</id>
-		<property name="postId" type="int">
+		<property name="PostId" type="int">
 			<column name="PostId" not-null="true" />
 		</property>
-		<property name="userId" type="int">
+		<property name="UserId" type="int">
 			<column name="UserId" />
 		</property>
-		<property name="bountyAmount" type="int">
+		<property name="BountyAmount" type="int">
 			<column name="BountyAmount" />
 		</property>
-		<property name="voteTypeId" type="byte">
+		<property name="VoteTypeId" type="byte">
 			<column name="VoteTypeId" not-null="true" />
 		</property>
-		<property name="creationDate" type="timestamp">
+		<property name="CreationDate" type="timestamp">
 			<column name="CreationDate" length="19" not-null="true" />
 		</property>
 	</class>
 	<class entity-name="votetypes" table="votetypes">
-		<id name="id" type="int">
+		<id name="Id" type="int">
 			<column name="Id" />
 			<generator class="assigned" />
 		</id>
-		<property name="name" type="string">
+		<property name="Name" type="string">
 			<column name="Name" length="40" not-null="true" />
 		</property>
 	</class>

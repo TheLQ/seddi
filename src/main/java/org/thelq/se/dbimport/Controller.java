@@ -1,7 +1,7 @@
 package org.thelq.se.dbimport;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.ImmutableSortedMap.Builder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -49,10 +49,10 @@ public class Controller {
 	}
 
 	public void initMetadataMap(SessionFactory sessionFactory) {
-		Builder<String, Map<String, Type>> metadataMapBuilder = ImmutableSortedMap.orderedBy(String.CASE_INSENSITIVE_ORDER);
+		ImmutableSortedMap.Builder<String, Map<String, Type>> metadataMapBuilder = ImmutableSortedMap.orderedBy(String.CASE_INSENSITIVE_ORDER);
 		for (Map.Entry<String, ClassMetadata> curEntry : sessionFactory.getAllClassMetadata().entrySet()) {
 			ClassMetadata tableDataRaw = curEntry.getValue();
-			Builder<String, Type> propertiesBuilder = ImmutableSortedMap.orderedBy(String.CASE_INSENSITIVE_ORDER);
+			ImmutableMap.Builder<String, Type> propertiesBuilder = ImmutableMap.builder();
 			propertiesBuilder.put(tableDataRaw.getIdentifierPropertyName(), tableDataRaw.getIdentifierType());
 			for (String curPropertyName : tableDataRaw.getPropertyNames())
 				propertiesBuilder.put(curPropertyName, tableDataRaw.getPropertyType(curPropertyName));
