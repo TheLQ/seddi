@@ -1,11 +1,8 @@
 package org.thelq.se.dbimport;
 
 import com.ctc.wstx.cfg.ErrorConsts;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -46,8 +43,6 @@ public class DumpParser {
 	protected Map<String, Type> properties;
 	protected SimpleDateFormat dateFormatterLong = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 	protected SimpleDateFormat dateFormatterShort = new SimpleDateFormat("yyyy-MM-dd");
-	@Getter
-	protected List<String> errors = new ArrayList();
 	@Getter
 	@Setter
 	protected boolean enabled = true;
@@ -93,11 +88,8 @@ public class DumpParser {
 			for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
 				String attributeName = xmlReader.getAttributeLocalName(i);
 				Type attributeType = properties.get(attributeName);
-				if (attributeType == null) {
-					errors.add("Unknown column " + xmlReader.getAttributeLocalName(i)
-							+ " at " + xmlReader.getLocation().toString());
-					continue;
-				}
+				if (attributeType == null)
+					throw new RuntimeException("Unknown column " + attributeName + " at " + xmlReader.getLocation());
 				Class attributeTypeClass = attributeType.getReturnedClass();
 				String attributeValueRaw = xmlReader.getAttributeValue(i);
 
