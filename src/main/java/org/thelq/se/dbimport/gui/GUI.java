@@ -224,6 +224,7 @@ public class GUI {
 		});
 
 		//Add options (Could be in a map, but this is cleaner)
+		dbType.addItem(DatabaseOption.SELECTONE);
 		dbType.addItem(new DatabaseOption()
 				.name("MySQL")
 				.jdbcString("jdbc:mysql://127.0.0.1:3306/so_new?rewriteBatchedStatements=true")
@@ -298,6 +299,10 @@ public class GUI {
 			public void actionPerformed(ActionEvent e) {
 				if (controller.getImportContainers().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Please add dump folders/archives", "Import Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if(dbType.getSelectedItem() == DatabaseOption.CUSTOM) {
+					JOptionPane.showMessageDialog(frame, "Please configure database options", "Import Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 

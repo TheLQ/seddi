@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 @Getter
 public class DatabaseOption {
 	public static DatabaseOption CUSTOM = new DatabaseOption().name("Custom");
+	public static DatabaseOption SELECTONE = new DatabaseOption().name("Select One");
 	String name;
 	String jdbcString;
 	String driver;
