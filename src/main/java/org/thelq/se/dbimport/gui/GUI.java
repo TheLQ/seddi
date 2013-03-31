@@ -399,6 +399,8 @@ public class GUI {
 		disableCreateTables.setEnabled(enabled);
 		lowerMemoryUsage.setEnabled(enabled);
 		globalTablePrefix.setEnabled(enabled);
+		batchSize.setEnabled(enabled);
+		dbAdvanced.setEnabled(enabled);
 		menuAdd.setEnabled(enabled);
 	}
 
