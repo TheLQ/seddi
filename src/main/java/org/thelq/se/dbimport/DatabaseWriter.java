@@ -79,7 +79,6 @@ public class DatabaseWriter {
 				session.clear();
 			}
 		} catch (Exception e) {
-			log.info("Current data: " + data.toString());
 			session.getTransaction().rollback();
 			throw e;
 		}
