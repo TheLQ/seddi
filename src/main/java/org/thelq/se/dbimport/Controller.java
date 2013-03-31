@@ -64,10 +64,10 @@ public class Controller {
 	public void importAll(int threads, final boolean createTables) {
 		//Build a test session factory with the first entry to see if database credentials work
 		DatabaseWriter.buildSessionFactory(importContainers.get(0));
-		
+
 		if (metadataMap == null)
 			initMetadataMap(importContainers.get(0).getSessionFactory());
-		
+
 		//Database wors, start importing
 		ThreadPoolExecutor importThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threads, new BasicThreadFactory.Builder()
 				.namingPattern("seImport-pool-%d")
@@ -111,34 +111,39 @@ public class Controller {
 			try {
 				curFuture.get();
 			} catch (Exception e) {
-				log.error("Cannot import", e);
+				log.error("Could not wait for import thread to complete", e);
 			}
+
 	}
 
 	public void importSingle(ImportContainer container, DumpEntry entry, boolean createTables) {
-		//Init parser
-		DumpParser parser = new DumpParser(entry);
-		container.getParserMap().put(entry, parser);
-		if (!metadataMap.containsKey(parser.getRoot()))
-			throw new RuntimeException("Cannot find table mapping for root " + parser.getRoot()
-					+ " for file " + entry.getLocation());
-		parser.setProperties(metadataMap.get(parser.getRoot()));
-		
-		//Init database
-		DatabaseWriter databaseWriter = new DatabaseWriter(container, parser.getRoot());
-		container.getDatabaseWriterMap().put(entry, databaseWriter);
-		parser.setDatabaseWriter(databaseWriter);
-		
-		//Import!
-		if(createTables)
-			databaseWriter.createTables();
-		while (!parser.isEndOfFile())
-			parser.parseNextEntry();
+		try {
+			//Init parser
+			DumpParser parser = new DumpParser(entry);
+			container.getParserMap().put(entry, parser);
+			if (!metadataMap.containsKey(parser.getRoot()))
+				throw new RuntimeException("Cannot find table mapping for root " + parser.getRoot()
+						+ " for file " + entry.getLocation());
+			parser.setProperties(metadataMap.get(parser.getRoot()));
 
-		//Done, close everything
-		parser.close();
-		databaseWriter.close();
-		entry.close();
+			//Init database
+			DatabaseWriter databaseWriter = new DatabaseWriter(container, parser.getRoot());
+			container.getDatabaseWriterMap().put(entry, databaseWriter);
+			parser.setDatabaseWriter(databaseWriter);
+
+			//Import!
+			if (createTables)
+				databaseWriter.createTables();
+			while (!parser.isEndOfFile())
+				parser.parseNextEntry();
+
+			//Done, close everything
+			parser.close();
+			databaseWriter.close();
+			entry.close();
+		} catch (Exception e) {
+			log.error("Cannot import", e);
+		}
 	}
 
 	public ImportContainer addDumpContainer(DumpContainer container) {
@@ -149,7 +154,7 @@ public class Controller {
 						+ " has already been added");
 		if (container.getEntries().isEmpty())
 			throw new RuntimeException(container.getType() + " doesn't have any dump files");
-		
+
 		ImportContainer importContainer = new ImportContainer(container);
 		importContainers.add(importContainer);
 		log.info("Added " + Utils.getLongLocation(importContainer));
