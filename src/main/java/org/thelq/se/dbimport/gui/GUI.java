@@ -122,7 +122,7 @@ public class GUI {
 		FormLayout configLayout = new FormLayout("pref, 3dlu, pref:grow, 6dlu, pref",
 				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
 		configLayout.setHonorsVisibility(true);
-		PanelBuilder configBuilder = new PanelBuilder(configLayout);
+		final PanelBuilder configBuilder = new PanelBuilder(configLayout);
 		configBuilder.addLabel("Preset", CC.xy(1, 2), dbType = new JComboBox(), CC.xy(3, 2));
 		configBuilder.add(dbAdvanced = new JCheckBox("Show advanced options"), CC.xy(5, 2));
 		configBuilder.addLabel("JDBC Connection", CC.xy(1, 4), jdbcString = new JTextField(15), CC.xyw(3, 4, 3));
@@ -300,7 +300,6 @@ public class GUI {
 				((JLabel) driver.getClientProperty("labeledBy")).setVisible(selected);
 				dialect.setVisible(selected);
 				((JLabel) dialect.getClientProperty("labeledBy")).setVisible(selected);
-				updateGuiLayout();
 			}
 		});
 
@@ -399,14 +398,6 @@ public class GUI {
 	}
 
 	/**
-	 * Validate and pack the entire frame
-	 */
-	protected void updateGuiLayout() {
-		frame.pack();
-		frame.validate();
-	}
-
-	/**
 	 * Update the list of locations
 	 */
 	protected void updateLocations(ImportContainer container) {
@@ -440,7 +431,6 @@ public class GUI {
 
 		//Add to builder
 		locationsBuilder.append(curLocationBuilder.getPanel());
-		updateGuiLayout();
 
 		//Handlers
 		headerLabel.addMouseListener(new MouseAdapter() {
