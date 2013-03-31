@@ -32,10 +32,13 @@ public class ArchiveDumpContainer implements DumpContainer {
 	protected String type = "Archive";
 	protected final File archiveFile;
 	@Getter
+	protected String name;
+	@Getter
 	protected List<ArchiveDumpEntry> entries = new ArrayList();
 
 	public ArchiveDumpContainer(Controller controller, File archiveFile) throws FileNotFoundException, SevenZipException {
 		this.archiveFile = archiveFile;
+		this.name = archiveFile.getName();
 
 		try {
 			@Cleanup

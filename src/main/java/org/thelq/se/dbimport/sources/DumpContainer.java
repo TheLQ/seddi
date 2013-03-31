@@ -10,5 +10,6 @@ import java.util.List;
 public interface DumpContainer {
 	public List<? extends DumpEntry> getEntries();
 	public String getLocation();
+	public String getName();
 	public String getType();
 }

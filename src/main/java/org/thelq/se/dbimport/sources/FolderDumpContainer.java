@@ -16,12 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 public class FolderDumpContainer implements DumpContainer {
 	protected final File folder;
 	protected String type = "Folder";
+	protected String name;
 	protected List<FileDumpEntry> entries = new ArrayList();
 
 	public FolderDumpContainer(File folder) {
 		if (!folder.isDirectory())
 			throw new IllegalArgumentException("File " + folder.getAbsolutePath() + " is not a folder");
 		this.folder = folder;
+		this.name = folder.getName();
 
 		//Add all the files
 		for (File curFile : folder.listFiles()) {
