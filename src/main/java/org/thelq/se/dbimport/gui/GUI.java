@@ -238,14 +238,23 @@ public class GUI {
 		dbType.addItem(DatabaseOption.CUSTOM);
 		setDbOption((DatabaseOption) dbType.getItemAt(0));
 		dbType.addItemListener(new ItemListener() {
+			boolean shownMysqlWarning = false;
+
 			public void itemStateChanged(ItemEvent e) {
 				//Don't run this twice for a single select
 				if (e.getStateChange() == ItemEvent.DESELECTED)
 					return;
 
-				//Do not change anything if Custom is selected so user can edit it
 				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
-				if (selectedOption != DatabaseOption.CUSTOM)
+				if (selectedOption.name().equals("MySQL") && !shownMysqlWarning) {
+					JOptionPane.showMessageDialog(frame,
+							"Warning: Your server must be configured with character_set_server=utf8mb4"
+							+ "\nOtherwise, data dumps that contain 4 byte UTF-8 characters will fail",
+							"MySQL Warning",
+							JOptionPane.WARNING_MESSAGE);
+					shownMysqlWarning = true;
+				} //Do not change anything if Custom is selected so user can edit it
+				else if (selectedOption != DatabaseOption.CUSTOM)
 					setDbOption(selectedOption);
 			}
 		});
@@ -301,7 +310,7 @@ public class GUI {
 					JOptionPane.showMessageDialog(frame, "Please add dump folders/archives", "Import Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if(dbType.getSelectedItem() == DatabaseOption.CUSTOM) {
+				if (dbType.getSelectedItem() == DatabaseOption.CUSTOM) {
 					JOptionPane.showMessageDialog(frame, "Please configure database options", "Import Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
