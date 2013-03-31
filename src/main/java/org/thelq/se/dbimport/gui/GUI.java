@@ -205,7 +205,7 @@ public class GUI {
 				importButton.setEnabled(false);
 				for (File curFile : fc.getSelectedFiles()) {
 					DumpContainer dumpContainer = null;
-					ImportContainer importContainer = null;
+					ImportContainer importContainer;
 					try {
 						if (curFile.isDirectory())
 							dumpContainer = new FolderDumpContainer(curFile);
@@ -431,6 +431,7 @@ public class GUI {
 
 		//Add to builder
 		locationsBuilder.append(curLocationBuilder.getPanel());
+		locationsBuilder.getPanel().validate();
 
 		//Handlers
 		headerLabel.addMouseListener(new MouseAdapter() {
