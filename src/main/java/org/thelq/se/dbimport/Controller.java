@@ -14,10 +14,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.Type;
+import org.jboss.logging.MDC;
 import org.thelq.se.dbimport.gui.GUI;
 import org.thelq.se.dbimport.sources.DumpContainer;
 import org.thelq.se.dbimport.sources.DumpEntry;
@@ -118,6 +120,11 @@ public class Controller {
 
 	public void importSingle(ImportContainer container, DumpEntry entry, boolean createTables) {
 		try {
+			String mdcValue = container.getTablePrefix();
+			if(StringUtils.isBlank(mdcValue))
+				mdcValue = container.getDumpContainer().getName();
+			MDC.put("longContainer", " [" + mdcValue + "]");
+			
 			//Init parser
 			DumpParser parser = new DumpParser(entry);
 			container.getParserMap().put(entry, parser);

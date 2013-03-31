@@ -18,6 +18,7 @@ import javax.swing.text.StyledDocument;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 /**
  *
@@ -85,6 +86,8 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 		else
 			msgStyle = loggerStyle.getStyle("Normal");
 		
+		final String longContainer = MDC.get("longContainer");
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -97,8 +100,9 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 			protected void runInsert() throws BadLocationException {
 				int prevLength = loggerStyle.getLength();
 				String[] messageArray = StringUtils.split(messageLayout.doLayout(event).trim(), " ", 2);
-				loggerStyle.insertString(loggerStyle.getLength(), "[" + dateFormatter.format(event.getTimeStamp()) + "] ", loggerStyle.getStyle("Normal")); //time
+				loggerStyle.insertString(loggerStyle.getLength(), "[" + dateFormatter.format(event.getTimeStamp()) + "]", loggerStyle.getStyle("Normal")); //time
 				//doc.insertString(doc.getLength(), "["+event.getThreadName()+"] ", doc.getStyle("Thread")); //thread name
+				loggerStyle.insertString(loggerStyle.getLength(), longContainer + " ", loggerStyle.getStyle("Level")); //Container name
 				loggerStyle.insertString(loggerStyle.getLength(), event.getLevel().toString() + " ", loggerStyle.getStyle("Level")); //Logging level
 				loggerStyle.insertString(loggerStyle.getLength(), messageArray[0] + " ", loggerStyle.getStyle("Class"));
 				loggerStyle.insertString(loggerStyle.getLength(), messageArray[1], msgStyle);
