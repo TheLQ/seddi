@@ -19,6 +19,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -247,6 +248,8 @@ public class GUI {
 
 				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
 				if (selectedOption.name().equals("MySQL") && !shownMysqlWarning) {
+					//Hide popup so you don't have to click twice on the dialog 
+					dbType.setPopupVisible(false);
 					JOptionPane.showMessageDialog(frame,
 							"Warning: Your server must be configured with character_set_server=utf8mb4"
 							+ "\nOtherwise, data dumps that contain 4 byte UTF-8 characters will fail",
