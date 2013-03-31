@@ -420,7 +420,7 @@ public class GUI {
 		curLocationBuilder.add(headerLabel, CC.xyw(1, 1, 2));
 		final JTextField headerPrefix = new JTextField(6);
 		curLocationBuilder.add(headerPrefix, CC.xy(5, 1));
-		container.setGuiTablePrefix(globalTablePrefix);
+		container.setGuiTablePrefix(headerPrefix);
 
 		//Try to generate a prefix from the container name
 		String dumpLocation = container.getDumpContainer().getLocation();
