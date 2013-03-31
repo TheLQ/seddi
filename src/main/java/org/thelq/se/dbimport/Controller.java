@@ -121,10 +121,10 @@ public class Controller {
 	public void importSingle(ImportContainer container, DumpEntry entry, boolean createTables) {
 		try {
 			String mdcValue = container.getTablePrefix();
-			if(StringUtils.isBlank(mdcValue))
+			if (StringUtils.isBlank(mdcValue))
 				mdcValue = container.getDumpContainer().getName();
 			MDC.put("longContainer", " [" + mdcValue + "]");
-			
+
 			//Init parser
 			DumpParser parser = new DumpParser(entry);
 			container.getParserMap().put(entry, parser);
@@ -134,6 +134,8 @@ public class Controller {
 			parser.setProperties(metadataMap.get(parser.getRoot()));
 
 			//Init database
+			if (container.getHibernateConfiguration() == null)
+				DatabaseWriter.buildSessionFactory(container);
 			DatabaseWriter databaseWriter = new DatabaseWriter(container, parser.getRoot());
 			container.getDatabaseWriterMap().put(entry, databaseWriter);
 			parser.setDatabaseWriter(databaseWriter);
