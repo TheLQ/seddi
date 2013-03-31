@@ -348,7 +348,7 @@ public class GUI {
 		//Done, init logger
 		logAppender.init();
 		log.info("Finished creating GUI");
-		
+
 		//Display
 		frame.setContentPane(primaryBuilder.getPanel());
 		frame.pack();
@@ -423,14 +423,9 @@ public class GUI {
 		container.setGuiTablePrefix(headerPrefix);
 
 		//Try to generate a prefix from the container name
-		String dumpLocation = container.getDumpContainer().getLocation();
-		String containerName = StringUtils.substringAfterLast(dumpLocation, "/");
-		if (StringUtils.isBlank(containerName))
-			containerName = StringUtils.substringAfterLast(dumpLocation, "\\");
-		if (!StringUtils.isBlank(containerName))
-			headerPrefix.setText(Utils.genTablePrefix(containerName));
-		else
-			log.warn("Unable to generate a table prefix for " + dumpLocation);
+		headerPrefix.setText(Utils.genTablePrefix(container.getDumpContainer().getName()));
+		if (StringUtils.isBlank(headerPrefix.getText()))
+			log.warn("Unable to generate a table prefix for " + container.getDumpContainer().getLocation());
 
 		//Generate a table
 		final JTable table = new JTable(new DumpContainerTableModel(container));
