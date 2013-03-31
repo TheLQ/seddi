@@ -146,7 +146,6 @@ public class GUI {
 		FormLayout optionsLayout = new FormLayout("pref, 3dlu, pref:grow", "");
 		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout);
 		optionsBuilder.append(disableCreateTables = new JCheckBox("Disable Creating Tables"), 3);
-		optionsBuilder.append(lowerMemoryUsage = new JCheckBox("Lower memory usage"), 3);
 		optionsBuilder.append("Global Table Prefix", globalTablePrefix = new JTextField(7));
 		optionsBuilder.append("Batch Size", batchSize = new JSpinner());
 		batchSize.setModel(new SpinnerNumberModel(500, 1, 500000, 1));
