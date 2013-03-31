@@ -47,6 +47,8 @@ public class Utils {
 
 	public static String genTablePrefix(String containerName) {
 		String name = containerName.trim().toLowerCase();
+		if(StringUtils.isBlank(name))
+			return "";
 		//Hardcoded conversions
 		name = StringUtils.removeEnd(name, ".stackexchange.com");
 		if (StringUtils.contains(name, "stackoverflow"))
