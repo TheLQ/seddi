@@ -4,6 +4,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
@@ -48,7 +49,8 @@ public class DatabaseWriter {
 		container.getHibernateConfiguration().setProperty("hibernate.connection.driver_class", driver);
 		container.getHibernateConfiguration().setProperty("hibernate.dialect", dialect);
 		container.getHibernateConfiguration().setProperty("hibernate.jdbc.batch_size", Integer.toString(batchSize));
-		container.getHibernateConfiguration().setNamingStrategy(new PrefixNamingStrategy(globalPrefix + container.getTablePrefix()));
+		container.getHibernateConfiguration().setNamingStrategy(new PrefixNamingStrategy(
+				StringUtils.defaultString(globalPrefix) + StringUtils.defaultString(container.getTablePrefix())));
 		container.setServiceRegistry(new ServiceRegistryBuilder().applySettings(container.getHibernateConfiguration().getProperties())
 				.buildServiceRegistry());
 		container.setSessionFactory(container.getHibernateConfiguration().buildSessionFactory(container.getServiceRegistry()));
