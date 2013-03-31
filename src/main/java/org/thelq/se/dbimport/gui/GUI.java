@@ -256,8 +256,10 @@ public class GUI {
 							"MySQL Warning",
 							JOptionPane.WARNING_MESSAGE);
 					shownMysqlWarning = true;
-				} //Do not change anything if Custom is selected so user can edit it
-				else if (selectedOption != DatabaseOption.CUSTOM)
+				} 
+				
+				//Do not change anything if Custom is selected so user can edit it
+				if (selectedOption != DatabaseOption.CUSTOM)
 					setDbOption(selectedOption);
 			}
 		});
