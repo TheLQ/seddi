@@ -150,6 +150,9 @@
 		<property name="Text" type="text">
 			<column name="Text" length="65535" />
 		</property>
+		<property name="CloseReasonId" type="byte">
+			<column name="CloseReasonId"/>
+		</property>
 	</class>
 	<class entity-name="users" table="users">
 		<id name="Id" type="int">
