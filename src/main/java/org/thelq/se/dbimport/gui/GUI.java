@@ -179,12 +179,6 @@ public class GUI {
 		loggerPanePanel.add(loggerPane);
 		primaryBuilder.add(loggerPanePanel, CC.xyw(2, 6, 4));
 
-		//Display
-		frame.setContentPane(primaryBuilder.getPanel());
-		frame.pack();
-		frame.setMinimumSize(frame.getSize());
-		frame.setVisible(true);
-
 		menuAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//TODO: Allow 7z files but handle corner cases
@@ -354,6 +348,12 @@ public class GUI {
 		//Done, init logger
 		logAppender.init();
 		log.info("Finished creating GUI");
+		
+		//Display
+		frame.setContentPane(primaryBuilder.getPanel());
+		frame.pack();
+		frame.setMinimumSize(frame.getSize());
+		frame.setVisible(true);
 	}
 
 	protected void start() throws Exception {
