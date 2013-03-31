@@ -77,7 +77,7 @@ public class GUI {
 	protected JCheckBox dbAdvanced;
 	protected JButton importButton;
 	protected JCheckBox disableCreateTables;
-	protected JCheckBox lowerMemoryUsage;
+	protected JSpinner threads;
 	protected JTextField globalTablePrefix;
 	protected JSpinner batchSize;
 	protected DefaultFormBuilder locationsBuilder;
@@ -147,6 +147,11 @@ public class GUI {
 		DefaultFormBuilder optionsBuilder = new DefaultFormBuilder(optionsLayout);
 		optionsBuilder.append(disableCreateTables = new JCheckBox("Disable Creating Tables"), 3);
 		optionsBuilder.append("Global Table Prefix", globalTablePrefix = new JTextField(7));
+		optionsBuilder.append("Threads", threads = new JSpinner());
+		//Save a core for the database
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		numThreads = (numThreads != 1) ? numThreads - 1 : numThreads;
+		threads.setModel(new SpinnerNumberModel(numThreads, 1, 100, 1));
 		optionsBuilder.append("Batch Size", batchSize = new JSpinner());
 		batchSize.setModel(new SpinnerNumberModel(500, 1, 500000, 1));
 		primaryBuilder.add(optionsBuilder.getPanel(), CC.xy(5, 2));
@@ -255,8 +260,8 @@ public class GUI {
 							"MySQL Warning",
 							JOptionPane.WARNING_MESSAGE);
 					shownMysqlWarning = true;
-				} 
-				
+				}
+
 				//Do not change anything if Custom is selected so user can edit it
 				if (selectedOption != DatabaseOption.CUSTOM)
 					setDbOption(selectedOption);
@@ -367,7 +372,7 @@ public class GUI {
 			curContainer.setTablePrefix(curContainer.getGuiTablePrefix().getText());
 		}
 
-		controller.importAll(1, !disableCreateTables.isSelected());
+		controller.importAll((Integer) threads.getValue(), !disableCreateTables.isSelected());
 	}
 
 	/**
@@ -396,7 +401,7 @@ public class GUI {
 		jdbcString.setEnabled(enabled);
 		importButton.setEnabled(enabled);
 		disableCreateTables.setEnabled(enabled);
-		lowerMemoryUsage.setEnabled(enabled);
+		threads.setEnabled(enabled);
 		globalTablePrefix.setEnabled(enabled);
 		batchSize.setEnabled(enabled);
 		dbAdvanced.setEnabled(enabled);
