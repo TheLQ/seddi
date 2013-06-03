@@ -88,8 +88,10 @@ public class Controller {
 					public void run() {
 						try {
 							MDC.put("longContainer", " [" + curContainer.getDumpContainer().getName() + "]");
-							if (curContainer.getSessionFactory() == null)
-								DatabaseWriter.buildSessionFactory(curContainer);
+							synchronized (curContainer.getHibernateCreateLock()) {
+								if (curContainer.getSessionFactory() == null)
+									DatabaseWriter.buildSessionFactory(curContainer);
+							}
 							DatabaseWriter.createTables(curContainer);
 						} finally {
 							finishedLatch.countDown();
@@ -118,8 +120,10 @@ public class Controller {
 				final DumpEntry curEntry = curContainer.getDumpContainer().getEntries().get(curIndex);
 				futures.add(importThreadPool.submit(new Runnable() {
 					public void run() {
-						if (curContainer.getSessionFactory() == null)
-							DatabaseWriter.buildSessionFactory(curContainer);
+						synchronized (curContainer.getHibernateCreateLock()) {
+							if (curContainer.getSessionFactory() == null)
+								DatabaseWriter.buildSessionFactory(curContainer);
+						}
 						importSingle(curContainer, curEntry, createTables);
 					}
 				}));

@@ -23,6 +23,7 @@ public class ImportContainer {
 	protected SessionFactory sessionFactory;
 	protected ServiceRegistry serviceRegistry;
 	protected Configuration hibernateConfiguration;
+	protected final Object hibernateCreateLock = new Object();
 	protected JTable guiTable;
 	protected JTextField guiTablePrefix;
 	protected String tablePrefix;
