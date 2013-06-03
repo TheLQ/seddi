@@ -212,8 +212,10 @@ public class GUI {
 							dumpContainer = new ArchiveDumpContainer(controller, curFile);
 						importContainer = controller.addDumpContainer(dumpContainer);
 					} catch (Exception ex) {
-						LoggerFactory.getLogger(getClass()).error("Cannot open " + dumpContainer.getType(), ex);
-						showErrorDialog(ex, "Cannot open " + Utils.getLongLocation(dumpContainer), curFile.getAbsolutePath());
+						String type = (dumpContainer != null) ? dumpContainer.getType() : "";
+						LoggerFactory.getLogger(getClass()).error("Cannot open " + type, ex);
+						String location = (dumpContainer != null) ? Utils.getLongLocation(dumpContainer) : "";
+						showErrorDialog(ex, "Cannot open " + location, curFile.getAbsolutePath());
 						continue;
 					}
 					updateLocations(importContainer);
