@@ -86,18 +86,18 @@ public class DatabaseWriter {
 		}
 	}
 
-	public void createTables() {
-		SchemaExport exporter = new SchemaExport(container.getServiceRegistry(), container.getHibernateConfiguration());
-		exporter.setHaltOnError(true);
-		exporter.create(false, true);
-		log.info("Finished creating tables for " + Utils.getLongLocation(container));
-	}
-
 	public void close() {
 		//Make sure the session is fully done
 		session.flush();
 		session.clear();
 		session.getTransaction().commit();
 		session.close();
+	}
+	
+	public static void createTables(ImportContainer container) {
+		SchemaExport exporter = new SchemaExport(container.getServiceRegistry(), container.getHibernateConfiguration());
+		exporter.setHaltOnError(true);
+		exporter.create(false, true);
+		log.info("Finished creating tables for " + Utils.getLongLocation(container));
 	}
 }

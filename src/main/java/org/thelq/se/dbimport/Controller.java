@@ -1,12 +1,15 @@
 package org.thelq.se.dbimport;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -63,7 +66,7 @@ public class Controller {
 		metadataMap = metadataMapBuilder.build();
 	}
 
-	public void importAll(int threads, final boolean createTables) {
+	public void importAll(int threads, final boolean createTables) throws InterruptedException {
 		//Build a test session factory with the first entry to see if database credentials work
 		DatabaseWriter.buildSessionFactory(importContainers.get(0));
 
@@ -76,6 +79,26 @@ public class Controller {
 				.build());
 
 		log.info("Starting import pool with " + threads + " threads");
+
+		if (createTables) {
+			log.info("Creating all tables");
+			final CountDownLatch finishedLatch = new CountDownLatch(importContainers.size());
+			for (final ImportContainer curContainer : importContainers)
+				importThreadPool.submit(new Runnable() {
+					public void run() {
+						try {
+							MDC.put("longContainer", " [" + curContainer.getDumpContainer().getName() + "]");
+							if (curContainer.getSessionFactory() == null)
+								DatabaseWriter.buildSessionFactory(curContainer);
+							DatabaseWriter.createTables(curContainer);
+						} finally {
+							finishedLatch.countDown();
+						}
+					}
+				});
+			//Wait for all imports to finish
+			finishedLatch.await();
+		}
 
 		//Order threads by first entry from each container, second entry from each container...
 		//This is so we don't slam a single container (IE 7z archives) with all the threads
@@ -95,6 +118,8 @@ public class Controller {
 				final DumpEntry curEntry = curContainer.getDumpContainer().getEntries().get(curIndex);
 				futures.add(importThreadPool.submit(new Runnable() {
 					public void run() {
+						if (curContainer.getSessionFactory() == null)
+							DatabaseWriter.buildSessionFactory(curContainer);
 						importSingle(curContainer, curEntry, createTables);
 					}
 				}));
@@ -135,15 +160,11 @@ public class Controller {
 			parser.setProperties(metadataMap.get(parser.getRoot()));
 
 			//Init database
-			if (container.getHibernateConfiguration() == null)
-				DatabaseWriter.buildSessionFactory(container);
 			DatabaseWriter databaseWriter = new DatabaseWriter(container, parser.getRoot());
 			container.getDatabaseWriterMap().put(entry, databaseWriter);
 			parser.setDatabaseWriter(databaseWriter);
 
 			//Import!
-			if (createTables)
-				databaseWriter.createTables();
 			while (!parser.isEndOfFile())
 				parser.parseNextEntry();
 
