@@ -33,14 +33,14 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 	protected StyledDocument loggerStyle;
 	protected SimpleDateFormat dateFormatter = new SimpleDateFormat("hh:mm:ss a");
 	protected PatternLayout messageLayout;
-	
+
 	public GUILogAppender(GUI gui) {
 		this.gui = gui;
-		
+
 		//Grab the context from root logger
 		Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		setContext(rootLogger.getLoggerContext());
-		
+
 		messageLayout = new PatternLayout();
 		messageLayout.setContext(getContext());
 		messageLayout.setPattern("%logger{36} %message%n");
@@ -51,7 +51,7 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 		rootLogger.addAppender(this);
 		log.debug("Added GUILogAppender, waiting for init");
 	}
-	
+
 	public void init() {
 		//Configure logger
 		loggerText = gui.getLoggerText();
@@ -61,7 +61,7 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 		StyleConstants.setForeground(loggerStyle.addStyle("Error", null), Color.red);
 		StyleConstants.setItalic(loggerStyle.addStyle("Thread", null), true);
 		StyleConstants.setItalic(loggerStyle.addStyle("Level", null), true);
-		
+
 		log.debug("Inited GUILogAppender, processing any saved messages");
 		synchronized (initMessageQueue) {
 			inited = true;
@@ -69,7 +69,7 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 				append(initMessageQueue.poll());
 		}
 	}
-	
+
 	@Override
 	protected void append(final ILoggingEvent event) {
 		if (!inited)
@@ -85,9 +85,9 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 			msgStyle = loggerStyle.getStyle("Error");
 		else
 			msgStyle = loggerStyle.getStyle("Normal");
-		
+
 		final String longContainer = MDC.get("longContainer");
-		
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -96,13 +96,14 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 					e.printStackTrace();
 				}
 			}
-			
+
 			protected void runInsert() throws BadLocationException {
 				int prevLength = loggerStyle.getLength();
 				String[] messageArray = StringUtils.split(messageLayout.doLayout(event).trim(), " ", 2);
 				loggerStyle.insertString(loggerStyle.getLength(), "[" + dateFormatter.format(event.getTimeStamp()) + "]", loggerStyle.getStyle("Normal")); //time
 				//doc.insertString(doc.getLength(), "["+event.getThreadName()+"] ", doc.getStyle("Thread")); //thread name
-				loggerStyle.insertString(loggerStyle.getLength(), longContainer + " ", loggerStyle.getStyle("Level")); //Container name
+				if (StringUtils.isNotBlank(longContainer))
+					loggerStyle.insertString(loggerStyle.getLength(), longContainer, loggerStyle.getStyle("Level")); //Container name
 				loggerStyle.insertString(loggerStyle.getLength(), event.getLevel().toString() + " ", loggerStyle.getStyle("Level")); //Logging level
 				loggerStyle.insertString(loggerStyle.getLength(), messageArray[0] + " ", loggerStyle.getStyle("Class"));
 				loggerStyle.insertString(loggerStyle.getLength(), messageArray[1], msgStyle);

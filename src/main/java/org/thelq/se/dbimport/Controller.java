@@ -123,10 +123,11 @@ public class Controller {
 			String mdcValue = container.getTablePrefix();
 			if (StringUtils.isBlank(mdcValue))
 				mdcValue = container.getDumpContainer().getName();
-			MDC.put("longContainer", " [" + mdcValue + "]");
+			MDC.put("longContainer", " [" + mdcValue + entry.getName() + "]");
 
 			//Init parser
 			DumpParser parser = new DumpParser(entry);
+			MDC.put("longContainer", " [" + mdcValue + parser.getRoot() + "]");
 			container.getParserMap().put(entry, parser);
 			if (!metadataMap.containsKey(parser.getRoot()))
 				throw new RuntimeException("Cannot find table mapping for root " + parser.getRoot()
