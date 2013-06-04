@@ -50,6 +50,7 @@ public class Utils {
 		if(StringUtils.isBlank(name))
 			return "";
 		//Hardcoded conversions
+		name = StringUtils.removeEnd(name, ".7z");
 		name = StringUtils.removeEnd(name, ".stackexchange.com");
 		if (StringUtils.contains(name, "stackoverflow"))
 			name = StringUtils.replace(name, "stackoverflow", "so");
@@ -59,7 +60,6 @@ public class Utils {
 			name = StringUtils.replace(name, "superuser", "su");
 
 		//Remove unnessesary extensions
-		name = StringUtils.removeEnd(name, ".7z");
 		name = StringUtils.removeEnd(name, ".com");
 
 		//Meta handling
