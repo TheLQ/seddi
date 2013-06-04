@@ -144,7 +144,8 @@ public class Controller {
 			} catch (Exception e) {
 				log.error("Could not wait for import thread to complete", e);
 			}
-
+		
+		Utils.shutdownPool(importThreadPool, "import pool");
 	}
 
 	public void importSingle(ImportContainer container, DumpEntry entry, boolean createTables) {

@@ -1,8 +1,10 @@
 package org.thelq.se.dbimport;
 
-import java.io.File;
 import java.util.Collection;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.swing.SwingUtilities;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.thelq.se.dbimport.sources.DumpContainer;
 
@@ -10,6 +12,7 @@ import org.thelq.se.dbimport.sources.DumpContainer;
  *
  * @author Leon
  */
+@Slf4j
 public class Utils {
 	protected static String getCaseInsensitive(Collection<String> data, String needle) {
 		for (String curString : data)
@@ -45,9 +48,18 @@ public class Utils {
 		}
 	}
 
+	public static void shutdownPool(ExecutorService pool, String poolName) throws InterruptedException {
+		pool.shutdown();
+		int secondsPassed = 0;
+		while (pool.awaitTermination(5, TimeUnit.SECONDS) == false) {
+			secondsPassed = secondsPassed + 5;
+			log.info("Still waiting for " + poolName + " to " + secondsPassed);
+		}
+	}
+
 	public static String genTablePrefix(String containerName) {
 		String name = containerName.trim().toLowerCase();
-		if(StringUtils.isBlank(name))
+		if (StringUtils.isBlank(name))
 			return "";
 		//Hardcoded conversions
 		name = StringUtils.removeEnd(name, ".7z");
