@@ -73,7 +73,7 @@ public class ArchiveDumpEntry implements DumpEntry {
 			public void run() {
 				try {
 					archive7.extract(new int[]{itemId}, false, new OutputExtractCallback());
-				} catch (SevenZipException ex) {
+				} catch (Exception ex) {
 					IOException exception = new IOException("Cannot extract archive " + archiveFile.getAbsolutePath(), ex);
 					pipedInput.setException(exception);
 					LoggerFactory.getLogger(getClass()).error("Exception encountered during extraction", ex);
