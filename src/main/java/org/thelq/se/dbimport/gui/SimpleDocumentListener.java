@@ -7,7 +7,7 @@ import javax.swing.event.DocumentListener;
  *
  * @author Leon
  */
-public abstract class SimpleDocumentListener<E> implements DocumentListener {
+public abstract class SimpleDocumentListener implements DocumentListener {
 	public void insertUpdate(DocumentEvent e) {
 		updatePerformed(e);
 	}
