@@ -146,6 +146,7 @@ public class Controller {
 			}
 		
 		Utils.shutdownPool(importThreadPool, "import pool");
+		log.info("Import finished!");
 	}
 
 	public void importSingle(ImportContainer container, DumpEntry entry, boolean createTables) {
