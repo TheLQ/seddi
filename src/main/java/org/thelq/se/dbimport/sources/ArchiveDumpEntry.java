@@ -18,10 +18,9 @@ import net.sf.sevenzipjbinding.PropID;
 import net.sf.sevenzipjbinding.SevenZip;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
-import org.thelq.se.dbimport.DatabaseWriter;
-import org.thelq.se.dbimport.DumpParser;
 
 /**
  *
@@ -48,8 +47,8 @@ public class ArchiveDumpEntry implements DumpEntry {
 		this.itemId = itemId;
 		try {
 			this.archiveFile = archiveFile;
-			this.archiveRandomFile = new RandomAccessFile(archiveFile, "r");
-			this.archive7 = SevenZip.openInArchive(null, new RandomAccessFileInStream(this.archiveRandomFile));
+			archiveRandomFile = new RandomAccessFile(archiveFile, "r");
+			archive7 = SevenZip.openInArchive(null, new RandomAccessFileInStream(archiveRandomFile));
 
 			//Set properties that don't actually change, so might as well pre-fetch them
 			this.name = (String) archive7.getProperty(itemId, PropID.PATH);
@@ -70,13 +69,26 @@ public class ArchiveDumpEntry implements DumpEntry {
 			throw new RuntimeException("Cannot open Piped streams", ex);
 		}
 		controller.getGeneralThreadPool().execute(new Runnable() {
+			protected final Logger log = LoggerFactory.getLogger(getClass());
+
 			public void run() {
 				try {
 					archive7.extract(new int[]{itemId}, false, new OutputExtractCallback());
+					log.info("Done with extraction");
 				} catch (Exception ex) {
 					IOException exception = new IOException("Cannot extract archive " + archiveFile.getAbsolutePath(), ex);
 					pipedInput.setException(exception);
-					LoggerFactory.getLogger(getClass()).error("Exception encountered during extraction", ex);
+					log.error("Exception encountered during extraction", ex);
+				} finally {
+					try {
+						archive7.close();
+						archiveRandomFile.close();
+						pipedOutput.close();
+						pipedInput.close();
+						log.debug("Closed archive");
+					} catch (Exception e) {
+						log.error("Exception encountered during cosing", e);
+					}
 				}
 			}
 		});
@@ -84,14 +96,7 @@ public class ArchiveDumpEntry implements DumpEntry {
 	}
 
 	public void close() {
-		try {
-			pipedOutput.close();
-			pipedInput.close();
-			archive7.close();
-			archiveRandomFile.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Cannot close " + getLocation(), e);
-		}
+		//Everything is closed when extraction is finished
 	}
 
 	protected class OutputExtractCallback implements IArchiveExtractCallback {
