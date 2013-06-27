@@ -72,13 +72,13 @@
 		<dependency>
 			<groupId>net.sf.sevenzipjbinding</groupId>
 			<artifactId>core</artifactId>
-			<version>4.65-1.07</version>
+			<version>4.65-1.06rc-extr-only</version>
 		</dependency>
 		<!-- 7-zip Java Bindings - All native libraries -->
 		<dependency>
 			<groupId>net.sf.sevenzipjbinding</groupId>
-			<artifactId>lib-windows</artifactId>
-			<version>4.65-1.07</version>
+			<artifactId>allplatforms</artifactId>
+			<version>4.65-1.06rc-extr-only</version>
 		</dependency>
 		
 		<!-- 
@@ -172,7 +172,7 @@
 						</goals>                     
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>		
 		</plugins>
 	</build>
 </project>
