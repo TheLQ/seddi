@@ -2,7 +2,6 @@ package org.thelq.se.dbimport;
 
 import org.thelq.se.dbimport.sources.DumpContainer;
 import java.util.Map;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -10,11 +9,8 @@ import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 /**
@@ -52,8 +48,9 @@ public class DatabaseWriter {
 		container.getHibernateConfiguration().setProperty("hibernate.jdbc.batch_size", Integer.toString(batchSize));
 		container.getHibernateConfiguration().setNamingStrategy(new PrefixNamingStrategy(
 				StringUtils.defaultString(globalPrefix) + StringUtils.defaultString(container.getTablePrefix())));
-		container.setServiceRegistry(new ServiceRegistryBuilder().applySettings(container.getHibernateConfiguration().getProperties())
-				.buildServiceRegistry());
+		container.setServiceRegistry(new StandardServiceRegistryBuilder()
+				.applySettings(container.getHibernateConfiguration().getProperties())
+				.build());
 		container.setSessionFactory(container.getHibernateConfiguration().buildSessionFactory(container.getServiceRegistry()));
 
 		//Make a test connection so we know if this actually works
