@@ -224,12 +224,12 @@ public class GUI {
 		dbType.addItem(DatabaseOption.SELECTONE);
 		dbType.addItem(new DatabaseOption()
 				.name("MySQL")
-				.jdbcString("jdbc:mysql://127.0.0.1:3306/so_new?rewriteBatchedStatements=true")
+				.jdbcString("jdbc:mysql://127.0.0.1:3306/stackexchange?rewriteBatchedStatements=true")
 				.dialect("org.hibernate.dialect.MySQL5Dialect")
 				.driver("com.mysql.jdbc.Driver"));
 		dbType.addItem(new DatabaseOption()
 				.name("PostgreSQL")
-				.jdbcString("jdbc:postgresql://127.0.0.1:5432/so_new")
+				.jdbcString("jdbc:postgresql://127.0.0.1:5432/stackexchange")
 				.dialect("org.hibernate.dialect.PostgreSQLDialect")
 				.driver("org.postgresql.Driver"));
 		dbType.addItem(DatabaseOption.CUSTOM);
