@@ -1,5 +1,6 @@
 package org.thelq.se.dbimport;
 
+import org.thelq.se.dbimport.sources.DumpContainer;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,9 +39,9 @@ public class DatabaseWriter {
 	protected static int batchSize;
 	protected int count = 0;
 	protected final String table;
-	protected final ImportContainer container;
+	protected final DumpContainer container;
 
-	public static void buildSessionFactory(ImportContainer container) throws HibernateException {
+	public static void buildSessionFactory(DumpContainer container) throws HibernateException {
 		container.setHibernateConfiguration(new Configuration());
 		container.getHibernateConfiguration().configure();
 		container.getHibernateConfiguration().setProperty("hibernate.connection.username", username);
@@ -63,7 +64,7 @@ public class DatabaseWriter {
 	}
 	protected Session session;
 
-	public DatabaseWriter(ImportContainer container, String table) {
+	public DatabaseWriter(DumpContainer container, String table) {
 		this.table = table;
 		this.container = container;
 		session = container.getSessionFactory().openSession();
@@ -94,7 +95,7 @@ public class DatabaseWriter {
 		session.close();
 	}
 	
-	public static void createTables(ImportContainer container) {
+	public static void createTables(DumpContainer container) {
 		SchemaExport exporter = new SchemaExport(container.getServiceRegistry(), container.getHibernateConfiguration());
 		exporter.setHaltOnError(true);
 		exporter.create(false, true);

@@ -1,7 +1,12 @@
-
+/**
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.thelq.se.dbimport.sources;
 
 import java.io.InputStream;
+import javax.swing.JLabel;
+import lombok.Data;
 import org.thelq.se.dbimport.DatabaseWriter;
 import org.thelq.se.dbimport.DumpParser;
 
@@ -9,10 +14,19 @@ import org.thelq.se.dbimport.DumpParser;
  *
  * @author Leon
  */
-public interface DumpEntry {
-	public String getLocation();
-	public String getName();
-	public InputStream getInput();
-	public void close();
-	public long getSizeBytes();
+@Data
+public abstract class DumpEntry {
+	protected DumpParser parser;
+	protected DatabaseWriter databaseWriter;
+	protected JLabel guiLog;
+
+	public abstract String getLocation();
+
+	public abstract String getName();
+
+	public abstract InputStream getInput();
+
+	public abstract void close();
+
+	public abstract long getSizeBytes();
 }

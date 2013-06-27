@@ -5,13 +5,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
  * @author Leon
  */
 @Data
-public class FileDumpEntry implements DumpEntry {
+@EqualsAndHashCode(callSuper = true)
+public class FileDumpEntry extends DumpEntry {
 	protected final File file;
 	protected FileInputStream inputStream;
 

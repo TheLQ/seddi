@@ -1,9 +1,7 @@
 package org.thelq.se.dbimport;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -35,7 +33,7 @@ import org.thelq.se.dbimport.sources.DumpEntry;
 public class Controller {
 	protected GUI gui;
 	@Getter
-	protected List<ImportContainer> importContainers = Collections.synchronizedList(new LinkedList());
+	protected List<DumpContainer> dumpContainers = Collections.synchronizedList(new LinkedList());
 	@Getter
 	protected ExecutorService generalThreadPool;
 	protected Map<String, Map<String, Type>> metadataMap;
@@ -68,10 +66,10 @@ public class Controller {
 
 	public void importAll(int threads, final boolean createTables) throws InterruptedException {
 		//Build a test session factory with the first entry to see if database credentials work
-		DatabaseWriter.buildSessionFactory(importContainers.get(0));
+		DatabaseWriter.buildSessionFactory(dumpContainers.get(0));
 
 		if (metadataMap == null)
-			initMetadataMap(importContainers.get(0).getSessionFactory());
+			initMetadataMap(dumpContainers.get(0).getSessionFactory());
 
 		//Database wors, start importing
 		ThreadPoolExecutor importThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threads, new BasicThreadFactory.Builder()
@@ -82,12 +80,12 @@ public class Controller {
 
 		if (createTables) {
 			log.info("Creating all tables");
-			final CountDownLatch finishedLatch = new CountDownLatch(importContainers.size());
-			for (final ImportContainer curContainer : importContainers)
+			final CountDownLatch finishedLatch = new CountDownLatch(dumpContainers.size());
+			for (final DumpContainer curContainer : dumpContainers)
 				importThreadPool.submit(new Runnable() {
 					public void run() {
 						try {
-							MDC.put("longContainer", " [" + curContainer.getDumpContainer().getName() + "]");
+							MDC.put("longContainer", " [" + curContainer.getName() + "]");
 							synchronized (curContainer.getHibernateCreateLock()) {
 								if (curContainer.getSessionFactory() == null)
 									DatabaseWriter.buildSessionFactory(curContainer);
@@ -108,16 +106,16 @@ public class Controller {
 		int curIndex = 0;
 		while (true) {
 			int numFailed = 0;
-			for (final ImportContainer curContainer : importContainers) {
+			for (final DumpContainer curContainer : dumpContainers) {
 				//Make sure this entry actually exists
-				List<? extends DumpEntry> entries = curContainer.getDumpContainer().getEntries();
+				List<DumpEntry> entries = curContainer.getEntries();
 				if (curIndex >= entries.size()) {
 					numFailed++;
 					continue;
 				}
 
 				//Add to queue
-				final DumpEntry curEntry = curContainer.getDumpContainer().getEntries().get(curIndex);
+				final DumpEntry curEntry = curContainer.getEntries().get(curIndex);
 				futures.add(importThreadPool.submit(new Runnable() {
 					public void run() {
 						synchronized (curContainer.getHibernateCreateLock()) {
@@ -130,7 +128,7 @@ public class Controller {
 			}
 
 			//Check if we've exausted all DumpEntries
-			if (numFailed == importContainers.size())
+			if (numFailed == dumpContainers.size())
 				break;
 
 			//Nope, continue to the next index
@@ -149,17 +147,17 @@ public class Controller {
 		log.info("Import finished!");
 	}
 
-	public void importSingle(ImportContainer container, DumpEntry entry, boolean createTables) {
+	public void importSingle(DumpContainer container, DumpEntry entry, boolean createTables) {
 		try {
 			String mdcValue = container.getTablePrefix();
 			if (StringUtils.isBlank(mdcValue))
-				mdcValue = container.getDumpContainer().getName();
+				mdcValue = container.getName();
 			MDC.put("longContainer", " [" + mdcValue + entry.getName() + "]");
 
 			//Init parser
 			DumpParser parser = new DumpParser(entry);
 			MDC.put("longContainer", " [" + mdcValue + parser.getRoot() + "]");
-			container.getParserMap().put(entry, parser);
+			entry.setParser(parser);
 			if (!metadataMap.containsKey(parser.getRoot()))
 				throw new RuntimeException("Cannot find table mapping for root " + parser.getRoot()
 						+ " for file " + entry.getLocation());
@@ -167,7 +165,7 @@ public class Controller {
 
 			//Init database
 			DatabaseWriter databaseWriter = new DatabaseWriter(container, parser.getRoot());
-			container.getDatabaseWriterMap().put(entry, databaseWriter);
+			entry.setDatabaseWriter(databaseWriter);
 			parser.setDatabaseWriter(databaseWriter);
 
 			//Import!
@@ -183,19 +181,18 @@ public class Controller {
 		}
 	}
 
-	public ImportContainer addDumpContainer(DumpContainer container) {
+	public DumpContainer addDumpContainer(DumpContainer container) {
 		//Make sure it doesn't exist already
-		for (ImportContainer curContainer : importContainers)
-			if (curContainer.getDumpContainer().getLocation().equals(container.getLocation()))
+		for (DumpContainer curContainer : dumpContainers)
+			if (curContainer.getLocation().equals(container.getLocation()))
 				throw new IllegalArgumentException(container.getType() + " " + container.getLocation()
 						+ " has already been added");
 		if (container.getEntries().isEmpty())
 			throw new RuntimeException(container.getType() + " doesn't have any dump files");
 
-		ImportContainer importContainer = new ImportContainer(container);
-		importContainers.add(importContainer);
-		log.info("Added " + Utils.getLongLocation(importContainer));
-		return importContainer;
+		dumpContainers.add(container);
+		log.info("Added " + Utils.getLongLocation(container));
+		return container;
 	}
 
 	public static void main(String[] args) {

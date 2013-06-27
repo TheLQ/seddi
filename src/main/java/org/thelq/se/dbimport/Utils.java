@@ -1,5 +1,6 @@
 package org.thelq.se.dbimport;
 
+import org.thelq.se.dbimport.sources.DumpContainer;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -27,10 +28,6 @@ public class Utils {
 	 * @param container
 	 * @return 
 	 */
-	public static String getLongLocation(ImportContainer importContainer) {
-		return getLongLocation(importContainer.getDumpContainer());
-	}
-
 	public static String getLongLocation(DumpContainer dumpContainer) {
 		return dumpContainer.getType() + " " + dumpContainer.getLocation();
 	}

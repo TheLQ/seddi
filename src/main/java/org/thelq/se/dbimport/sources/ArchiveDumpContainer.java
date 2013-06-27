@@ -1,5 +1,6 @@
 package org.thelq.se.dbimport.sources;
 
+import com.google.common.collect.ImmutableList;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,14 +28,14 @@ import org.thelq.se.dbimport.Controller;
  * @author Leon
  */
 @Slf4j
-public class ArchiveDumpContainer implements DumpContainer {
+public class ArchiveDumpContainer extends DumpContainer {
 	@Getter
 	protected String type = "Archive";
 	protected final File archiveFile;
 	@Getter
 	protected String name;
 	@Getter
-	protected List<ArchiveDumpEntry> entries = new ArrayList();
+	protected final ImmutableList<DumpEntry> entries;
 
 	public ArchiveDumpContainer(Controller controller, File archiveFile) throws FileNotFoundException, SevenZipException {
 		this.archiveFile = archiveFile;
@@ -45,10 +46,11 @@ public class ArchiveDumpContainer implements DumpContainer {
 			RandomAccessFile archiveRandomFile = new RandomAccessFile(archiveFile, "r");
 			@Cleanup
 			ISevenZipInArchive archive7 = SevenZip.openInArchive(null, new RandomAccessFileInStream(archiveRandomFile));
-
+			ImmutableList.Builder<DumpEntry> entriesBuilder = ImmutableList.builder();
 			for (int i = 0; i < archive7.getNumberOfItems(); i++)
 				if (!((Boolean) archive7.getProperty(i, PropID.IS_FOLDER)).booleanValue())
-					entries.add(new ArchiveDumpEntry(controller, archiveFile, i));
+					entriesBuilder.add(new ArchiveDumpEntry(controller, archiveFile, i));
+			this.entries = entriesBuilder.build();
 		} catch (Exception e) {
 			throw new RuntimeException("Could not iterate archive " + archiveFile.getAbsolutePath(), e);
 		}

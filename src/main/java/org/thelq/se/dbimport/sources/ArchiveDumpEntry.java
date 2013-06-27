@@ -27,7 +27,7 @@ import org.thelq.se.dbimport.Controller;
  * @author Leon
  */
 @Slf4j
-public class ArchiveDumpEntry implements DumpEntry {
+public class ArchiveDumpEntry extends DumpEntry {
 	protected final Controller controller;
 	protected final int itemId;
 	protected RandomAccessFile archiveRandomFile;
