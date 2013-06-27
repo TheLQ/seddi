@@ -28,7 +28,7 @@ import org.slf4j.MDC;
 public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 	protected final GUI gui;
 	protected boolean inited = false;
-	protected final LinkedList<ILoggingEvent> initMessageQueue = new LinkedList();
+	protected final LinkedList<ILoggingEvent> initMessageQueue = new LinkedList<ILoggingEvent>();
 	protected JTextPane loggerText;
 	protected StyledDocument loggerStyle;
 	protected SimpleDateFormat dateFormatter = new SimpleDateFormat("hh:mm:ss a");

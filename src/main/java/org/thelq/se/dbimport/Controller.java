@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,7 +34,7 @@ import org.thelq.se.dbimport.sources.DumpEntry;
 public class Controller {
 	protected GUI gui;
 	@Getter
-	protected List<DumpContainer> dumpContainers = Collections.synchronizedList(new LinkedList());
+	protected List<DumpContainer> dumpContainers = Collections.synchronizedList(new LinkedList<DumpContainer>());
 	@Getter
 	protected ExecutorService generalThreadPool;
 	protected Map<String, Map<String, Type>> metadataMap;
@@ -102,7 +103,7 @@ public class Controller {
 
 		//Order threads by first entry from each container, second entry from each container...
 		//This is so we don't slam a single container (IE 7z archives) with all the threads
-		List<Future> futures = new ArrayList();
+		List<Future<Void>> futures = new ArrayList<Future<Void>>();
 		int curIndex = 0;
 		while (true) {
 			int numFailed = 0;
@@ -116,13 +117,14 @@ public class Controller {
 
 				//Add to queue
 				final DumpEntry curEntry = curContainer.getEntries().get(curIndex);
-				futures.add(importThreadPool.submit(new Runnable() {
-					public void run() {
+				futures.add(importThreadPool.submit(new Callable<Void>() {
+					public Void call() {
 						synchronized (curContainer.getHibernateCreateLock()) {
 							if (curContainer.getSessionFactory() == null)
 								DatabaseWriter.buildSessionFactory(curContainer);
 						}
 						importSingle(curContainer, curEntry, createTables);
+						return null;
 					}
 				}));
 			}
@@ -136,7 +138,7 @@ public class Controller {
 		}
 
 		//Block until all imports have completed
-		for (Future curFuture : futures)
+		for (Future<Void> curFuture : futures)
 			try {
 				curFuture.get();
 			} catch (Exception e) {
