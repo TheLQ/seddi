@@ -2,13 +2,12 @@ package org.thelq.se.dbimport.gui;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -17,9 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.Action;
+import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -33,8 +30,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SpinnerNumberModel;
@@ -44,8 +41,6 @@ import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -54,10 +49,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
 import org.thelq.se.dbimport.Controller;
 import org.thelq.se.dbimport.DatabaseWriter;
-import org.thelq.se.dbimport.ImportContainer;
 import org.thelq.se.dbimport.Utils;
 import org.thelq.se.dbimport.sources.ArchiveDumpContainer;
 import org.thelq.se.dbimport.sources.DumpContainer;
+import org.thelq.se.dbimport.sources.DumpEntry;
 import org.thelq.se.dbimport.sources.FolderDumpContainer;
 
 /**
@@ -81,6 +76,7 @@ public class GUI {
 	protected JTextField globalTablePrefix;
 	protected JSpinner batchSize;
 	protected DefaultFormBuilder locationsBuilder;
+	protected JScrollPane locationsPane;
 	@Getter
 	protected JTextPane loggerText;
 	protected GUILogAppender logAppender;
@@ -158,12 +154,13 @@ public class GUI {
 
 		//Locations
 		primaryBuilder.addSeparator("Dump Locations", CC.xyw(1, 3, 5));
-		FormLayout locationsLayout = new FormLayout("pref:grow", "pref");
+		FormLayout locationsLayout = new FormLayout("15dlu, pref, 5dlu, pref, 5dlu, pref:grow", "");
 		locationsBuilder = new DefaultFormBuilder(locationsLayout)
-				.background(Color.WHITE);
-		JScrollPane locationsPane = new JScrollPane(locationsBuilder.getPanel());
+				.background(Color.WHITE)
+				.lineGapSize(Sizes.ZERO);
+		locationsPane = new JScrollPane(locationsBuilder.getPanel());
 		locationsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		locationsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		locationsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		primaryBuilder.add(locationsPane, CC.xyw(2, 4, 4));
 
 		//Logger
@@ -204,13 +201,12 @@ public class GUI {
 				importButton.setEnabled(false);
 				for (File curFile : fc.getSelectedFiles()) {
 					DumpContainer dumpContainer = null;
-					ImportContainer importContainer;
 					try {
 						if (curFile.isDirectory())
 							dumpContainer = new FolderDumpContainer(curFile);
 						else
 							dumpContainer = new ArchiveDumpContainer(controller, curFile);
-						importContainer = controller.addDumpContainer(dumpContainer);
+						controller.addDumpContainer(dumpContainer);
 					} catch (Exception ex) {
 						String type = (dumpContainer != null) ? dumpContainer.getType() : "";
 						LoggerFactory.getLogger(getClass()).error("Cannot open " + type, ex);
@@ -218,8 +214,8 @@ public class GUI {
 						showErrorDialog(ex, "Cannot open " + location, curFile.getAbsolutePath());
 						continue;
 					}
-					updateLocations(importContainer);
 				}
+				updateLocations();
 				importButton.setEnabled(true);
 			}
 		});
@@ -310,7 +306,7 @@ public class GUI {
 
 		importButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (controller.getImportContainers().isEmpty()) {
+				if (controller.getDumpContainers().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Please add dump folders/archives", "Import Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -355,6 +351,7 @@ public class GUI {
 		frame.setContentPane(primaryBuilder.getPanel());
 		frame.pack();
 		frame.setMinimumSize(frame.getSize());
+
 		frame.setVisible(true);
 	}
 
@@ -369,8 +366,8 @@ public class GUI {
 		DatabaseWriter.setGlobalPrefix(globalTablePrefix.getText());
 
 		//Need to set the table prefix so everything else sees it
-		for (ImportContainer curContainer : controller.getImportContainers()) {
-			log.info("Setting prefix on " + curContainer.getDumpContainer().getLocation() + " to " + curContainer.getGuiTablePrefix().getText());
+		for (DumpContainer curContainer : controller.getDumpContainers()) {
+			log.info("Setting prefix on " + curContainer.getLocation() + " to " + curContainer.getGuiTablePrefix().getText());
 			curContainer.setTablePrefix(curContainer.getGuiTablePrefix().getText());
 		}
 
@@ -413,67 +410,82 @@ public class GUI {
 	/**
 	 * Update the list of locations
 	 */
-	protected void updateLocations(ImportContainer container) {
-		FormLayout layout = new FormLayout("15dlu, fill:pref:grow, pref, 3dlu, pref", "pref:grow, pref:grow");
-		final PanelBuilder curLocationBuilder = new PanelBuilder(layout, new FormDebugPanel())
-				.background(Color.WHITE);
-		final JLabel headerLabel = new JLabel(Utils.getLongLocation(container));
-		headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
-		curLocationBuilder.add(headerLabel, CC.xyw(1, 1, 2));
-		final JTextField headerPrefix = new JTextField(6);
-		curLocationBuilder.add(headerPrefix, CC.xy(5, 1));
-		container.setGuiTablePrefix(headerPrefix);
+	protected void updateLocations() {
+		locationsBuilder.getPanel().removeAll();
+		for (final DumpContainer curContainer : controller.getDumpContainers()) {
+			//Initialize components
+			if (curContainer.getGuiHeader() == null) {
+				JLabel headerLabel = new JLabel(Utils.getLongLocation(curContainer));
+				headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
+				curContainer.setGuiHeader(headerLabel);
+				//Handlers
+				headerLabel.addMouseListener(new MouseAdapter() {
+					boolean visible = true;
 
-		//Try to generate a prefix from the container name
-		headerPrefix.setText(Utils.genTablePrefix(container.getDumpContainer().getName()));
-		if (StringUtils.isBlank(headerPrefix.getText()))
-			log.warn("Unable to generate a table prefix for " + container.getDumpContainer().getLocation());
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						//Update labels
+						visible = !visible;
+						for (DumpEntry curEntry : curContainer.getEntries()) {
+							curEntry.getGuiName().setVisible(visible);
+							curEntry.getGuiSize().setVisible(visible);
+							curEntry.getGuiLog().setVisible(visible);
+							if (curEntry.getGuiSeparator() != null)
+								curEntry.getGuiSeparator().setVisible(visible);
+						}
 
-		//Generate a table
-		final JTable table = new JTable(new DumpContainerTableModel(container));
-		table.setVisible(false);
-		table.setFillsViewportHeight(true);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		curLocationBuilder.add(table, CC.xyw(2, 2, 4));
-		container.setGuiTable(table);
-
-		//Add to builder
-		locationsBuilder.append(curLocationBuilder.getPanel());
-		locationsBuilder.getPanel().validate();
-
-		//Handlers
-		headerLabel.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				table.setVisible(!table.isVisible());
-				if (table.isVisible())
-					headerLabel.setIcon(UIManager.getIcon("Tree.expandedIcon"));
-				else
-					headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
-				curLocationBuilder.getPanel().revalidate();
+						//Change icon
+						if (visible)
+							curContainer.getGuiHeader().setIcon(UIManager.getIcon("Tree.expandedIcon"));
+						else
+							curContainer.getGuiHeader().setIcon(UIManager.getIcon("Tree.collapsedIcon"));
+						locationsPane.revalidate();
+					}
+				});
 			}
-		});
+			if (curContainer.getGuiTablePrefix() == null) {
+				JTextField headerPrefix = new JTextField(6);
+				curContainer.setGuiTablePrefix(headerPrefix);
+				headerPrefix.setText(Utils.genTablePrefix(curContainer.getName()));
+				if (StringUtils.isBlank(headerPrefix.getText()))
+					log.warn("Unable to generate a table prefix for {}", curContainer.getLocation());
+			}
 
-		//Update all column sizes
-		int maxNameWidth = 0;
-		int maxSizeWidth = 0;
-		for (ImportContainer curImportContainer : controller.getImportContainers()) {
-			JTable curTable = curImportContainer.getGuiTable();
-			maxNameWidth = Math.max(maxNameWidth, getMaxColumnSize(curTable, DumpContainerColumn.NAME));
-			maxSizeWidth = Math.max(maxSizeWidth, getMaxColumnSize(curTable, DumpContainerColumn.SIZE));
-		}
-		maxNameWidth += 6;
-		maxSizeWidth += 6;
-		for (ImportContainer curImportContainer : controller.getImportContainers()) {
-			JTable curTable = curImportContainer.getGuiTable();
-			setColumnWidth(curTable, DumpContainerColumn.NAME, maxNameWidth);
-			setColumnWidth(curTable, DumpContainerColumn.SIZE, maxSizeWidth);
+			//Start adding to panel
+			FormLayout headerLayout = new FormLayout("min, pref", "pref");
+			DefaultFormBuilder headerBuilder = new DefaultFormBuilder(headerLayout)
+					.background(Color.WHITE)
+					.lineGapSize(Sizes.ZERO);
+			headerBuilder.add(curContainer.getGuiHeader(), CC.xy(1, 1));
+			headerBuilder.add(curContainer.getGuiTablePrefix(), CC.xy(2, 1));
+			locationsBuilder.leadingColumnOffset(0);
+			locationsBuilder.append(headerBuilder.getPanel(), 6);
+			locationsBuilder.nextLine();
+			locationsBuilder.leadingColumnOffset(1);
 
-			//Split remaining width
-			int totalRemaining = (int) curTable.getSize().getWidth() - maxNameWidth - maxSizeWidth;
-			setColumnWidth(curTable, DumpContainerColumn.PARSER, totalRemaining / 2);
-			setColumnWidth(curTable, DumpContainerColumn.DATABASE, totalRemaining / 2);
+			Iterator<DumpEntry> entriesItr = curContainer.getEntries().iterator();
+			while (entriesItr.hasNext()) {
+				DumpEntry curEntry = entriesItr.next();
+				if (curEntry.getGuiName() == null)
+					curEntry.setGuiName(new JLabel(curEntry.getName()));
+				locationsBuilder.append(curEntry.getGuiName());
+				if (curEntry.getGuiSize() == null)
+					curEntry.setGuiSize(new JLabel(String.valueOf(curEntry.getSizeBytes())));
+				locationsBuilder.append(curEntry.getGuiSize());
+				if (curEntry.getGuiLog() == null)
+					curEntry.setGuiLog(new JLabel("Waiting..."));
+				locationsBuilder.append(curEntry.getGuiLog());
+				locationsBuilder.nextLine();
+				if (entriesItr.hasNext()) {
+					if (curEntry.getGuiSeparator() == null)
+						curEntry.setGuiSeparator(new JSeparator());
+					locationsBuilder.append(curEntry.getGuiSeparator(), 5);
+					locationsBuilder.nextLine();
+				}
+			}
 		}
+
+		locationsPane.validate();
 	}
 
 	protected void showErrorDialog(Exception ex, String title, String messageRaw) {
@@ -489,42 +501,5 @@ public class GUI {
 				+ root
 				+ "\nSee Log for more information",
 				title, JOptionPane.ERROR_MESSAGE);
-	}
-
-	/**
-	 * Set the column width on the specified table
-	 * Modified from https://tips4java.wordpress.com/2008/11/10/table-column-adjuster/
-	 * @param table
-	 * @param column
-	 * @param width 
-	 */
-	protected static void setColumnWidth(JTable table, DumpContainerColumn column, int width) {
-		TableColumn tableColumn = table.getColumnModel().getColumn(column.getId());
-		tableColumn.setMaxWidth(width);
-		tableColumn.setWidth(width);
-		table.getTableHeader().setResizingColumn(tableColumn);
-	}
-
-	/**
-	 * Get the maximum size of a column in the specified table
-	 * Modified from https://tips4java.wordpress.com/2008/11/10/table-column-adjuster/
-	 * @param table 
-	 * @param column
-	 * @return 
-	 */
-	protected static int getMaxColumnSize(JTable table, DumpContainerColumn column) {
-		int max = 0;
-		int maxWidth = table.getColumnModel().getColumn(column.getId()).getMaxWidth();
-		for (int row = 0; row < table.getRowCount(); row++) {
-			TableCellRenderer cellRenderer = table.getCellRenderer(row, column.getId());
-			Component c = table.prepareRenderer(cellRenderer, row, column.getId());
-			int width = c.getPreferredSize().width + table.getIntercellSpacing().width;
-			if (width >= maxWidth) {
-				max = maxWidth;
-				break;
-			} else
-				max = Math.max(max, width);
-		}
-		return max;
 	}
 }

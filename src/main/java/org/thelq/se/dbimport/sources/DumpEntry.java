@@ -6,6 +6,7 @@ package org.thelq.se.dbimport.sources;
 
 import java.io.InputStream;
 import javax.swing.JLabel;
+import javax.swing.JSeparator;
 import lombok.Data;
 import org.thelq.se.dbimport.DatabaseWriter;
 import org.thelq.se.dbimport.DumpParser;
@@ -18,7 +19,10 @@ import org.thelq.se.dbimport.DumpParser;
 public abstract class DumpEntry {
 	protected DumpParser parser;
 	protected DatabaseWriter databaseWriter;
+	protected JLabel guiName;
+	protected JLabel guiSize;
 	protected JLabel guiLog;
+	protected JSeparator guiSeparator;
 
 	public abstract String getLocation();
 
