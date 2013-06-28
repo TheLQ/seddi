@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.thelq.se.dbimport.gui;
+package org.thelq.stackexchange.dbimport.gui;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -17,7 +17,7 @@ import javax.swing.SwingConstants;
  */
 public class ScrollablePanel extends JPanel implements Scrollable {
     public Dimension getPreferredScrollableViewportSize() {
-        return getMinimumSize();
+        return getPreferredSize();
     }
 
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
@@ -25,8 +25,7 @@ public class ScrollablePanel extends JPanel implements Scrollable {
     }
 
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-        //return ((orientation == SwingConstants.VERTICAL) ? visibleRect.height : visibleRect.width) - 10;
-		return visibleRect.width;
+        return ((orientation == SwingConstants.VERTICAL) ? visibleRect.height : visibleRect.width) - 10;
     }
 
     public boolean getScrollableTracksViewportWidth() {

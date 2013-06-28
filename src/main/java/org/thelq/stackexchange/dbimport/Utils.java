@@ -1,13 +1,13 @@
-package org.thelq.se.dbimport;
+package org.thelq.stackexchange.dbimport;
 
-import org.thelq.se.dbimport.sources.DumpContainer;
+import org.thelq.stackexchange.dbimport.sources.DumpContainer;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.thelq.se.dbimport.sources.DumpContainer;
+import org.thelq.stackexchange.dbimport.sources.DumpContainer;
 
 /**
  *

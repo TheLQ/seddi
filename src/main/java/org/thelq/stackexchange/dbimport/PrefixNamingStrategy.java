@@ -1,4 +1,4 @@
-package org.thelq.se.dbimport;
+package org.thelq.stackexchange.dbimport;
 
 import lombok.RequiredArgsConstructor;
 import org.hibernate.cfg.ImprovedNamingStrategy;

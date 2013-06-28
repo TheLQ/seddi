@@ -2,14 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.thelq.se.dbimport.sources;
+package org.thelq.stackexchange.dbimport.sources;
 
 import java.io.InputStream;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import lombok.Data;
-import org.thelq.se.dbimport.DatabaseWriter;
-import org.thelq.se.dbimport.DumpParser;
+import org.thelq.stackexchange.dbimport.DatabaseWriter;
+import org.thelq.stackexchange.dbimport.DumpParser;
 
 /**
  *

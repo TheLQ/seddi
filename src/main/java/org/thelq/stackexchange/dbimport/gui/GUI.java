@@ -1,4 +1,4 @@
-package org.thelq.se.dbimport.gui;
+package org.thelq.stackexchange.dbimport.gui;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
@@ -47,13 +47,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
-import org.thelq.se.dbimport.Controller;
-import org.thelq.se.dbimport.DatabaseWriter;
-import org.thelq.se.dbimport.Utils;
-import org.thelq.se.dbimport.sources.ArchiveDumpContainer;
-import org.thelq.se.dbimport.sources.DumpContainer;
-import org.thelq.se.dbimport.sources.DumpEntry;
-import org.thelq.se.dbimport.sources.FolderDumpContainer;
+import org.thelq.stackexchange.dbimport.Controller;
+import org.thelq.stackexchange.dbimport.DatabaseWriter;
+import org.thelq.stackexchange.dbimport.Utils;
+import org.thelq.stackexchange.dbimport.sources.ArchiveDumpContainer;
+import org.thelq.stackexchange.dbimport.sources.DumpContainer;
+import org.thelq.stackexchange.dbimport.sources.DumpEntry;
+import org.thelq.stackexchange.dbimport.sources.FolderDumpContainer;
 
 /**
  *
@@ -155,7 +155,7 @@ public class GUI {
 		//Locations
 		primaryBuilder.addSeparator("Dump Locations", CC.xyw(1, 3, 5));
 		FormLayout locationsLayout = new FormLayout("15dlu, pref, 5dlu, pref, 5dlu, pref:grow", "");
-		locationsBuilder = new DefaultFormBuilder(locationsLayout)
+		locationsBuilder = new DefaultFormBuilder(locationsLayout, new ScrollablePanel())
 				.background(Color.WHITE)
 				.lineGapSize(Sizes.ZERO);
 		locationsPane = new JScrollPane(locationsBuilder.getPanel());
@@ -452,7 +452,7 @@ public class GUI {
 			}
 
 			//Start adding to panel
-			FormLayout headerLayout = new FormLayout("min, pref", "pref");
+			FormLayout headerLayout = new FormLayout("fill:min, pref", "pref");
 			DefaultFormBuilder headerBuilder = new DefaultFormBuilder(headerLayout)
 					.background(Color.WHITE)
 					.lineGapSize(Sizes.ZERO);

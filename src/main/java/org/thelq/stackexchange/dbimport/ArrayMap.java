@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.thelq.se.dbimport;
+package org.thelq.stackexchange.dbimport;
 
 import com.google.common.base.Objects;
 import java.util.AbstractMap;

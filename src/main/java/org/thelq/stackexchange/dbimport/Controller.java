@@ -1,4 +1,4 @@
-package org.thelq.se.dbimport;
+package org.thelq.stackexchange.dbimport;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
@@ -22,9 +22,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.Type;
 import org.jboss.logging.MDC;
-import org.thelq.se.dbimport.gui.GUI;
-import org.thelq.se.dbimport.sources.DumpContainer;
-import org.thelq.se.dbimport.sources.DumpEntry;
+import org.thelq.stackexchange.dbimport.gui.GUI;
+import org.thelq.stackexchange.dbimport.sources.DumpContainer;
+import org.thelq.stackexchange.dbimport.sources.DumpEntry;
 
 /**
  *

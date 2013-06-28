@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "https://www.jboss.org/dtd/hibernate/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-	<session-factory>
-		<!-- Tune for batch insertion -->
-		<property name="hibernate.default_entity_mode">dynamic-map</property>
-		<property name="hibernate.jdbc.batch_size">50</property>
-		<property name="hibernate.order_inserts">true</property>
-		<property name="hibernate.order_updates">true</property>
-		<property name="hibernate.cache.use_second_level_cache">false</property>
-		<property name="cache.use_query_cache">false</property>
-
-		<!-- Use unicode -->
-		<property name="hibernate.connection.useUnicode">true</property>
-		<property name="hibernate.connection.characterEncoding">UTF-8</property>
-		<property name="hibernate.connection.charSet">UTF-8</property>
-
-		<!-- Our mapping file -->
-		<mapping resource="mapping.hbm.xml"/>
-	</session-factory>
+  <session-factory>
+    <!-- Tune for batch insertion -->
+    <property name="hibernate.default_entity_mode">dynamic-map</property>
+    <property name="hibernate.jdbc.batch_size">50</property>
+    <property name="hibernate.order_inserts">true</property>
+    <property name="hibernate.order_updates">true</property>
+    <property name="hibernate.cache.use_second_level_cache">false</property>
+    <property name="cache.use_query_cache">false</property>
+    <!-- Use unicode -->
+    <property name="hibernate.connection.useUnicode">true</property>
+    <property name="hibernate.connection.characterEncoding">UTF-8</property>
+    <property name="hibernate.connection.charSet">UTF-8</property>
+    <!-- Our mapping file -->
+    <mapping resource="mapping.hbm.xml"/>
+  </session-factory>
 </hibernate-configuration>

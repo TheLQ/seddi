@@ -1,4 +1,4 @@
-package org.thelq.se.dbimport;
+package org.thelq.stackexchange.dbimport;
 
 import com.ctc.wstx.cfg.ErrorConsts;
 import java.text.SimpleDateFormat;
@@ -14,7 +14,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 import org.hibernate.type.Type;
-import org.thelq.se.dbimport.sources.DumpEntry;
+import org.thelq.stackexchange.dbimport.sources.DumpEntry;
 
 /**
  *

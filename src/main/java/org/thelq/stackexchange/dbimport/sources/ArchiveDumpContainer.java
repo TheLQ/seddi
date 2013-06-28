@@ -1,4 +1,4 @@
-package org.thelq.se.dbimport.sources;
+package org.thelq.stackexchange.dbimport.sources;
 
 import com.google.common.collect.ImmutableList;
 import java.io.File;
@@ -21,7 +21,7 @@ import net.sf.sevenzipjbinding.PropID;
 import net.sf.sevenzipjbinding.SevenZip;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
-import org.thelq.se.dbimport.Controller;
+import org.thelq.stackexchange.dbimport.Controller;
 
 /**
  *

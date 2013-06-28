@@ -1,4 +1,4 @@
-package org.thelq.se.dbimport.gui;
+package org.thelq.stackexchange.dbimport.gui;
 
 import lombok.Getter;
 import lombok.Setter;

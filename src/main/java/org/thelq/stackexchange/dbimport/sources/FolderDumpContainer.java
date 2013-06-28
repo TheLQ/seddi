@@ -1,4 +1,4 @@
-package org.thelq.se.dbimport.sources;
+package org.thelq.stackexchange.dbimport.sources;
 
 import com.google.common.collect.ImmutableList;
 import java.io.File;

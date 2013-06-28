@@ -1,4 +1,4 @@
-package org.thelq.se.dbimport.sources;
+package org.thelq.stackexchange.dbimport.sources;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.thelq.se.dbimport.Controller;
+import org.thelq.stackexchange.dbimport.Controller;
 
 /**
  *

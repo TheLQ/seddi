@@ -1,4 +1,4 @@
-package org.thelq.se.dbimport.gui;
+package org.thelq.stackexchange.dbimport.gui;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
