@@ -268,6 +268,11 @@ public class GUI {
 				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
 				.dialect("org.hibernate.dialect.SQLServer2008Dialect")
 				.driver("net.sourceforge.jtds.jdbc.Driver"));
+		dbType.addItem(new DatabaseOption()
+				.name("H2")
+				.jdbcString("jdbc:h2:stackexchange")
+				.dialect("org.hibernate.dialect.H2Dialect")
+				.driver("org.h2.Driver"));
 		dbType.addItem(DatabaseOption.CUSTOM);
 		setDbOption(dbType.getItemAt(0));
 		dbType.addItemListener(new ItemListener() {
