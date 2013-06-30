@@ -294,7 +294,7 @@ public class GUI {
 					return;
 
 				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
-				if (selectedOption.name().equals("MySQL") && !shownMysqlWarning) {
+				if (selectedOption.name().startsWith("MySQL") && !shownMysqlWarning) {
 					//Hide popup so you don't have to click twice on the dialog 
 					dbType.setPopupVisible(false);
 					JOptionPane.showMessageDialog(frame,
@@ -431,9 +431,9 @@ public class GUI {
 	 */
 	protected void setDbOption(DatabaseOption option) {
 		dbType.setSelectedItem(option);
-		driver.setText(option.driver().getCanonicalName());
+		driver.setText((option.driver() != null) ? option.driver().getCanonicalName() : "");
 		driver.setCaretPosition(0);
-		dialect.setText(option.dialect().getCanonicalName());
+		dialect.setText((option.dialect() != null) ? option.dialect().getCanonicalName() : "");
 		dialect.setCaretPosition(0);
 		jdbcString.setText(option.jdbcString());
 		jdbcString.setCaretPosition(0);
