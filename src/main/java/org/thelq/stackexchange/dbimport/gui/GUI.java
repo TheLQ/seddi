@@ -253,6 +253,21 @@ public class GUI {
 				.jdbcString("jdbc:postgresql://127.0.0.1:5432/stackexchange")
 				.dialect("org.hibernate.dialect.PostgreSQLDialect")
 				.driver("org.postgresql.Driver"));
+		dbType.addItem(new DatabaseOption()
+				.name("SQL Server")
+				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
+				.dialect("org.hibernate.dialect.SQLServerDialect")
+				.driver("net.sourceforge.jtds.jdbc.Driver"));
+		dbType.addItem(new DatabaseOption()
+				.name("SQL Server 2005+")
+				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
+				.dialect("org.hibernate.dialect.SQLServer2005Dialect")
+				.driver("net.sourceforge.jtds.jdbc.Driver"));
+		dbType.addItem(new DatabaseOption()
+				.name("SQL Server 2008+")
+				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
+				.dialect("org.hibernate.dialect.SQLServer2008Dialect")
+				.driver("net.sourceforge.jtds.jdbc.Driver"));
 		dbType.addItem(DatabaseOption.CUSTOM);
 		setDbOption(dbType.getItemAt(0));
 		dbType.addItemListener(new ItemListener() {
