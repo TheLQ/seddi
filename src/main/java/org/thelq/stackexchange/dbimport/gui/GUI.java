@@ -61,6 +61,7 @@ import org.thelq.stackexchange.dbimport.sources.FolderDumpContainer;
  */
 @Slf4j
 public class GUI {
+	@Getter
 	protected Controller controller;
 	protected JFrame frame;
 	protected JComboBox<DatabaseOption> dbType;
