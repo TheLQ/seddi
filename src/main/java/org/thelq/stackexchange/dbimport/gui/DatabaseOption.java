@@ -33,8 +33,8 @@ public class DatabaseOption {
 	public static DatabaseOption SELECTONE = new DatabaseOption().name("Select One");
 	String name;
 	String jdbcString;
-	String driver;
-	String dialect;
+	Class driver;
+	Class dialect;
 
 	@Override
 	public String toString() {

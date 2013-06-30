@@ -246,33 +246,33 @@ public class GUI {
 		dbType.addItem(new DatabaseOption()
 				.name("MySQL")
 				.jdbcString("jdbc:mysql://127.0.0.1:3306/stackexchange?rewriteBatchedStatements=true")
-				.dialect("org.hibernate.dialect.MySQL5Dialect")
-				.driver("com.mysql.jdbc.Driver"));
+				.dialect(org.hibernate.dialect.MySQL5Dialect.class)
+				.driver(com.mysql.jdbc.Driver.class));
 		dbType.addItem(new DatabaseOption()
 				.name("PostgreSQL")
 				.jdbcString("jdbc:postgresql://127.0.0.1:5432/stackexchange")
-				.dialect("org.hibernate.dialect.PostgreSQLDialect")
-				.driver("org.postgresql.Driver"));
+				.dialect(org.hibernate.dialect.PostgreSQLDialect.class)
+				.driver(org.postgresql.Driver.class));
 		dbType.addItem(new DatabaseOption()
 				.name("SQL Server")
 				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
-				.dialect("org.hibernate.dialect.SQLServerDialect")
-				.driver("net.sourceforge.jtds.jdbc.Driver"));
+				.dialect(org.hibernate.dialect.SQLServerDialect.class)
+				.driver(net.sourceforge.jtds.jdbc.Driver.class));
 		dbType.addItem(new DatabaseOption()
 				.name("SQL Server 2005+")
 				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
-				.dialect("org.hibernate.dialect.SQLServer2005Dialect")
-				.driver("net.sourceforge.jtds.jdbc.Driver"));
+				.dialect(org.hibernate.dialect.SQLServer2005Dialect.class)
+				.driver(net.sourceforge.jtds.jdbc.Driver.class));
 		dbType.addItem(new DatabaseOption()
 				.name("SQL Server 2008+")
 				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
-				.dialect("org.hibernate.dialect.SQLServer2008Dialect")
-				.driver("net.sourceforge.jtds.jdbc.Driver"));
+				.dialect(org.hibernate.dialect.SQLServer2008Dialect.class)
+				.driver(net.sourceforge.jtds.jdbc.Driver.class));
 		dbType.addItem(new DatabaseOption()
 				.name("H2")
 				.jdbcString("jdbc:h2:stackexchange")
-				.dialect("org.hibernate.dialect.H2Dialect")
-				.driver("org.h2.Driver"));
+				.dialect(org.hibernate.dialect.H2Dialect.class)
+				.driver(org.h2.Driver.class));
 		dbType.addItem(DatabaseOption.CUSTOM);
 		setDbOption(dbType.getItemAt(0));
 		dbType.addItemListener(new ItemListener() {
@@ -421,9 +421,9 @@ public class GUI {
 	 */
 	protected void setDbOption(DatabaseOption option) {
 		dbType.setSelectedItem(option);
-		driver.setText(option.driver());
+		driver.setText(option.driver().getCanonicalName());
 		driver.setCaretPosition(0);
-		dialect.setText(option.dialect());
+		dialect.setText(option.dialect().getCanonicalName());
 		dialect.setCaretPosition(0);
 		jdbcString.setText(option.jdbcString());
 		jdbcString.setCaretPosition(0);
