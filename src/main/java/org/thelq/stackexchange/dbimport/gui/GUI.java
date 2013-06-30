@@ -2,14 +2,12 @@ package org.thelq.stackexchange.dbimport.gui;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
-import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -18,6 +16,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -469,7 +469,7 @@ public class GUI {
 					curEntry.setGuiName(new JLabel(curEntry.getName()));
 				locationsBuilder.append(curEntry.getGuiName());
 				if (curEntry.getGuiSize() == null)
-					curEntry.setGuiSize(new JLabel(String.valueOf(curEntry.getSizeBytes())));
+					curEntry.setGuiSize(new JLabel(sizeInMegabytes(curEntry.getSizeBytes())));
 				locationsBuilder.append(curEntry.getGuiSize());
 				if (curEntry.getGuiLog() == null)
 					curEntry.setGuiLog(new JLabel("Waiting..."));
@@ -485,6 +485,10 @@ public class GUI {
 		}
 
 		locationsPane.validate();
+	}
+
+	public static String sizeInMegabytes(long size) {
+		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, 2)) + " MiB";
 	}
 
 	protected void showErrorDialog(Exception ex, String title, String messageRaw) {
