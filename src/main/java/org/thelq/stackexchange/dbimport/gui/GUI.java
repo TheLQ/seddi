@@ -419,7 +419,9 @@ public class GUI {
 		for (final DumpContainer curContainer : controller.getDumpContainers()) {
 			//Initialize components
 			if (curContainer.getGuiHeader() == null) {
-				JLabel headerLabel = new JLabel(Utils.getLongLocation(curContainer));
+				String longLocation = Utils.getLongLocation(curContainer);
+				JLabel headerLabel = new JLabel(longLocation);
+				headerLabel.setToolTipText(longLocation);
 				headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
 				curContainer.setGuiHeader(headerLabel);
 				//Handlers
