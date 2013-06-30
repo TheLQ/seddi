@@ -409,6 +409,9 @@ public class GUI {
 		batchSize.setEnabled(enabled);
 		dbAdvanced.setEnabled(enabled);
 		menuAdd.setEnabled(enabled);
+		for(DumpContainer curContainer : controller.getDumpContainers())
+			if(curContainer.getGuiTablePrefix() != null)
+				curContainer.getGuiTablePrefix().setEnabled(enabled);
 	}
 
 	/**
