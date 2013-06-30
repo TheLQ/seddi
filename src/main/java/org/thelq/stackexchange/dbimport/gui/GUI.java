@@ -2,12 +2,14 @@ package org.thelq.stackexchange.dbimport.gui;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.PanelBuilder;
+import com.jgoodies.forms.debug.FormDebugPanel;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.windows.WindowsLookAndFeel;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -155,12 +157,12 @@ public class GUI {
 
 		//Locations
 		primaryBuilder.addSeparator("Dump Locations", CC.xyw(1, 3, 5));
-		//TODO: Figure out how to configure scrollable panel to have a maximum width
-		FormLayout locationsLayout = new FormLayout("15dlu, pref, 5dlu, pref, 5dlu, pref:grow", "");
-		locationsBuilder = new DefaultFormBuilder(locationsLayout)
+		FormLayout locationsLayout = new FormLayout("pref, 15dlu, pref, 5dlu, pref, 5dlu, pref:grow, 2dlu, pref", "");
+		locationsBuilder = new DefaultFormBuilder(locationsLayout, new ScrollablePanel())
 				.background(Color.WHITE)
 				.lineGapSize(Sizes.ZERO);
 		locationsPane = new JScrollPane(locationsBuilder.getPanel());
+		locationsPane.getViewport().setBackground(Color.white);
 		locationsPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		locationsPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		primaryBuilder.add(locationsPane, CC.xyw(2, 4, 4));
@@ -454,16 +456,11 @@ public class GUI {
 			}
 
 			//Start adding to panel
-			FormLayout headerLayout = new FormLayout("fill:min, pref", "pref");
-			DefaultFormBuilder headerBuilder = new DefaultFormBuilder(headerLayout)
-					.background(Color.WHITE)
-					.lineGapSize(Sizes.ZERO);
-			headerBuilder.add(curContainer.getGuiHeader(), CC.xy(1, 1));
-			headerBuilder.add(curContainer.getGuiTablePrefix(), CC.xy(2, 1));
 			locationsBuilder.leadingColumnOffset(0);
-			locationsBuilder.append(headerBuilder.getPanel(), 6);
+			locationsBuilder.append(curContainer.getGuiHeader(), 7);
+			locationsBuilder.append(curContainer.getGuiTablePrefix());
 			locationsBuilder.nextLine();
-			locationsBuilder.leadingColumnOffset(1);
+			locationsBuilder.leadingColumnOffset(2);
 
 			Iterator<DumpEntry> entriesItr = curContainer.getEntries().iterator();
 			while (entriesItr.hasNext()) {
@@ -476,12 +473,12 @@ public class GUI {
 				locationsBuilder.append(curEntry.getGuiSize());
 				if (curEntry.getGuiLog() == null)
 					curEntry.setGuiLog(new JLabel("Waiting..."));
-				locationsBuilder.append(curEntry.getGuiLog());
+				locationsBuilder.append(curEntry.getGuiLog(), 3);
 				locationsBuilder.nextLine();
 				if (entriesItr.hasNext()) {
 					if (curEntry.getGuiSeparator() == null)
 						curEntry.setGuiSeparator(new JSeparator());
-					locationsBuilder.append(curEntry.getGuiSeparator(), 5);
+					locationsBuilder.append(curEntry.getGuiSeparator(), 7);
 					locationsBuilder.nextLine();
 				}
 			}
