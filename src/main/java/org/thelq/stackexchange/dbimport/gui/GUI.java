@@ -249,9 +249,14 @@ public class GUI {
 				.dialect(org.hibernate.dialect.MySQL5Dialect.class)
 				.driver(com.mysql.jdbc.Driver.class));
 		dbType.addItem(new DatabaseOption()
-				.name("PostgreSQL")
+				.name("PostgreSQL 8.1")
 				.jdbcString("jdbc:postgresql://127.0.0.1:5432/stackexchange")
-				.dialect(org.hibernate.dialect.PostgreSQLDialect.class)
+				.dialect(org.hibernate.dialect.PostgreSQL81Dialect.class)
+				.driver(org.postgresql.Driver.class));
+		dbType.addItem(new DatabaseOption()
+				.name("PostgreSQL 8.2+")
+				.jdbcString("jdbc:postgresql://127.0.0.1:5432/stackexchange")
+				.dialect(org.hibernate.dialect.PostgreSQL82Dialect.class)
 				.driver(org.postgresql.Driver.class));
 		dbType.addItem(new DatabaseOption()
 				.name("SQL Server")
