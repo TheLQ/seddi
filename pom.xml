@@ -165,10 +165,10 @@
 						<phase>process-resources</phase>
 						<goals>
 							<!-- mvn com.savage7.maven.plugins:maven-external-dependency-plugin:resolve-external -->
-							<goal>resolve-external</goal>
+							<!--<goal>resolve-external</goal>-->
 
 							<!-- mvn com.savage7.maven.plugins:maven-external-dependency-plugin:install-external -->
-							<goal>install-external</goal>
+							<!--<goal>install-external</goal>-->
 						</goals>                     
 					</execution>
 				</executions>
