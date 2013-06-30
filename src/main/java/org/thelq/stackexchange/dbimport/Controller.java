@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,8 @@ public class Controller {
 	@Getter
 	protected ExecutorService generalThreadPool;
 	protected Map<String, Map<String, Type>> metadataMap;
+	@Getter
+	protected final ThreadLocal<DumpEntry> currentDumpEntry = new ThreadLocal<DumpEntry>(); 
 
 	public Controller(boolean createGui) {
 		generalThreadPool = Executors.newCachedThreadPool(new BasicThreadFactory.Builder()
@@ -119,11 +122,13 @@ public class Controller {
 				final DumpEntry curEntry = curContainer.getEntries().get(curIndex);
 				futures.add(importThreadPool.submit(new Callable<Void>() {
 					public Void call() {
+						currentDumpEntry.set(curEntry);
 						synchronized (curContainer.getHibernateCreateLock()) {
 							if (curContainer.getSessionFactory() == null)
 								DatabaseWriter.buildSessionFactory(curContainer);
 						}
 						importSingle(curContainer, curEntry, createTables);
+						currentDumpEntry.remove();
 						return null;
 					}
 				}));

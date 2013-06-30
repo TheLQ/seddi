@@ -8,17 +8,19 @@ import ch.qos.logback.core.AppenderBase;
 import java.awt.Color;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
-import java.util.Queue;
+import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.thelq.stackexchange.dbimport.sources.DumpEntry;
 
 /**
  *
@@ -85,35 +87,47 @@ public class GUILogAppender extends AppenderBase<ILoggingEvent> {
 			msgStyle = loggerStyle.getStyle("Error");
 		else
 			msgStyle = loggerStyle.getStyle("Normal");
-
+		DumpEntry curDumpEntry = gui.getController().getCurrentDumpEntry().get();
+		JLabel guiLogLabel = (curDumpEntry != null) ? curDumpEntry.getGuiLog() : null;
 		final String longContainer = MDC.get("longContainer");
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					runInsert();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+		SwingUtilities.invokeLater(new GuiAppender(event, longContainer, guiLogLabel, msgStyle));
+	}
 
-			protected void runInsert() throws BadLocationException {
-				int prevLength = loggerStyle.getLength();
-				String[] messageArray = StringUtils.split(messageLayout.doLayout(event).trim(), " ", 2);
-				loggerStyle.insertString(loggerStyle.getLength(), "[" + dateFormatter.format(event.getTimeStamp()) + "]", loggerStyle.getStyle("Normal")); //time
-				//doc.insertString(doc.getLength(), "["+event.getThreadName()+"] ", doc.getStyle("Thread")); //thread name
-				if (StringUtils.isNotBlank(longContainer))
-					loggerStyle.insertString(loggerStyle.getLength(), longContainer, loggerStyle.getStyle("Level")); //Container name
-				loggerStyle.insertString(loggerStyle.getLength(), event.getLevel().toString() + " ", loggerStyle.getStyle("Level")); //Logging level
-				loggerStyle.insertString(loggerStyle.getLength(), messageArray[0] + " ", loggerStyle.getStyle("Class"));
-				loggerStyle.insertString(loggerStyle.getLength(), messageArray[1], msgStyle);
-				loggerStyle.insertString(loggerStyle.getLength(), "\n", loggerStyle.getStyle("Normal"));
+	@RequiredArgsConstructor
+	protected class GuiAppender implements Runnable {
+		protected final ILoggingEvent event;
+		protected final String longContainer;
+		protected final JLabel guiLog;
+		protected final Style msgStyle;
 
-				//Only autoscroll if the scrollbar is at the bottom
-				//JScrollBar scrollBar = scroll.getVerticalScrollBar();
-				//if (scrollBar.getVisibleAmount() != scrollBar.getMaximum() && scrollBar.getValue() + scrollBar.getVisibleAmount() == scrollBar.getMaximum())
-				loggerText.setCaretPosition(prevLength);
+		public void run() {
+			try {
+				runInsert();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		});
+		}
+
+		protected void runInsert() throws BadLocationException {
+			int prevLength = loggerStyle.getLength();
+			String[] messageArray = StringUtils.split(messageLayout.doLayout(event).trim(), " ", 2);
+			loggerStyle.insertString(loggerStyle.getLength(), "[" + dateFormatter.format(event.getTimeStamp()) + "]", loggerStyle.getStyle("Normal")); //time
+			//doc.insertString(doc.getLength(), "["+event.getThreadName()+"] ", doc.getStyle("Thread")); //thread name
+			if (StringUtils.isNotBlank(longContainer))
+				loggerStyle.insertString(loggerStyle.getLength(), longContainer, loggerStyle.getStyle("Level")); //Container name
+			loggerStyle.insertString(loggerStyle.getLength(), event.getLevel().toString() + " ", loggerStyle.getStyle("Level")); //Logging level
+			loggerStyle.insertString(loggerStyle.getLength(), messageArray[0] + " ", loggerStyle.getStyle("Class"));
+			loggerStyle.insertString(loggerStyle.getLength(), messageArray[1], msgStyle);
+			loggerStyle.insertString(loggerStyle.getLength(), "\n", loggerStyle.getStyle("Normal"));
+
+			//Only autoscroll if the scrollbar is at the bottom
+			//JScrollBar scrollBar = scroll.getVerticalScrollBar();
+			//if (scrollBar.getVisibleAmount() != scrollBar.getMaximum() && scrollBar.getValue() + scrollBar.getVisibleAmount() == scrollBar.getMaximum())
+			loggerText.setCaretPosition(prevLength);
+
+			if (guiLog != null)
+				guiLog.setText(messageArray[1]);
+		}
 	}
 }
