@@ -244,12 +244,7 @@ public class GUI {
 		//Add options (Could be in a map, but this is cleaner)
 		dbType.addItem(DatabaseOption.SELECTONE);
 		dbType.addItem(new DatabaseOption()
-				.name("MySQL 4")
-				.jdbcString("jdbc:mysql://127.0.0.1:3306/stackexchange?rewriteBatchedStatements=true")
-				.dialect(org.hibernate.dialect.MySQLDialect.class)
-				.driver(com.mysql.jdbc.Driver.class));
-		dbType.addItem(new DatabaseOption()
-				.name("MySQL 5+")
+				.name("MySQL 5.5.3+")
 				.jdbcString("jdbc:mysql://127.0.0.1:3306/stackexchange?rewriteBatchedStatements=true")
 				.dialect(org.hibernate.dialect.MySQL5Dialect.class)
 				.driver(com.mysql.jdbc.Driver.class));
