@@ -101,7 +101,7 @@ public class GUI {
 
 		this.controller = passedController;
 		frame = new JFrame();
-		frame.setTitle("Unified StackExchange Data Dump Importer");
+		frame.setTitle("Unified StackExchange Data Dump Importer v" + Controller.VERSION);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 		//Setup menu
