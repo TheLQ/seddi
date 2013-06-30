@@ -17,6 +17,14 @@
 	<prerequisites>
 		<maven>2.2.1</maven>
 	</prerequisites>
+	
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<dependencies>
 		<!--
@@ -106,6 +114,35 @@
 
 	<build>
 		<plugins>
+			<!--Makes sure License Headers are consistant across all files-->
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.10.b1</version>
+				<configuration>
+					<header>src/etc/license-header.txt</header>
+					<properties>
+						<email>lord.quackstar at gmail.com</email>
+						<name>Leon Blakey</name>
+						<year>2013</year>
+						<projectname>Unified StackExchange Data Dump Importer</projectname>
+					</properties>
+					<excludes>
+						<exclude>**/*.txt</exclude>
+						<exclude>**/*.log</exclude>
+						<exclude>**/nbactions.xml</exclude>
+					</excludes>
+					<strictCheck>true</strictCheck>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- Update version in Controller -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
