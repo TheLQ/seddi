@@ -155,8 +155,9 @@ public class GUI {
 
 		//Locations
 		primaryBuilder.addSeparator("Dump Locations", CC.xyw(1, 3, 5));
+		//TODO: Figure out how to configure scrollable panel to have a maximum width
 		FormLayout locationsLayout = new FormLayout("15dlu, pref, 5dlu, pref, 5dlu, pref:grow", "");
-		locationsBuilder = new DefaultFormBuilder(locationsLayout, new ScrollablePanel())
+		locationsBuilder = new DefaultFormBuilder(locationsLayout)
 				.background(Color.WHITE)
 				.lineGapSize(Sizes.ZERO);
 		locationsPane = new JScrollPane(locationsBuilder.getPanel());
