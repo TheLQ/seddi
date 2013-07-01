@@ -323,11 +323,32 @@ public class GUI {
 		});
 
 		importButton.addActionListener(new ActionListener() {
+			protected void showImportError(String error) {
+				JOptionPane.showMessageDialog(frame, error, "Configuration Error", JOptionPane.ERROR_MESSAGE);
+			}
+
+			protected void showInputErrorDatabase(String error) {
+				if (dbType.getSelectedItem() == null)
+					showImportError("No dbType specified, " + StringUtils.uncapitalize(error));
+				else
+					showImportError(error);
+			}
+
 			public void actionPerformed(ActionEvent e) {
-				if (controller.getDumpContainers().isEmpty()) {
-					JOptionPane.showMessageDialog(frame, "Please add dump folders/archives", "Import Error", JOptionPane.ERROR_MESSAGE);
+				boolean validationPassed = false;
+				if (controller.getDumpContainers().isEmpty())
+					showImportError("Please add dump folders/archives");
+				else if (StringUtils.isBlank(jdbcString.getText()))
+					showInputErrorDatabase("Must specify JDBC String");
+				else if (StringUtils.isBlank(driver.getText()))
+					showInputErrorDatabase("Must specify driver");
+				else if (StringUtils.isBlank(dialect.getText()))
+					showInputErrorDatabase("Must specify hibernate dialect");
+				else 
+					validationPassed = true;
+				
+				if(!validationPassed)
 					return;
-				}
 
 				//Disable all GUI components so they can't change anything during processing
 				setGuiEnabled(false);
