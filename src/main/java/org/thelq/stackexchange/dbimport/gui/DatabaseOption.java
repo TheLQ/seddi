@@ -29,7 +29,6 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 public class DatabaseOption {
-	public static DatabaseOption SELECTONE = new DatabaseOption().name("Select One");
 	String name;
 	String jdbcString;
 	String driver;

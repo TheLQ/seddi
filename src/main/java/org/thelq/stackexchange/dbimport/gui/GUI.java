@@ -249,7 +249,6 @@ public class GUI {
 		});
 
 		//Add options (Could be in a map, but this is cleaner)
-		dbType.addItem(DatabaseOption.SELECTONE);
 		dbType.addItem(new DatabaseOption()
 				.name("MySQL 5.5.3+")
 				.jdbcString("jdbc:mysql://127.0.0.1:3306/stackexchange?rewriteBatchedStatements=true")
@@ -285,7 +284,7 @@ public class GUI {
 				.jdbcString("jdbc:h2:stackexchange")
 				.dialect("org.hibernate.dialect.H2Dialect")
 				.driver("org.h2.Driver"));
-		setDbOption(dbType.getItemAt(0));
+		dbType.setSelectedItem(null);
 		dbType.addItemListener(new ItemListener() {
 			boolean shownMysqlWarning = false;
 
