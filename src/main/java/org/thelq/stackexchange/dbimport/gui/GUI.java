@@ -153,7 +153,14 @@ public class GUI {
 		dialect.setVisible(false);
 		JLabel driverLabel = new JLabel("Driver");
 		driverLabel.setVisible(false);
-		configBuilder.add(driverLabel, CC.xy(1, 12), driver = new JTextField(10), CC.xyw(3, 12, 3));
+		configBuilder.add(driverLabel, CC.xy(1, 12), driver = new JTextField(10) {
+			@Override
+			public void setText(String text) {
+				if(StringUtils.isBlank(text))
+					log.debug("Text is blank", new RuntimeException("Text " + text + " is blank"));
+				super.setText(text);
+			}
+		}, CC.xyw(3, 12, 3));
 		driver.setVisible(false);
 		primaryBuilder.add(configBuilder.getPanel(), CC.xy(2, 2));
 
@@ -246,39 +253,38 @@ public class GUI {
 		dbType.addItem(new DatabaseOption()
 				.name("MySQL 5.5.3+")
 				.jdbcString("jdbc:mysql://127.0.0.1:3306/stackexchange?rewriteBatchedStatements=true")
-				.dialect(org.hibernate.dialect.MySQL5Dialect.class)
-				.driver(com.mysql.jdbc.Driver.class));
+				.dialect("org.hibernate.dialect.MySQL5Dialect")
+				.driver("com.mysql.jdbc.Driver"));
 		dbType.addItem(new DatabaseOption()
 				.name("PostgreSQL 8.1")
 				.jdbcString("jdbc:postgresql://127.0.0.1:5432/stackexchange")
-				.dialect(org.hibernate.dialect.PostgreSQL81Dialect.class)
-				.driver(org.postgresql.Driver.class));
+				.dialect("org.hibernate.dialect.PostgreSQL81Dialect")
+				.driver("org.postgresql.Driver"));
 		dbType.addItem(new DatabaseOption()
 				.name("PostgreSQL 8.2+")
 				.jdbcString("jdbc:postgresql://127.0.0.1:5432/stackexchange")
-				.dialect(org.hibernate.dialect.PostgreSQL82Dialect.class)
-				.driver(org.postgresql.Driver.class));
+				.dialect("org.hibernate.dialect.PostgreSQL82Dialect")
+				.driver("org.postgresql.Driver"));
 		dbType.addItem(new DatabaseOption()
 				.name("SQL Server")
 				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
-				.dialect(org.hibernate.dialect.SQLServerDialect.class)
-				.driver(net.sourceforge.jtds.jdbc.Driver.class));
+				.dialect("org.hibernate.dialect.SQLServerDialect")
+				.driver("net.sourceforge.jtds.jdbc.Driver"));
 		dbType.addItem(new DatabaseOption()
 				.name("SQL Server 2005+")
 				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
-				.dialect(org.hibernate.dialect.SQLServer2005Dialect.class)
-				.driver(net.sourceforge.jtds.jdbc.Driver.class));
+				.dialect("org.hibernate.dialect.SQLServer2005Dialect")
+				.driver("net.sourceforge.jtds.jdbc.Driver"));
 		dbType.addItem(new DatabaseOption()
 				.name("SQL Server 2008+")
 				.jdbcString("jbdc:jtds:mssql://127.0.0.1:1433/stackexchange")
-				.dialect(org.hibernate.dialect.SQLServer2008Dialect.class)
-				.driver(net.sourceforge.jtds.jdbc.Driver.class));
+				.dialect("org.hibernate.dialect.SQLServer2008Dialect")
+				.driver("net.sourceforge.jtds.jdbc.Driver"));
 		dbType.addItem(new DatabaseOption()
 				.name("H2")
 				.jdbcString("jdbc:h2:stackexchange")
-				.dialect(org.hibernate.dialect.H2Dialect.class)
-				.driver(org.h2.Driver.class));
-		dbType.addItem(DatabaseOption.CUSTOM);
+				.dialect("org.hibernate.dialect.H2Dialect")
+				.driver("org.h2.Driver"));
 		setDbOption(dbType.getItemAt(0));
 		dbType.addItemListener(new ItemListener() {
 			boolean shownMysqlWarning = false;
@@ -300,41 +306,7 @@ public class GUI {
 					shownMysqlWarning = true;
 				}
 
-				//Do not change anything if Custom is selected so user can edit it
-				if (selectedOption != DatabaseOption.CUSTOM)
 					setDbOption(selectedOption);
-			}
-		});
-
-		//Change type to custom when a field is edited 
-		jdbcString.getDocument().addDocumentListener(new SimpleDocumentListener() {
-			@Override
-			public void updatePerformed(DocumentEvent e) {
-				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
-				if (selectedOption == DatabaseOption.CUSTOM)
-					//Nothing to match
-					return;
-				String jdbcUser = jdbcString.getText();
-				String jdbcOption = selectedOption.jdbcString();
-				if (!StringUtils.substringBefore(jdbcUser, "://").equals(StringUtils.substringBefore(jdbcOption, "://"))
-						|| !StringUtils.substringAfter(jdbcUser, "?").equals(StringUtils.substringAfter(jdbcOption, "?")))
-					dbType.setSelectedItem(DatabaseOption.CUSTOM);
-			}
-		});
-		dialect.getDocument().addDocumentListener(new SimpleDocumentListener() {
-			@Override
-			public void updatePerformed(DocumentEvent e) {
-				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
-				if (!dialect.getText().equals(selectedOption.dialect()) && selectedOption != DatabaseOption.CUSTOM)
-					dbType.setSelectedItem(DatabaseOption.CUSTOM);
-			}
-		});
-		driver.getDocument().addDocumentListener(new SimpleDocumentListener() {
-			@Override
-			public void updatePerformed(DocumentEvent e) {
-				DatabaseOption selectedOption = (DatabaseOption) dbType.getSelectedItem();
-				if (!driver.getText().equals(selectedOption.driver()) && selectedOption != DatabaseOption.CUSTOM)
-					dbType.setSelectedItem(DatabaseOption.CUSTOM);
 			}
 		});
 
@@ -354,10 +326,6 @@ public class GUI {
 			public void actionPerformed(ActionEvent e) {
 				if (controller.getDumpContainers().isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "Please add dump folders/archives", "Import Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if (dbType.getSelectedItem() == DatabaseOption.CUSTOM) {
-					JOptionPane.showMessageDialog(frame, "Please configure database options", "Import Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
@@ -426,9 +394,9 @@ public class GUI {
 	 */
 	protected void setDbOption(DatabaseOption option) {
 		dbType.setSelectedItem(option);
-		driver.setText((option.driver() != null) ? option.driver().getCanonicalName() : "");
+		driver.setText(option.driver());
 		driver.setCaretPosition(0);
-		dialect.setText((option.dialect() != null) ? option.dialect().getCanonicalName() : "");
+		dialect.setText((option.dialect() != null) ? option.dialect() : "");
 		dialect.setCaretPosition(0);
 		jdbcString.setText(option.jdbcString());
 		jdbcString.setCaretPosition(0);

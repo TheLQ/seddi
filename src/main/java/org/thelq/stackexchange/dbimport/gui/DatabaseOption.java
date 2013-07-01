@@ -29,12 +29,11 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 public class DatabaseOption {
-	public static DatabaseOption CUSTOM = new DatabaseOption().name("Custom");
 	public static DatabaseOption SELECTONE = new DatabaseOption().name("Select One");
 	String name;
 	String jdbcString;
-	Class driver;
-	Class dialect;
+	String driver;
+	String dialect;
 
 	@Override
 	public String toString() {
