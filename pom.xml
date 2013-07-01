@@ -178,6 +178,30 @@
 					</replacements>                        
 				</configuration>
 			</plugin>
+			<!-- Make a final single jar -->
+			<plugin>              
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>org.thelq.stackexchange.dbimport.Controller</Main-Class>
+										<Class-Path>.</Class-Path>
+									</manifestEntries>									
+								</transformer>
+							</transformers>
+							<finalName>${project.artifactId}-standalone</finalName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>com.savage7.maven.plugins</groupId>
 				<artifactId>maven-external-dependency-plugin</artifactId>
