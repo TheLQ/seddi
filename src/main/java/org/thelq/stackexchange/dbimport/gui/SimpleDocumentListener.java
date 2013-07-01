@@ -34,7 +34,7 @@ public abstract class SimpleDocumentListener implements DocumentListener {
 	}
 
 	public void changedUpdate(DocumentEvent e) {
-		updatePerformed(e);
+		//updatePerformed(e);
 	}
 
 	public abstract void updatePerformed(DocumentEvent e);
