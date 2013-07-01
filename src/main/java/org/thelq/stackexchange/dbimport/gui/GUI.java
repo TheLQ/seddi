@@ -48,6 +48,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
@@ -156,7 +157,7 @@ public class GUI {
 		configBuilder.add(driverLabel, CC.xy(1, 12), driver = new JTextField(10) {
 			@Override
 			public void setText(String text) {
-				if(StringUtils.isBlank(text))
+				if (StringUtils.isBlank(text))
 					log.debug("Text is blank", new RuntimeException("Text " + text + " is blank"));
 				super.setText(text);
 			}
@@ -305,7 +306,7 @@ public class GUI {
 					shownMysqlWarning = true;
 				}
 
-					setDbOption(selectedOption);
+				setDbOption(selectedOption);
 			}
 		});
 
@@ -418,8 +419,8 @@ public class GUI {
 		batchSize.setEnabled(enabled);
 		dbAdvanced.setEnabled(enabled);
 		menuAdd.setEnabled(enabled);
-		for(DumpContainer curContainer : controller.getDumpContainers())
-			if(curContainer.getGuiTablePrefix() != null)
+		for (DumpContainer curContainer : controller.getDumpContainers())
+			if (curContainer.getGuiTablePrefix() != null)
 				curContainer.getGuiTablePrefix().setEnabled(enabled);
 	}
 
@@ -435,6 +436,17 @@ public class GUI {
 				JLabel headerLabel = new JLabel(longLocation);
 				headerLabel.setToolTipText(longLocation);
 				headerLabel.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
+				JPopupMenu popupMenu = new JPopupMenu();
+				JMenuItem deleteItem = new JMenuItem("Delete");
+				deleteItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						log.info("Removing " + curContainer.getType() + " " + curContainer.getLocation());
+						controller.getDumpContainers().remove(curContainer);
+						updateLocations();
+					}
+				});
+				popupMenu.add(deleteItem);
+				headerLabel.setComponentPopupMenu(popupMenu);
 				curContainer.setGuiHeader(headerLabel);
 				//Handlers
 				headerLabel.addMouseListener(new MouseAdapter() {
