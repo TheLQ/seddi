@@ -140,7 +140,7 @@ public class GUI {
 				"pref, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow");
 		configLayout.setHonorsVisibility(true);
 		final PanelBuilder configBuilder = new PanelBuilder(configLayout);
-		configBuilder.addLabel("Preset", CC.xy(1, 2), dbType = new JComboBox<DatabaseOption>(), CC.xy(3, 2));
+		configBuilder.addLabel("Server", CC.xy(1, 2), dbType = new JComboBox<DatabaseOption>(), CC.xy(3, 2));
 		configBuilder.add(dbAdvanced = new JCheckBox("Show advanced options"), CC.xy(5, 2));
 		configBuilder.addLabel("JDBC Connection", CC.xy(1, 4), jdbcString = new JTextField(15), CC.xyw(3, 4, 3));
 		configBuilder.addLabel("Username", CC.xy(1, 6), username = new JTextField(10), CC.xy(3, 6));
