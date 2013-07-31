@@ -20,18 +20,9 @@ package org.thelq.stackexchange.dbimport.sources;
 import com.google.common.collect.ImmutableList;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.Cleanup;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.sevenzipjbinding.ISevenZipInArchive;
 import net.sf.sevenzipjbinding.PropID;
@@ -66,7 +57,10 @@ public class ArchiveDumpContainer extends DumpContainer {
 			ImmutableList.Builder<DumpEntry> entriesBuilder = ImmutableList.builder();
 			for (int i = 0; i < archive7.getNumberOfItems(); i++)
 				if (!((Boolean) archive7.getProperty(i, PropID.IS_FOLDER)).booleanValue())
-					entriesBuilder.add(new ArchiveDumpEntry(controller, archiveFile, i));
+					entriesBuilder.add(new ArchiveDumpEntry(controller, archiveFile,
+							(String) archive7.getProperty(i, PropID.PATH),
+							i,
+							(Long) archive7.getProperty(i, PropID.SIZE)));
 			this.entries = entriesBuilder.build();
 		} catch (Exception e) {
 			throw new RuntimeException("Could not iterate archive " + archiveFile.getAbsolutePath(), e);

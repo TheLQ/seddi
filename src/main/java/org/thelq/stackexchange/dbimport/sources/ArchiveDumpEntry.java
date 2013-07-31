@@ -23,7 +23,9 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.RandomAccessFile;
+import lombok.Cleanup;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.sevenzipjbinding.ExtractAskMode;
@@ -43,39 +45,24 @@ import org.thelq.stackexchange.dbimport.Controller;
  *
  * @author Leon
  */
+@RequiredArgsConstructor
 @Slf4j
 public class ArchiveDumpEntry extends DumpEntry {
 	protected final Controller controller;
+	protected final File archiveFile;
+	@Getter
+	protected final String name;
 	protected final int itemId;
-	protected RandomAccessFile archiveRandomFile;
-	protected ISevenZipInArchive archive7;
-	protected File archiveFile;
+	@Getter
+	protected final long sizeBytes;
 	protected PipedOutputStream pipedOutput;
 	protected ExceptionPipedInputStream pipedInput;
-	@Getter
-	protected String name;
-	@Getter
-	protected String location;
-	@Getter
-	protected long sizeBytes;
 
-	public ArchiveDumpEntry(Controller controller, File archiveFile, int itemId) {
-		this.controller = controller;
-		this.itemId = itemId;
-		try {
-			this.archiveFile = archiveFile;
-			archiveRandomFile = new RandomAccessFile(archiveFile, "r");
-			archive7 = SevenZip.openInArchive(null, new RandomAccessFileInStream(archiveRandomFile));
-
-			//Set properties that don't actually change, so might as well pre-fetch them
-			this.name = (String) archive7.getProperty(itemId, PropID.PATH);
-			this.location = archiveFile.getAbsolutePath() + System.getProperty("file.separator") + name;
-			this.sizeBytes = (Long) archive7.getProperty(itemId, PropID.SIZE);
-		} catch (Exception ex) {
-			throw new RuntimeException("Cannot open archive", ex);
-		}
+	@Override
+	public String getLocation() {
+		return archiveFile.getAbsolutePath() + System.getProperty("file.separator") + name;
 	}
-
+	
 	public InputStream getInput() {
 		if (pipedInput != null)
 			throw new RuntimeException("Already generated an InputStream");
@@ -90,6 +77,10 @@ public class ArchiveDumpEntry extends DumpEntry {
 
 			public void run() {
 				try {
+					@Cleanup
+					RandomAccessFile archiveRandomFile = new RandomAccessFile(archiveFile, "r");
+					@Cleanup
+					ISevenZipInArchive archive7 = SevenZip.openInArchive(null, new RandomAccessFileInStream(archiveRandomFile));
 					archive7.extract(new int[]{itemId}, false, new OutputExtractCallback());
 					log.debug("Done with extraction");
 				} catch (Exception ex) {
@@ -98,8 +89,6 @@ public class ArchiveDumpEntry extends DumpEntry {
 					log.error("Exception encountered during extraction", ex);
 				} finally {
 					try {
-						archive7.close();
-						archiveRandomFile.close();
 						pipedOutput.close();
 						pipedInput.close();
 						log.debug("Closed archive");
