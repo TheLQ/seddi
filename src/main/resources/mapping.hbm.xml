@@ -56,6 +56,9 @@
 		<property name="UserId" type="int">
 			<column name="UserId" />
 		</property>
+		<property name="UserDisplayName" type="string">
+			<column name="UserDisplayName" length="40"/>
+		</property>
 	</class>
 	<class entity-name="posts" table="posts">
 		<id name="Id" type="int">
