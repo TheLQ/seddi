@@ -122,6 +122,9 @@
 		<property name="ViewCount" type="int">
 			<column name="ViewCount"/>
 		</property>
+		<property name="OwnerDisplayName" type="string">
+			<column name="OwnerDisplayName" length="40"/>
+		</property>
 	</class>
 	<class entity-name="posttags" table="posttags">
 		<composite-id name="id">
