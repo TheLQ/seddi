@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.sevenzipjbinding.SevenZipException;
 import org.thelq.stackexchange.dbimport.sources.ArchiveDumpContainer;
 
 /**
@@ -30,7 +29,7 @@ import org.thelq.stackexchange.dbimport.sources.ArchiveDumpContainer;
  */
 @Slf4j
 public class Test {
-	public static void main(String[] args) throws FileNotFoundException, SevenZipException, InterruptedException, IOException {
+	public static void main(String[] args) throws FileNotFoundException, InterruptedException, IOException {
 		DatabaseWriter.setUsername("root");
 		DatabaseWriter.setPassword("password");
 		DatabaseWriter.setDialect("org.hibernate.dialect.MySQL5Dialect");
