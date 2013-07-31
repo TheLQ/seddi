@@ -37,6 +37,9 @@ import net.sf.sevenzipjbinding.PropID;
 import net.sf.sevenzipjbinding.SevenZip;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
+import org.apache.commons.compress.archivers.sevenz.SevenZFile;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thelq.stackexchange.dbimport.Controller;
@@ -49,132 +52,51 @@ import org.thelq.stackexchange.dbimport.Controller;
 @Slf4j
 public class ArchiveDumpEntry extends DumpEntry {
 	protected final Controller controller;
-	protected final File archiveFile;
+	protected final File file;
+	protected final SevenZArchiveEntry fileEntry;
 	@Getter
 	protected final String name;
-	protected final int itemId;
+	@Getter
+	protected final String location;
 	@Getter
 	protected final long sizeBytes;
-	protected PipedOutputStream pipedOutput;
-	protected ExceptionPipedInputStream pipedInput;
+	protected InputStream input;
 
-	@Override
-	public String getLocation() {
-		return archiveFile.getAbsolutePath() + System.getProperty("file.separator") + name;
+	public ArchiveDumpEntry(Controller controller, File file, SevenZArchiveEntry fileEntry) {
+		this.controller = controller;
+		this.file = file;
+		this.fileEntry = fileEntry;
+		this.name = fileEntry.getName();
+		this.location = file.getAbsolutePath() + SystemUtils.FILE_SEPARATOR + name;
+		this.sizeBytes = fileEntry.getSize();
 	}
-	
-	public InputStream getInput() {
-		if (pipedInput != null)
-			throw new RuntimeException("Already generated an InputStream");
-		try {
-			pipedOutput = new PipedOutputStream();
-			pipedInput = new ExceptionPipedInputStream(pipedOutput);
-		} catch (IOException ex) {
-			throw new RuntimeException("Cannot open Piped streams", ex);
-		}
-		controller.getGeneralThreadPool().execute(new Runnable() {
-			protected final Logger log = LoggerFactory.getLogger(getClass());
 
-			public void run() {
-				try {
-					@Cleanup
-					RandomAccessFile archiveRandomFile = new RandomAccessFile(archiveFile, "r");
-					@Cleanup
-					ISevenZipInArchive archive7 = SevenZip.openInArchive(null, new RandomAccessFileInStream(archiveRandomFile));
-					archive7.extract(new int[]{itemId}, false, new OutputExtractCallback());
-					log.debug("Done with extraction");
-				} catch (Exception ex) {
-					IOException exception = new IOException("Cannot extract archive " + archiveFile.getAbsolutePath(), ex);
-					pipedInput.setException(exception);
-					log.error("Exception encountered during extraction", ex);
-				} finally {
-					try {
-						pipedOutput.close();
-						pipedInput.close();
-						log.debug("Closed archive");
-					} catch (Exception e) {
-						log.error("Exception encountered during cosing", e);
+	public InputStream getInput() {
+		if (input != null)
+			throw new RuntimeException("Already generated an InputStream");
+		
+		try {
+			final SevenZFile file7 = new SevenZFile(file);
+			//Advance archive until we find the correct ArchiveEntry
+			SevenZArchiveEntry curEntry;
+			while((curEntry = file7.getNextEntry()) != null) {
+				if(!curEntry.getName().equals(name))
+					continue;
+				//Found, return a wrapped InputStream
+				return new InputStream() {
+					@Override
+					public int read() throws IOException {
+						return file7.read();
 					}
-				}
+				};
 			}
-		});
-		return pipedInput;
+		} catch (IOException ex) {
+			throw new RuntimeException("Cannot open archive entry", ex);
+		}
+		//Didn't find anything
+		throw new RuntimeException("Could not find file " + name + " in archive " + file.getAbsolutePath());
 	}
 
 	public void close() {
-		//Everything is closed when extraction is finished
-	}
-
-	protected class OutputExtractCallback implements IArchiveExtractCallback {
-		protected boolean skipFile = false;
-
-		public ISequentialOutStream getStream(int index, ExtractAskMode extractAskMode) throws SevenZipException {
-			if (index != itemId) {
-				if (extractAskMode == ExtractAskMode.EXTRACT)
-					throw new SevenZipException("Asked to extract index " + index + " but expected index " + itemId);
-				skipFile = true;
-				return null;
-			}
-			skipFile = false;
-			return new ISequentialOutStream() {
-				public int write(byte[] data) throws SevenZipException {
-					try {
-						pipedOutput.write(data);
-						return data.length;
-					} catch (IOException e) {
-						throw new SevenZipException("Cannot write data to OutputStream", e);
-					}
-				}
-			};
-		}
-
-		public void prepareOperation(ExtractAskMode extractAskMode) throws SevenZipException {
-		}
-
-		public void setOperationResult(ExtractOperationResult extractOperationResult) throws SevenZipException {
-			if (skipFile)
-				return;
-			if (extractOperationResult != ExtractOperationResult.OK)
-				throw new SevenZipException("Extraction halted with " + extractOperationResult.name());
-			try {
-				pipedOutput.close();
-			} catch (IOException ex) {
-				throw new SevenZipException("Cannot close", ex);
-			}
-		}
-
-		public void setCompleted(long completeValue) throws SevenZipException {
-		}
-
-		public void setTotal(long total) throws SevenZipException {
-		}
-	}
-
-	protected static class ExceptionPipedInputStream extends PipedInputStream {
-		@Setter
-		protected IOException exception;
-
-		public ExceptionPipedInputStream(PipedOutputStream src) throws IOException {
-			super(src);
-		}
-
-		protected void handleException() throws IOException {
-			if (exception != null && in != -1) {
-				close();
-				throw exception;
-			}
-		}
-
-		@Override
-		public synchronized int read() throws IOException {
-			handleException();
-			return super.read();
-		}
-
-		@Override
-		public synchronized int read(byte[] b, int off, int len) throws IOException {
-			handleException();
-			return super.read(b, off, len);
-		}
 	}
 }

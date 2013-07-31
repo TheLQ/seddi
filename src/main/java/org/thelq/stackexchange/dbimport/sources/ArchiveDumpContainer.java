@@ -20,15 +20,11 @@ package org.thelq.stackexchange.dbimport.sources;
 import com.google.common.collect.ImmutableList;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
-import lombok.Cleanup;
+import java.io.IOException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.sevenzipjbinding.ISevenZipInArchive;
-import net.sf.sevenzipjbinding.PropID;
-import net.sf.sevenzipjbinding.SevenZip;
-import net.sf.sevenzipjbinding.SevenZipException;
-import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
+import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 import org.thelq.stackexchange.dbimport.Controller;
 
 /**
@@ -39,35 +35,30 @@ import org.thelq.stackexchange.dbimport.Controller;
 public class ArchiveDumpContainer extends DumpContainer {
 	@Getter
 	protected String type = "Archive";
-	protected final File archiveFile;
+	protected final File file;
+	@Getter
+	protected final SevenZFile file7;
 	@Getter
 	protected String name;
 	@Getter
 	protected final ImmutableList<DumpEntry> entries;
 
-	public ArchiveDumpContainer(Controller controller, File archiveFile) throws FileNotFoundException, SevenZipException {
-		this.archiveFile = archiveFile;
-		this.name = archiveFile.getName();
+	public ArchiveDumpContainer(Controller controller, File file) throws FileNotFoundException, IOException {
+		this.file = file;
+		this.name = file.getName();
+		this.file7 = new SevenZFile(file);
 
-		try {
-			@Cleanup
-			RandomAccessFile archiveRandomFile = new RandomAccessFile(archiveFile, "r");
-			@Cleanup
-			ISevenZipInArchive archive7 = SevenZip.openInArchive(null, new RandomAccessFileInStream(archiveRandomFile));
-			ImmutableList.Builder<DumpEntry> entriesBuilder = ImmutableList.builder();
-			for (int i = 0; i < archive7.getNumberOfItems(); i++)
-				if (!((Boolean) archive7.getProperty(i, PropID.IS_FOLDER)).booleanValue())
-					entriesBuilder.add(new ArchiveDumpEntry(controller, archiveFile,
-							(String) archive7.getProperty(i, PropID.PATH),
-							i,
-							(Long) archive7.getProperty(i, PropID.SIZE)));
-			this.entries = entriesBuilder.build();
-		} catch (Exception e) {
-			throw new RuntimeException("Could not iterate archive " + archiveFile.getAbsolutePath(), e);
-		}
+		ImmutableList.Builder<DumpEntry> entriesBuilder = ImmutableList.builder();
+		SevenZArchiveEntry curEntry;
+		while ((curEntry = file7.getNextEntry()) != null) {
+			if(curEntry.isDirectory())
+				continue;
+			entriesBuilder.add(new ArchiveDumpEntry(controller, file, curEntry));
+ 		}
+		this.entries = entriesBuilder.build();
 	}
 
 	public String getLocation() {
-		return archiveFile.getAbsolutePath();
+		return file.getAbsolutePath();
 	}
 }

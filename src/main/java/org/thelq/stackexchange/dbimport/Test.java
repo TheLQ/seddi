@@ -35,7 +35,7 @@ public class Test {
 		DatabaseWriter.setPassword("password");
 		DatabaseWriter.setDialect("org.hibernate.dialect.MySQL5Dialect");
 		DatabaseWriter.setDriver("com.mysql.jdbc.Driver");
-		DatabaseWriter.setJdbcString("jdbc:mysql://127.0.0.1:3306/so_new?rewriteBatchedStatements=true");
+		DatabaseWriter.setJdbcString("jdbc:mysql://127.0.0.1:3306/stackexchange?rewriteBatchedStatements=true");
 		DatabaseWriter.setBatchSize(5000);
 		DatabaseWriter.setGlobalPrefix("");
 
@@ -43,7 +43,7 @@ public class Test {
 		//new Scanner(System.in).nextLine();
 
 		Controller controller = new Controller(false);
-		File archive = new File("C:\\Users\\Leon\\Downloads\\Stack Exchange Data Dump - Aug 2012\\Content\\serverfault.com.7z");
+		File archive = new File("C:\\Users\\Leon\\Downloads\\Stack Exchange Data Dump - Jun 2013\\Content\\serverfault.com.7z");
 		controller.addDumpContainer(new ArchiveDumpContainer(controller, archive))
 				.setTablePrefix("serverfault_");
 		controller.importAll(3, true);
