@@ -120,7 +120,7 @@
 			<column name="Title" length="250" />
 		</property>
 		<property name="ViewCount" type="int">
-			<column name="ViewCount" not-null="true" />
+			<column name="ViewCount"/>
 		</property>
 	</class>
 	<class entity-name="posttags" table="posttags">
