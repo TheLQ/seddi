@@ -57,7 +57,7 @@ public class Controller {
 	protected List<DumpContainer> dumpContainers = Collections.synchronizedList(new LinkedList<DumpContainer>());
 	@Getter
 	protected ExecutorService generalThreadPool;
-	protected Map<String, Map<String, Type>> metadataMap;
+	protected ImmutableSortedMap<String, ImmutableMap<String, Type>> metadataMap;
 	@Getter
 	protected final ThreadLocal<DumpEntry> currentDumpEntry = new ThreadLocal<DumpEntry>(); 
 
@@ -75,7 +75,7 @@ public class Controller {
 	}
 
 	public void initMetadataMap(SessionFactory sessionFactory) {
-		ImmutableSortedMap.Builder<String, Map<String, Type>> metadataMapBuilder = ImmutableSortedMap.orderedBy(String.CASE_INSENSITIVE_ORDER);
+		ImmutableSortedMap.Builder<String, ImmutableMap<String, Type>> metadataMapBuilder = ImmutableSortedMap.orderedBy(String.CASE_INSENSITIVE_ORDER);
 		for (Map.Entry<String, ClassMetadata> curEntry : sessionFactory.getAllClassMetadata().entrySet()) {
 			ClassMetadata tableDataRaw = curEntry.getValue();
 			ImmutableMap.Builder<String, Type> propertiesBuilder = ImmutableMap.builder();
@@ -84,7 +84,7 @@ public class Controller {
 				propertiesBuilder.put(curPropertyName, tableDataRaw.getPropertyType(curPropertyName));
 			metadataMapBuilder.put(curEntry.getKey(), propertiesBuilder.build());
 		}
-		metadataMap = metadataMapBuilder.build();
+   		metadataMap = metadataMapBuilder.build();
 	}
 
 	public void importAll(int threads, final boolean createTables) throws InterruptedException {
