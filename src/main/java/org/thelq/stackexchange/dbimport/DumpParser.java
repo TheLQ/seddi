@@ -40,14 +40,14 @@ import org.thelq.stackexchange.dbimport.sources.DumpEntry;
 @Slf4j
 public class DumpParser {
 	protected static int BATCH_SIZE = 5000;
-	public static final XMLInputFactory2 xmlFactory;
+	public static final XMLInputFactory2 XML_FACTORY;
 
 	static {
-		xmlFactory = (XMLInputFactory2) XMLInputFactory2.newInstance();
-		xmlFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
-		xmlFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
-		xmlFactory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.TRUE);
-		xmlFactory.configureForSpeed();
+		XML_FACTORY = (XMLInputFactory2) XMLInputFactory2.newInstance();
+		XML_FACTORY.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
+		XML_FACTORY.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+		XML_FACTORY.setProperty(XMLInputFactory.IS_COALESCING, Boolean.TRUE);
+		XML_FACTORY.configureForSpeed();
 	}
 	protected XMLStreamReader2 xmlReader;
 	@Getter
@@ -72,7 +72,7 @@ public class DumpParser {
 			this.dumpEntry = dumpEntry;
 
 			//Initialize the reader
-			this.xmlReader = (XMLStreamReader2) xmlFactory.createXMLStreamReader(dumpEntry.getInput());
+			this.xmlReader = (XMLStreamReader2) XML_FACTORY.createXMLStreamReader(dumpEntry.getInput());
 
 			//Get root element
 			xmlReader.next();
