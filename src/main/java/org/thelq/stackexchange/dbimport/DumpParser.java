@@ -40,7 +40,7 @@ import org.thelq.stackexchange.dbimport.sources.DumpEntry;
 @Slf4j
 public class DumpParser {
 	protected static int BATCH_SIZE = 5000;
-	protected static XMLInputFactory2 xmlFactory;
+	public static final XMLInputFactory2 xmlFactory;
 
 	static {
 		xmlFactory = (XMLInputFactory2) XMLInputFactory2.newInstance();
